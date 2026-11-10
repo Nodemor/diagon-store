@@ -1,11 +1,12 @@
 import { forwardRef, useCallback, useEffect, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "motion/react";
 import PillNav from "../reactbits/PillNav";
 import { useCart } from "../../context/CartContext";
 import { useSettings } from "../../context/SettingsContext";
-import { BagIcon, LampMark, SearchIcon } from "../ui/icons";
+import { BagIcon, LampMark } from "../ui/icons";
 import { MobileMenu } from "./MobileMenu";
+import { SearchForm } from "./SearchForm";
 
 export const NAV_ITEMS = [
   { href: "/shop", label: "Shop all" },
@@ -18,35 +19,6 @@ export const NAV_ITEMS = [
 const RouterLink = forwardRef(function RouterLink({ href, ...props }, ref) {
   return <Link ref={ref} to={href} {...props} />;
 });
-
-export function SearchForm({ onDone, className = "", id = "site-search" }) {
-  const navigate = useNavigate();
-  const [query, setQuery] = useState("");
-
-  const submit = (event) => {
-    event.preventDefault();
-    const term = query.trim();
-    navigate(term ? `/shop?search=${encodeURIComponent(term)}` : "/shop");
-    onDone?.();
-  };
-
-  return (
-    <form role="search" onSubmit={submit} className={`relative ${className}`}>
-      <label htmlFor={id} className="sr-only">
-        Search products
-      </label>
-      <SearchIcon className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-moon-soft" />
-      <input
-        id={id}
-        type="search"
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        placeholder="Search products, brands, codes"
-        className="h-11 w-full rounded-full border border-cobble-line bg-cobble/60 pl-11 pr-4 text-sm text-moon placeholder:text-moon-soft/80 transition-colors focus:border-lamp focus:bg-cobble focus:outline-none"
-      />
-    </form>
-  );
-}
 
 /** Animated two-line menu toggle: the label rolls and the bars cross into an X. */
 function MenuToggle({ open, onClick }) {
@@ -75,7 +47,7 @@ function MenuToggle({ open, onClick }) {
 }
 
 export function Header() {
-  const { count } = useCart();
+  const { count, openCart } = useCart();
   const { storeName } = useSettings();
   const location = useLocation();
   const [open, setOpen] = useState(false);
@@ -125,11 +97,14 @@ export function Header() {
           />
           </div>
 
-          <SearchForm className="ml-auto hidden w-full max-w-xs md:block" />
+          <SearchForm id="site-search" className="ml-auto hidden w-full max-w-xs md:block" />
 
-          <Link
-            to="/cart"
-            onClick={close}
+          <button
+            type="button"
+            onClick={() => {
+              close();
+              openCart();
+            }}
             className="relative ml-auto grid h-11 w-11 place-items-center rounded-full text-moon transition-colors hover:text-lamp md:ml-0"
             aria-label={`Cart, ${count} item${count === 1 ? "" : "s"}`}
           >
@@ -147,7 +122,7 @@ export function Header() {
                 </motion.span>
               )}
             </AnimatePresence>
-          </Link>
+          </button>
 
           <MenuToggle open={open} onClick={() => setOpen((v) => !v)} />
         </div>

@@ -5,9 +5,10 @@ import { ScrollTrigger } from "../../lib/motion";
 import { Header } from "./Header";
 import { Footer } from "./Footer";
 import { WhatsAppButton } from "./WhatsAppButton";
+import { CartDrawer } from "../cart/CartDrawer";
 
 /**
- * Storefront shell: header, animated page area, footer, WhatsApp button.
+ * Storefront shell: header, animated page area, footer, WhatsApp button, cart drawer.
  * Pages cross-fade between routes; the outgoing page is frozen with useOutlet().
  */
 export function StoreLayout() {
@@ -51,6 +52,7 @@ export function StoreLayout() {
 
       <Footer />
       <WhatsAppButton />
+      <CartDrawer />
     </div>
   );
 }

@@ -55,6 +55,12 @@ const publicListQuery = z.object({
   newArrival: boolQuery,
   onSale: boolQuery,
   brand: z.string().trim().max(100).optional(),
+  // comma-separated product ids (cart refresh), e.g. "3,8,12"
+  ids: z
+    .string()
+    .regex(/^\d+(,\d+){0,59}$/, "ids must be comma-separated numbers")
+    .transform((s) => s.split(",").map(Number))
+    .optional(),
   sort: z.enum(PUBLIC_SORTS).optional(),
   ...pageQuery,
 });

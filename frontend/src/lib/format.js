@@ -30,3 +30,22 @@ export function whatsappLink(number, message) {
   if (!digits) return null;
   return `https://wa.me/${digits}${message ? `?text=${encodeURIComponent(message)}` : ""}`;
 }
+
+/**
+ * WhatsApp message for one product, in the format from the proposal (§9):
+ * "Hello Diagon Store, I would like to order the following product: ..."
+ */
+export function productWhatsAppMessage(product, quantity, storeName = "Diagon Store") {
+  const lines = [
+    `Hello ${storeName},`,
+    "I would like to order the following product:",
+    "",
+    `Product: ${product.name}`,
+  ];
+  if (product.sku) lines.push(`Product Code: ${product.sku}`);
+  lines.push(`Quantity: ${quantity}`);
+  lines.push(`Price: LKR ${lkr.format(product.finalPrice)}`);
+  if (quantity > 1) lines.push(`Total: LKR ${lkr.format(product.finalPrice * quantity)}`);
+  lines.push("", "Please confirm availability and delivery details.");
+  return lines.join("\n");
+}

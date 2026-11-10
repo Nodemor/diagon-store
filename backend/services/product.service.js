@@ -78,6 +78,7 @@ async function listPublic(query) {
   if (query.category) AND.push({ category: { slug: query.category } });
   if (query.subcategory) AND.push({ subcategory: { slug: query.subcategory } });
   if (query.brand) AND.push({ brand: query.brand });
+  if (query.ids) AND.push({ id: { in: query.ids } });
   if (query.featured) AND.push({ isFeatured: true });
   if (query.newArrival) AND.push({ isNewArrival: true });
   if (query.onSale) AND.push({ salePrice: { not: null } });

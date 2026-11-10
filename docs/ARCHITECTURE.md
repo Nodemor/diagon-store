@@ -109,7 +109,7 @@ Errors look like `{ "message": "...", "errors": [{ "path": "price", "message": "
 |---|---|---|
 | GET | `/health` | Health check |
 | GET | `/home` | `{ heroBanners, promoBanners, featured, newArrivals, popular, onSale, categories }` |
-| GET | `/products` | Query: `search`, `category` (slug), `subcategory` (slug), `brand`, `minPrice`, `maxPrice`, `availability` (`in_stock`/`out_of_stock`), `featured`, `newArrival`, `onSale`, `sort` (`newest`, `price_asc`, `price_desc`, `name_asc`, `popular`, `featured`), `page`, `limit` (≤ 60). Returns `{ items, total, page, limit, pages }`. |
+| GET | `/products` | Query: `search`, `category` (slug), `subcategory` (slug), `brand`, `minPrice`, `maxPrice`, `availability` (`in_stock`/`out_of_stock`), `featured`, `newArrival`, `onSale`, `ids` (comma-separated, used by the cart), `sort` (`newest`, `price_asc`, `price_desc`, `name_asc`, `popular`, `featured`), `page`, `limit` (≤ 60). Returns `{ items, total, page, limit, pages }`. |
 | GET | `/products/:slug` | Detail (slug or id), all images. Counts a view. |
 | GET | `/products/:slug/related` | Up to 8: hand-picked, then same subcategory, then same category, then featured |
 | GET | `/categories` | Active categories + active subcategories with `productCount` |

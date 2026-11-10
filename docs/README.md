@@ -9,4 +9,4 @@ Start here if you're new to the project.
 5. **[FILE-GUIDE.md](FILE-GUIDE.md)**: what every file does.
 6. **[THEME-GUIDE.md](THEME-GUIDE.md)**: the wizarding look, colours, fonts, wording and motion rules.
 
-**Current phase:** Phase 3, shop, category and product pages, and the cart. Phases 0–2 are done.
+**Current phase:** Phase 4, the order flow (checkout, WhatsApp, email, tracking). Phases 0–3 are done.

@@ -89,6 +89,33 @@
     background: radial-gradient(circle, rgb(242 181 68 / 0.55) 0%, rgb(242 181 68 / 0.18) 35%, transparent 70%);
   }
 
+  /* filter checkboxes and radios */
+  .dg-check,
+  .dg-radio {
+    appearance: none;
+    flex-shrink: 0;
+    width: 1.125rem;
+    height: 1.125rem;
+    cursor: pointer;
+    border: 1px solid rgb(28 34 48 / 0.3);
+    background: var(--color-mist) center / 80% no-repeat;
+    transition: border-color 0.2s, background-color 0.2s, border-width 0.15s;
+  }
+  .dg-check {
+    border-radius: 5px;
+  }
+  .dg-check:checked {
+    border-color: var(--color-ink);
+    background-color: var(--color-ink);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27 fill=%27none%27 stroke=%27%23f5f7f8%27 stroke-width=%273%27%3E%3Cpath d=%27m5 12.5 4.2 4.2L19 7%27/%3E%3C/svg%3E");
+  }
+  .dg-radio {
+    border-radius: 999px;
+  }
+  .dg-radio:checked {
+    border: 5px solid var(--color-ink);
+  }
+
   /* hide scrollbar on horizontal rails, keep them scrollable */
   .no-scrollbar {
     scrollbar-width: none;
@@ -133,4 +160,45 @@
   *::after {
     scroll-behavior: auto !important;
   }
+}
+
+/* rich-text product descriptions and content pages (HTML from the admin panel) */
+.prose-shop {
+  color: var(--color-ink);
+  line-height: 1.7;
+}
+.prose-shop > * + * {
+  margin-top: 0.9em;
+}
+.prose-shop h2,
+.prose-shop h3 {
+  font-family: var(--font-sign);
+  line-height: 1.15;
+  margin-top: 1.4em;
+}
+.prose-shop h2 {
+  font-size: 1.9rem;
+}
+.prose-shop h3 {
+  font-size: 1.5rem;
+}
+.prose-shop a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.prose-shop ul,
+.prose-shop ol {
+  padding-left: 1.25em;
+}
+.prose-shop ul {
+  list-style: disc;
+}
+.prose-shop ol {
+  list-style: decimal;
+}
+.prose-shop li + li {
+  margin-top: 0.3em;
+}
+.prose-shop img {
+  border-radius: 1rem;
 }
