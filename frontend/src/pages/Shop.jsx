@@ -12,6 +12,7 @@ import { ProductCardSkeleton } from "../components/ui/Skeleton";
 import { FilterPanel } from "../components/shop/FilterPanel";
 import { Button, ButtonLink } from "../components/ui/Button";
 import { CloseIcon, FilterIcon } from "../components/ui/icons";
+import { Img } from "../components/ui/Img";
 
 // /shop and /category/:slug (proposal §3 Shop page + Category pages)
 
@@ -153,7 +154,7 @@ export default function Shop() {
       <section className="relative isolate overflow-hidden bg-night text-moon">
         {category?.imageUrl && (
           <>
-            <img src={imageAt(category.imageUrl, 1600)} alt="" className="absolute inset-0 -z-10 h-full w-full object-cover opacity-30" />
+            <Img src={imageAt(category.imageUrl, 1600)} alt="" className="absolute inset-0 -z-10 h-full w-full object-cover opacity-30" />
             <div className="absolute inset-0 -z-10 bg-linear-to-r from-night via-night/85 to-night/40" />
           </>
         )}

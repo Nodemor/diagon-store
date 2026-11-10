@@ -9,6 +9,7 @@ import { getRecentOrders } from "../lib/recentOrders";
 import { StatusTimeline, STATUS_LABELS } from "../components/order/StatusTimeline";
 import { Button } from "../components/ui/Button";
 import { WhatsAppIcon } from "../components/ui/icons";
+import { Img } from "../components/ui/Img";
 
 // /track — order tracking with the order number + the mobile number used (COD tracking).
 
@@ -147,7 +148,7 @@ export default function Track() {
                     {order.items.map((item) => (
                       <li key={`${item.productName}-${item.sku}`} className="flex items-center gap-3 py-3">
                         <span className="h-14 w-11 shrink-0 overflow-hidden rounded-lg bg-fog-deep">
-                          {item.imageUrl && <img src={imageAt(item.imageUrl, 120)} alt="" className="h-full w-full object-cover" />}
+                          {item.imageUrl && <Img src={imageAt(item.imageUrl, 120)} alt="" className="h-full w-full object-cover" />}
                         </span>
                         <span className="min-w-0 flex-1 text-sm">
                           {item.slug ? (

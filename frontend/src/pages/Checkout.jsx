@@ -9,6 +9,7 @@ import { formatPrice, imageAt } from "../lib/format";
 import { forgetDetails, getSavedDetails, saveDetails, saveRecentOrder } from "../lib/recentOrders";
 import { Button, ButtonLink } from "../components/ui/Button";
 import { MailIcon, WhatsAppIcon } from "../components/ui/icons";
+import { Img } from "../components/ui/Img";
 
 // /checkout — the order / inquiry form (proposal §9–§11). Payment is cash on delivery.
 // ?buy=<slug>&qty=<n> orders a single product without touching the cart.
@@ -303,7 +304,7 @@ export default function Checkout() {
               {lines.map((line) => (
                 <li key={line.productId} className="flex gap-3 py-3">
                   <span className="relative h-16 w-13 shrink-0 overflow-hidden rounded-lg bg-fog-deep">
-                    {line.image && <img src={imageAt(line.image, 160)} alt="" className="h-full w-full object-cover" />}
+                    {line.image && <Img src={imageAt(line.image, 160)} alt="" className="h-full w-full object-cover" />}
                     <span className="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-ink px-1 text-[0.7rem] font-bold text-fog">
                       {line.quantity}
                     </span>

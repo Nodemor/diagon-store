@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { imageAt } from "../../lib/format";
+import { Img } from "../ui/Img";
 
 /** Promotional banners managed in Admin → Banners (placement PROMO). */
 export function PromoBanners({ banners = [] }) {
@@ -11,7 +12,7 @@ export function PromoBanners({ banners = [] }) {
         {banners.slice(0, 2).map((banner) => {
           const inner = (
             <>
-              <img
+              <Img
                 src={imageAt(banner.imageUrl, 1000)}
                 alt=""
                 loading="lazy"

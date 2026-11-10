@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { imageAt } from "../../lib/format";
+import { Img } from "../ui/Img";
 
 /**
  * Product image gallery (proposal §5): large image with hover-zoom on desktop,
@@ -54,7 +55,7 @@ export function ProductGallery({ images = [], name, badges }) {
         <div ref={strip} onScroll={onStripScroll} className="no-scrollbar flex snap-x snap-mandatory overflow-x-auto rounded-[1.25rem]">
           {list.map((image, i) => (
             <div key={image.id} className="aspect-[4/5] w-full shrink-0 snap-center bg-fog-deep">
-              {image.url && <img src={imageAt(image.url, 800)} alt={image.altText || name} loading={i === 0 ? "eager" : "lazy"} className="h-full w-full object-cover" />}
+              {image.url && <Img src={imageAt(image.url, 800)} alt={image.altText || name} loading={i === 0 ? "eager" : "lazy"} className="h-full w-full object-cover" />}
             </div>
           ))}
         </div>
@@ -79,7 +80,7 @@ export function ProductGallery({ images = [], name, badges }) {
               aria-current={i === active}
               className={`aspect-square overflow-hidden rounded-xl bg-fog-deep ring-offset-2 ring-offset-fog transition ${i === active ? "ring-2 ring-ink" : "opacity-70 hover:opacity-100"}`}
             >
-              {image.url && <img src={imageAt(image.url, 200)} alt="" className="h-full w-full object-cover" loading="lazy" />}
+              {image.url && <Img src={imageAt(image.url, 200)} alt="" className="h-full w-full object-cover" loading="lazy" />}
             </button>
           ))}
         </div>

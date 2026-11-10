@@ -39,6 +39,7 @@ When you add a file, add a line here in the same commit.
 | `prisma.config.ts` | Prisma CLI config: schema, migrations folder, seed command, `DATABASE_URL` |
 | `create-admin.js` | `npm run create-admin`: creates a SUPER_ADMIN from `ADMIN_NAME`, `ADMIN_EMAIL` and `ADMIN_PASSWORD` |
 | `test-db.js` | `npm run db:test`: runs a real query to check the database connection |
+| `scripts/localize-images.js` | `npm run images:localize` (`-- --dry` to preview): copies external product, category and banner images into `uploads/` and points the database at the local copies |
 
 ### backend/config/
 
@@ -157,7 +158,6 @@ React 19 + Vite 8 + Tailwind CSS 4. Motion: GSAP + ScrollTrigger, Lenis, Motion 
 | `context/SettingsContext.jsx` | Store settings from `/api/settings` (name, WhatsApp, contact details, social links) with fallbacks |
 | `context/CartContext.jsx` | Cart saved in `localStorage`: `add`, `setQuantity`, `remove`, `clear`, `refresh` (re-reads prices and stock from the API), `count`, `subtotal`, `savings`, drawer `isOpen` / `openCart` / `closeCart` |
 | `services/store.js` | Public API calls (home, settings, categories, products, product, related, page, place order, track) |
-| `services/api.js` | Admin API calls used by the current admin pages |
 
 ### src/components/
 
@@ -173,6 +173,7 @@ React 19 + Vite 8 + Tailwind CSS 4. Motion: GSAP + ScrollTrigger, Lenis, Motion 
 | `product/ProductGallery.jsx` | Product images: hover zoom + thumbnails on desktop, swipe strip on mobile |
 | `product/ShareButton.jsx` | Share sheet / copy link / WhatsApp / Facebook |
 | `ui/QuantityStepper.jsx` | − n + quantity control |
+| `ui/Img.jsx` | `<img>` that shows a lamp placeholder instead of a broken image when a photo is missing |
 | `order/StatusTimeline.jsx` | Customer-facing order status names + animated tracking timeline |
 | `layout/MobileMenu.jsx` | Full-height mobile menu: staggered GSAP layers and links, focus handling, Escape to close, scroll lock |
 | `layout/Footer.jsx` | Shop and help links, contact details, hours and social links from settings |
@@ -205,5 +206,31 @@ React 19 + Vite 8 + Tailwind CSS 4. Motion: GSAP + ScrollTrigger, Lenis, Motion 
 | `OrderSuccess.jsx` | `/order/success/:number`: confirmation, order number, WhatsApp fallback button, summary |
 | `Track.jsx` | `/track`: look up by order number + mobile, status timeline, items |
 | `ComingSoon.jsx` | Placeholder for pages scheduled in later phases |
-| `AdminLogin.jsx` | Admin login (stores the JWT) — rebuilt in Phase 5 |
-| `AdminDashboard.jsx` | Admin shell with counts — rebuilt in Phase 5 |
+
+### src/admin/ (back office, lazy-loaded at `/admin`)
+
+| File | Purpose |
+|---|---|
+| `AdminApp.jsx` | Back-office routes, wrapped in the auth, toast and confirm providers |
+| `AdminLayout.jsx` | `RequireAdmin` gate + layout: sidebar (sliding marker, new-orders badge, profile, sign out), mobile drawer |
+| `api.js` | Admin API client (token from localStorage; a 401 signs the admin out) + `fieldErrors()` |
+| `context.jsx` | `AdminAuthProvider` / `useAdminAuth`, `ToastProvider` / `useToast`, `ConfirmProvider` / `useConfirm` |
+| `ui.jsx` | Admin UI kit: `useAdminData`, `PageHeader`, `Panel`, `Input`, `Textarea`, `Select`, `Toggle`, `Badge`, `StatusBadge`, `Pagination`, `Modal`, `EmptyState`, `ErrorBox`, date formatting |
+| `icons.jsx` | Sidebar and action icons |
+| `util.js` | `slugifyText` |
+| `components/ImageManager.jsx` | Product photos: drag-and-drop upload, drag to reorder, alt text, delete (or queue files for a new product) |
+| `components/FormParts.jsx` | `SpecsEditor`, `TagInput`, `RelatedPicker`, `SingleImageField` (category / banner image upload) |
+| `components/RichTextEditor.jsx` | Small rich-text editor (bold, italic, headings, lists, links) for descriptions and pages |
+| `pages/Login.jsx` | Sign-in |
+| `pages/Dashboard.jsx` | Proposal §13 figures, recent orders, stock alerts |
+| `pages/Orders.jsx` | Orders with status tabs, search, dates, pagination |
+| `pages/OrderDetail.jsx` | One order: items, customer, status + note, history, internal notes, print, delete |
+| `pages/Products.jsx` | Product list, filters, inline stock, featured / new toggles |
+| `pages/ProductForm.jsx` | Add / edit product (publish or draft), photos, pricing, stock, specs, tags, related, SEO |
+| `pages/Categories.jsx` | Categories (modal form, image, visibility) + inline subcategories |
+| `pages/Banners.jsx` | Hero and promo banners with schedules |
+| `pages/Customers.jsx` / `CustomerDetail.jsx` | Customer list and order history |
+| `pages/Pages.jsx` / `PageEditor.jsx` | Content pages list and editor |
+| `pages/Settings.jsx` | Store, contact & ordering, social, SEO settings |
+| `pages/Admins.jsx` | Admin users and roles (super admins only) |
+| `pages/Profile.jsx` | Change my password |

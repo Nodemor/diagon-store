@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { getProducts } from "../../services/store";
 import { formatPrice, imageAt } from "../../lib/format";
 import { SearchIcon } from "../ui/icons";
+import { Img } from "../ui/Img";
 
 /**
  * Header search with instant suggestions (proposal §7: name, code, brand, category, tags).
@@ -124,7 +125,7 @@ export function SearchForm({ onDone, className = "", id }) {
                   className={`flex cursor-pointer items-center gap-3 rounded-xl px-2 py-2 ${i === active ? "bg-fog" : ""}`}
                 >
                   <span className="h-12 w-10 shrink-0 overflow-hidden rounded-lg bg-fog-deep">
-                    {product.images?.[0] && <img src={imageAt(product.images[0].url, 120)} alt="" className="h-full w-full object-cover" />}
+                    {product.images?.[0] && <Img src={imageAt(product.images[0].url, 120)} alt="" className="h-full w-full object-cover" />}
                   </span>
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-sm font-semibold">{product.name}</span>

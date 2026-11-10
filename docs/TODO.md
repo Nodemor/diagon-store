@@ -8,7 +8,7 @@ Task checklist grouped by the phases in [ROADMAP.md](ROADMAP.md). Tick `[x]` ite
 
 - [ ] **Linux deployment:** migration `20260928153143_add_categories` runs `ALTER TABLE \`product\`` (lowercase) while the table was created as `Product`. This works on Windows/XAMPP, where table names are case-insensitive, but **fails on Linux MySQL**. Before the first Linux deploy, either set `lower_case_table_names=1` on the server or squash the migrations into a fresh baseline. *(Phase 7)*
 - [ ] Sorting by price uses the regular price, not the sale price. *(Small; revisit if the client notices.)*
-- [ ] Orders don't change stock automatically. The owner adjusts stock in the admin panel. Decide with the client whether confirming an order should deduct stock. *(Phase 5)*
+- [ ] Orders don't change stock automatically. The owner adjusts stock in Admin → Products (inline stock field). Decide with the client whether confirming an order should deduct stock.
 - [ ] The admin token is stored in `localStorage`. Consider an httpOnly cookie before launch. *(Phase 7)*
 - [ ] The old demo password `Admin@12345` is in the git history. Never use it. Create admins with `npm run create-admin`.
 
@@ -79,19 +79,25 @@ Task checklist grouped by the phases in [ROADMAP.md](ROADMAP.md). Tick `[x]` ite
 - [x] Cart cleared after a cart order; unavailable items refresh the cart and block sending
 - [x] End-to-end test: cart → checkout → WhatsApp → success → admin status changes → tracking; wrong phone is rejected
 
-## Phase 5 — Admin panel UI
+## Phase 5 — Admin panel UI ✅
 
-- [ ] `AdminLayout`, `ProtectedRoute`, auto-logout on 401
-- [ ] Dashboard
-- [ ] Products list + form + image manager + related picker
-- [ ] Stock quick-edit
-- [ ] Categories / subcategories
-- [ ] Orders list (status tabs) + detail + status / notes
-- [ ] Customers
-- [ ] Banners
-- [ ] Settings
-- [ ] Pages editor
-- [ ] Admin users + change password
+- [x] Back office at `/admin` (lazy-loaded chunk), sign-in page, session check, automatic sign-out on 401
+- [x] Layout: sidebar with sliding marker and a live "new orders" badge, mobile drawer, toasts, confirm dialogs
+- [x] Dashboard: proposal §13 figures (clickable), recent orders, stock alerts
+- [x] Orders: status tabs with counts, search, date range, pagination; detail with items, customer, WhatsApp link, status change + note, history, internal notes, print, delete
+- [x] Products: list with search / status / category / stock filters and sorting, inline stock edit, featured / new toggles, delete
+- [x] Product form: all proposal §4 fields, rich-text description, sale price or discount %, specifications, tags, related products, SEO, status; "Publish" / "Save as draft" for new products
+- [x] Multi-photo upload (drag and drop), drag to reorder, alt text, delete; photos picked before the first save upload automatically
+- [x] Categories: create / edit / hide / delete with image upload, display order, SEO; inline subcategory add / rename / delete
+- [x] Banners: hero and promo, image upload, button text / link, schedule (start / end), on/off
+- [x] Customers list + detail with order history
+- [x] Pages: list, add, rich-text editor, publish toggle, SEO
+- [x] Settings: store, contact & ordering (WhatsApp number with test link), social links, SEO
+- [x] Admin users (super admins only) + change my password
+- [x] Image safety: `<Img>` fallback placeholder everywhere; `npm run images:localize` copies external photos into `backend/uploads`
+- [x] Fixed: order date filter "to" now includes the whole day
+- [x] End-to-end tested in the browser (sign-in, publish product with photos, stock, categories, banners, settings, orders → customer tracking, pages, admins, mobile)
+- [ ] Decide with the client whether confirming an order should deduct stock automatically
 
 ## Phase 6 — Content & SEO
 

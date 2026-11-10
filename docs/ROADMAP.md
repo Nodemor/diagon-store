@@ -12,8 +12,8 @@ Phase 1  Backend foundation & full data model                    ✅ done
 Phase 2  Design system + animated landing page                   ✅ done
 Phase 3  Shop, categories, product page, search, filters, cart   ✅ done
 Phase 4  Order / inquiry flow: WhatsApp, email, tracking          ✅ done
-Phase 5  Admin panel UI                                           ← next
-Phase 6  Content pages, contact, SEO & performance
+Phase 5  Admin panel UI                                           ✅ done
+Phase 6  Content pages, contact, SEO & performance               ← next
 Phase 7  QA, security review & launch
 Future   Proposal §30 upgrades (payments, accounts, reviews, ...)
 ```
@@ -37,24 +37,24 @@ Future   Proposal §30 upgrades (payments, accounts, reviews, ...)
 | §3 Product details (gallery, price/discount, specs, SKU, stock, related, qty, cart, WhatsApp, email, share) | API 1 · UI 3 | API ✅ |
 | §4 Product fields: SKU, brand, short description, regular/sale price, discount, stock, specs, tags, featured, new arrival, status | 1 | ✅ |
 | §4 Product status Active / Inactive / Out of Stock / Draft | 1 | ✅ |
-| §5 Multiple product images + ordering | API 1 · UI 5 | API ✅ |
-| §6 Category & subcategory CRUD, image, description, active flag | API 1 · UI 5 | API ✅ |
+| §5 Multiple product images + ordering | API 1 · UI 5 | ✅ |
+| §6 Category & subcategory CRUD, image, description, active flag | API 1 · UI 5 | ✅ |
 | §7 Search: name, code, brand, category, tags | 1 | ✅ |
 | §8 Shopping cart | 3 | ✅ |
 | §9 WhatsApp order message (single product and whole cart) | API 1 · UI 4 | ✅ |
 | §10 Email inquiry to the business email | API 1 · UI 4 | ✅ |
 | §11 Customer order form | API 1 · UI 4 | ✅ |
-| §12 Admin order/inquiry management + statuses + internal notes | API 1 · UI 5 | API ✅ |
-| §13 Dashboard statistics | API 1 · UI 5 | API ✅ |
-| §14 Admin users, Super Admin / Admin roles | API 1 · UI 5 | API ✅ |
-| §15 Banner management | API 1 · UI 5 | API ✅ |
+| §12 Admin order/inquiry management + statuses + internal notes | API 1 · UI 5 | ✅ |
+| §13 Dashboard statistics | API 1 · UI 5 | ✅ |
+| §14 Admin users, Super Admin / Admin roles | API 1 · UI 5 | ✅ |
+| §15 Banner management | API 1 · UI 5 | ✅ |
 | §16–18 Featured, new arrivals, sale price / discount % | 1 | ✅ |
-| §19 Stock management | API 1 · UI 5 | API ✅ |
+| §19 Stock management | API 1 · UI 5 | ✅ |
 | §20 Related products (same category / subcategory / hand-picked) | 1 | ✅ |
 | §21–22 Responsive, mobile-friendly | 2–6 | — |
 | §23 SEO (URLs, titles, meta, alt text, sitemap) | slugs + meta fields 1 · rest 6 | partly |
 | §24–25 Contact info, Google Map, social links, hours | settings 1 · UI 6 | API ✅ |
-| §26 Website content management (pages, banners, settings) | API 1 · UI 5 | API ✅ |
+| §26 Website content management (pages, banners, settings) | API 1 · UI 5 | ✅ |
 | §27 Pages: About, Contact, Privacy, Terms, Delivery, Returns | API 1 · UI 6 | API ✅ |
 | §31 Security | 1 + 7 | partly |
 | §32 Performance (optimised images, pagination, caching) | 1 + 6 | partly |
@@ -147,7 +147,7 @@ Settings moved into environment variables, `.env.example` files, repo cleanup, R
 
 **Done when:** an order placed on the site appears in the admin API, opens in WhatsApp with the correct message (or arrives by email), and shows on `/track`.
 
-## Phase 5 — Admin panel UI
+## Phase 5 — Admin panel UI ✅
 
 `AdminLayout` with a protected route (redirects to login on a 401). The panel is calm and functional, in the same palette as the shop.
 

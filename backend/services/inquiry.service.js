@@ -160,7 +160,8 @@ async function listAdmin(query) {
   const AND = [];
   if (query.status) AND.push({ status: query.status });
   if (query.from) AND.push({ createdAt: { gte: query.from } });
-  if (query.to) AND.push({ createdAt: { lte: query.to } });
+  // "to" is a calendar day: include the whole day
+  if (query.to) AND.push({ createdAt: { lt: new Date(query.to.getTime() + 24 * 60 * 60 * 1000) } });
   if (query.search) {
     const term = query.search;
     const phone = normalizePhone(term);
