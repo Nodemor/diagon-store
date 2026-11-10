@@ -11,9 +11,14 @@ import Checkout from "./pages/Checkout";
 import OrderSuccess from "./pages/OrderSuccess";
 import Track from "./pages/Track";
 
-// admin pages are loaded on demand so shoppers never download them
-const AdminLogin = lazy(() => import("./pages/AdminLogin"));
-const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
+// the whole back office is loaded on demand, so shoppers never download it
+const AdminApp = lazy(() => import("./admin/AdminApp"));
+
+const AdminLoading = () => (
+  <div className="grid min-h-svh place-items-center bg-night text-moon-soft">
+    <p className="animate-pulse">Opening the back office…</p>
+  </div>
+);
 
 function App() {
   return (
@@ -37,9 +42,15 @@ function App() {
           <Route path="*" element={<NotFound />} />
         </Route>
 
-        {/* Admin (rebuilt in Phase 5) */}
-        <Route path="/admin/login" element={<Suspense fallback={null}><AdminLogin /></Suspense>} />
-        <Route path="/admin/dashboard" element={<Suspense fallback={null}><AdminDashboard /></Suspense>} />
+        {/* Back office (Phase 5) */}
+        <Route
+          path="/admin/*"
+          element={
+            <Suspense fallback={<AdminLoading />}>
+              <AdminApp />
+            </Suspense>
+          }
+        />
       </Routes>
     </BrowserRouter>
   );

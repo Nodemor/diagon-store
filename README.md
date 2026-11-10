@@ -4,7 +4,7 @@
 
 Customers browse electronics, fashion, beauty, home goods and more, then fill a cart and **send their order through WhatsApp or email**. Payment is **cash on delivery**, and customers **track the order** on the website using its order number. The shop team runs everything from a secure **admin panel**: products, images, prices, stock, categories, banners, featured products, offers, orders, customers, pages and settings.
 
-> **Status:** Phases 1–4 are complete. Customers can browse the animated storefront, fill a cart, send the order on WhatsApp or by email (cash on delivery) and track it. The admin panel UI is next; until then, orders and products are managed through the admin API. See [docs/ROADMAP.md](docs/ROADMAP.md).
+> **Status:** Phases 1–5 are complete. Customers browse the animated storefront, order on WhatsApp or by email (cash on delivery) and track their orders. The shop team runs everything from the back office at `/admin`. Content pages, SEO and launch work are next. See [docs/ROADMAP.md](docs/ROADMAP.md).
 
 ---
 
@@ -19,9 +19,9 @@ Customers browse electronics, fashion, beauty, home goods and more, then fill a 
 | Home page banners and promo banners (scheduled) | ✅ | Phase 2 / 5 |
 | Cart → order form → WhatsApp message / email inquiry (COD) | ✅ | ✅ |
 | Order tracking (order number + mobile) | ✅ | ✅ |
-| Admin: dashboard, orders/inquiries with statuses & notes, customers, stock | ✅ | Phase 5 |
-| Admin: banners, settings (contact, WhatsApp, social, hours, map), content pages | ✅ | Phase 5 / 6 |
-| Admin users with Super Admin / Admin roles | ✅ | Phase 5 |
+| Admin: dashboard, orders/inquiries with statuses & notes, customers, stock | ✅ | ✅ |
+| Admin: banners, settings (contact, WhatsApp, social, hours, map), content pages | ✅ | ✅ (public pages: Phase 6) |
+| Admin users with Super Admin / Admin roles | ✅ | ✅ |
 | Wizarding theme, smooth animations, responsive design | — | ✅ Landing page · rest Phase 3 → 6 |
 
 ---
@@ -74,6 +74,7 @@ npm run db:deploy       # create / update the tables
 npm run db:generate     # generate the Prisma client
 npm run db:seed         # optional: demo categories, products, banners, pages
 npm run create-admin    # first admin (SUPER_ADMIN) from ADMIN_* in .env
+npm run images:localize # optional: store the demo photos locally
 npm run dev             # API on http://127.0.0.1:5000
 ```
 
@@ -89,7 +90,7 @@ npm run dev             # http://localhost:5173
 | URL | What |
 |---|---|
 | http://localhost:5173 | Storefront |
-| http://localhost:5173/admin/login | Admin login |
+| http://localhost:5173/admin | Back office (sign in with the admin from `npm run create-admin`) |
 | http://127.0.0.1:5000/api/health | API health check |
 | http://127.0.0.1:5000/api/home | Home page data (JSON) |
 
@@ -110,6 +111,7 @@ npm run dev             # http://localhost:5173
 | `npm run db:studio` | Browse the database in Prisma Studio |
 | `npm run db:test` | Check the database connection |
 | `npm run create-admin` | Create a SUPER_ADMIN from `.env` |
+| `npm run images:localize` | Copy external demo photos into `backend/uploads` so the shop doesn't depend on an image host (`-- --dry` to preview) |
 
 **Frontend** (`frontend/`): `npm run dev`, `npm run build`, `npm run preview`, `npm run lint`.
 

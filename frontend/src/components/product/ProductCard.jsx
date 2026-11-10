@@ -5,6 +5,7 @@ import { useCart } from "../../context/CartContext";
 import { imageAt } from "../../lib/format";
 import { PriceTag } from "../ui/PriceTag";
 import { CheckIcon, PlusIcon } from "../ui/icons";
+import { Img } from "../ui/Img";
 
 /**
  * Product tile used on the home page and (Phase 3) the shop grid.
@@ -30,7 +31,7 @@ export function ProductCard({ product, priority = false }) {
       <div className="relative aspect-[4/5] overflow-hidden rounded-[1.25rem] bg-fog-deep">
         <Link to={`/product/${product.slug}`} className="absolute inset-0" tabIndex={-1} aria-hidden="true">
           {main && (
-            <img
+            <Img
               src={imageAt(main.url, 600)}
               srcSet={`${imageAt(main.url, 400)} 400w, ${imageAt(main.url, 800)} 800w`}
               sizes="(min-width: 1024px) 22vw, (min-width: 640px) 33vw, 50vw"
@@ -40,7 +41,7 @@ export function ProductCard({ product, priority = false }) {
             />
           )}
           {hover && (
-            <img
+            <Img
               src={imageAt(hover.url, 600)}
               alt=""
               loading="lazy"

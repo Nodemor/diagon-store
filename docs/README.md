@@ -9,4 +9,4 @@ Start here if you're new to the project.
 5. **[FILE-GUIDE.md](FILE-GUIDE.md)**: what every file does.
 6. **[THEME-GUIDE.md](THEME-GUIDE.md)**: the wizarding look, colours, fonts, wording and motion rules.
 
-**Current phase:** Phase 5, the admin panel UI. Phases 0–4 are done: customers can browse, order on WhatsApp or by email, and track their orders.
+**Current phase:** Phase 6, content pages, contact, SEO and performance. Phases 0–5 are done: the storefront, ordering and the full back office at `/admin`.

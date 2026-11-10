@@ -4,6 +4,7 @@ import { useCart } from "../../context/CartContext";
 import { formatPrice, imageAt } from "../../lib/format";
 import { QuantityStepper } from "../ui/QuantityStepper";
 import { TrashIcon } from "../ui/icons";
+import { Img } from "../ui/Img";
 
 /** Cart rows shared by the drawer and the /cart page. Removed rows collapse smoothly. */
 export function CartLines({ compact = false, onNavigate }) {
@@ -24,7 +25,7 @@ export function CartLines({ compact = false, onNavigate }) {
           >
             <div className={`grid gap-4 py-4 ${compact ? "grid-cols-[4.5rem_1fr]" : "grid-cols-[5.5rem_1fr] sm:grid-cols-[7rem_1fr]"}`}>
               <Link to={`/product/${item.slug}`} onClick={onNavigate} className="block aspect-[4/5] overflow-hidden rounded-xl bg-fog-deep">
-                {item.image && <img src={imageAt(item.image, 240)} alt="" className="h-full w-full object-cover" loading="lazy" />}
+                {item.image && <Img src={imageAt(item.image, 240)} alt="" className="h-full w-full object-cover" loading="lazy" />}
               </Link>
 
               <div className="flex min-w-0 flex-col">

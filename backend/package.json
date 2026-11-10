@@ -13,7 +13,8 @@
     "db:test": "node test-db.js",
     "db:seed": "node prisma/seed.js",
     "create-admin": "node create-admin.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "images:localize": "node scripts/localize-images.js"
   },
   "keywords": [],
   "author": "",

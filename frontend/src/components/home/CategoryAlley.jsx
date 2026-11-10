@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { gsap, useGSAP, REDUCED_MOTION, ScrollTrigger } from "../../lib/motion";
 import { imageAt } from "../../lib/format";
 import { useLenis } from "../motion/SmoothScroll";
+import { Img } from "../ui/Img";
 
 // Each category is drawn as a shopfront on the street (proposal §3 "Product categories").
 // Desktop: exactly four shopfronts fill the content width. The section pins and each
@@ -51,7 +52,7 @@ function Shopfront({ category, index }) {
         {/* shop window — the lights come on when you hover / focus */}
         <div className="relative mt-4 aspect-3/4 w-full overflow-hidden rounded-t-full border-[6px] border-night-deep/80 bg-night-deep lg:max-h-[38svh]">
           {category.imageUrl && (
-            <img
+            <Img
               src={imageAt(category.imageUrl, 600)}
               alt=""
               loading="lazy"
