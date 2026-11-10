@@ -1,101 +1,125 @@
 # Diagon Store — Theme Guide
 
-Diagon Store should feel like walking down a **magical shopping alley**: crooked shopfronts, candlelight, parchment, brass and gold, and a little wonder in every interaction. The shop must still be **fast, readable and easy to buy from**. The theme decorates the shopping experience and must never get in its way.
+## The idea: the alley at lamplight
+
+Diagon Store is one shop that feels like a whole street. The site is a **wizarding alley at night**: crooked rooftops, shop windows glowing amber, street lamps, painted shop signs in copper-green and oxblood. Product sections step out of the night into a cool **fog**, so photos read clearly and the shop stays easy to use.
+
+> **Why not parchment and gold?** Cream parchment with a gold serif is the default look for anything "magical". This palette was chosen to be specific to *a street at night* instead.
+
+### ⚖️ Original style, not the franchise
+
+"Harry Potter", its characters, house crests, logos, film stills and trademarked names belong to Warner Bros. / J.K. Rowling.
+
+- **Do:** use the general look of an old alley — lamps, shopfronts, signs, cobbles, fog, letterpress type.
+- **Don't:** use official logos, crests, character names or likenesses, and don't suggest the shop is licensed.
+
+Demo product names in the seed data are original. Some demo **photos** show real brand logos; the client will replace them with their own photos.
 
 ---
 
-## ⚖️ Use an original wizarding style, not the franchise
+## Colour tokens
 
-"Harry Potter", its characters, house crests, logos, film stills and specific trademarked names belong to Warner Bros. and J.K. Rowling. To stay safe:
+Tokens are defined in `frontend/src/index.css` (`@theme`) and used as Tailwind classes (`bg-night`, `text-lamp`, ...).
 
-- **Do** use a general wizarding-alley look: owls, wands, potions, parchment, candles, brass scales, spell-book type, starry skies.
-- **Don't** use official logos, house crests, the Hogwarts name or crest, film images or character likenesses, and don't suggest the shop is official or licensed.
-- Get legal advice before using franchise names in product titles or marketing.
+| Token | Hex | Use |
+|---|---|---|
+| `night` | `#1c2230` | Header, hero, dark sections |
+| `night-deep` | `#141924` | Footer, sky, deepest shadows, sign boards |
+| `cobble` / `cobble-line` | `#2b3345` / `#3a4357` | Raised surfaces and borders on dark backgrounds |
+| `lamp` | `#f2b544` | **The only accent.** Primary buttons, cart badge, lit windows, focus ring |
+| `lamp-soft` | `#f7d38a` | Button hover, shop-sign lettering |
+| `lamp-deep` | `#8a5a00` | Amber text on light backgrounds (meets 4.5:1 contrast) |
+| `fog` / `fog-deep` / `mist` | `#e8ecef` / `#d9dfe5` / `#f5f7f8` | Product sections, image wells, alternate sections |
+| `verdigris` / `verdigris-deep` | `#4fa39a` / `#2f6f68` | Shop signs, "New" badge, contact icons |
+| `oxblood` | `#8e2f3c` | Sale badges, errors |
+| `plum` | `#4a3550` | Shopfront variety |
+| `ink` / `ink-soft` | `#1c2230` / `#4b5568` | Text on light backgrounds |
+| `moon` / `moon-soft` | `#e9edf3` / `#a9b3c4` | Text on dark backgrounds |
 
----
+Rules:
 
-## Colour palette
-
-Define these as tokens in `frontend/src/index.css` using Tailwind 4 `@theme`:
-
-```css
-@theme {
-  --color-ink:        #14121f;  /* midnight background, primary text on light */
-  --color-night:      #1f1b33;  /* raised dark surfaces */
-  --color-parchment:  #f3e9d2;  /* page background (light) */
-  --color-vellum:     #e7d9b8;  /* cards on parchment */
-  --color-gold:       #c9a227;  /* accents, prices, CTAs */
-  --color-gold-deep:  #9c7b16;  /* hover / pressed gold, gold text on parchment */
-  --color-ember:      #7a1f2b;  /* deep red: sale badges, alerts */
-  --color-emerald:    #1f4d3a;  /* success, in-stock */
-  --color-sapphire:   #22356b;  /* links, info */
-  --color-smoke:      #6b6478;  /* muted text */
-
-  --font-display: "Cinzel Decorative", "Cinzel", serif;  /* logo, hero headings */
-  --font-heading: "Cinzel", serif;                       /* section headings */
-  --font-body:    "Cormorant Garamond", Georgia, serif;  /* long copy */
-  --font-ui:      "Inter", system-ui, sans-serif;         /* buttons, forms, prices, admin */
-}
-```
-
-- **Contrast:** gold on parchment is too faint for body text, so use `gold-deep` or `ink` for text. Check WCAG AA (4.5:1) on every text/background pair.
-- **Admin panel:** use the same palette but stay calm and practical: mostly `ink`, `parchment` and `vellum`, the `ui` font, and very little ornament.
+- **Use amber only for the most important action and for light.** Never use it for decoration.
+- **Shop facades** (on the categories street) cycle through verdigris, plum, oxblood, midnight blue and bronze. They are the only place with this many colours.
+- **Every text and background pair must meet WCAG AA contrast.** Check new pairs before using them.
 
 ## Typography
 
-- Load the fonts from Google Fonts with `display=swap`, or self-host them in Phase 8.
-- Use the decorative font **only** for the logo and big headings. Body copy, forms and prices stay highly readable.
-- Show prices in LKR with the `ui` font and tabular numbers: `Rs 2,500.00`.
+| Role | Typeface | Notes |
+|---|---|---|
+| Signs and headings (`font-sign`) | **IM Fell English** | A revival of 17th-century letterpress type, like hand-cut shop signs and old print. Used for headings, the logo, shop signs, prices on banners. Regular weight only. |
+| Everything else (`font-sans`) | **Figtree** | Body text, buttons, forms, prices, navigation, admin panel. 400–700. |
 
-## Shop wording
+Rules:
 
-Use themed names where it's fun, but **always keep the plain meaning clear**. For example, the cart icon is labelled "Trunk", with a tooltip and `aria-label` that say "Cart".
+- **Sentence case everywhere.** No all-caps labels and no little labels stacked above headings.
+- **Don't highlight one word in a heading** with italic, bold or a different colour.
+- **Headings follow a classic type scale:** 28 / 36 / 48 / 60 px, plus the hero at `clamp(3.25rem, 8.5vw, 7rem)`.
+- **Body text** is 16–18 px with 1.6 line height, and lines stay under about 75 characters (`max-w-md` / `max-w-lg`).
+- **Prices** use `tabular-nums` and the format `Rs 15,900`.
 
-| Plain | Themed wording |
+## Words
+
+Write plain, helpful sentences. The theme lives in the visuals, so a little flavour is fine but the meaning must always be clear.
+
+| Do | Don't |
 |---|---|
-| Shop / All products | The Alley |
-| Categories | Shopfronts |
-| Cart | Your Trunk |
-| Add to cart | Add to Trunk |
-| Checkout | Seal the Order |
-| Place order (COD) | Send by Owl — Pay on Delivery |
-| Order confirmed page | Your owl is on its way 🦉 |
-| Track order | Track your Owl |
-| Featured | Wizard's Picks |
-| Offers / Sale | Enchanted Offers |
-| New arrivals | Fresh from the Cauldron |
-| Out of stock | Vanished (back soon) |
-| 404 page | "You seem to have Apparated to the wrong place." |
-| Search placeholder | "Summon an item…" |
+| "Shop all products", "Add to cart", "Track an order" | Themed names that hide what a button does |
+| "Browse the shops", "Step inside" (category cards) | All-caps labels like "SHOPFRONTS" |
+| "This street doesn't lead anywhere" (404) + a clear way back | Vague errors ("Oops!") |
+| Buttons name the action: "Send order on WhatsApp" | "Submit", or an arrow on the end of a button label |
 
-Keep legal pages, error messages, form labels and anything to do with payments in **plain language**.
+## Layout
 
-## Imagery & ornament
+- Content width is `max-w-7xl`, with side padding of 16 / 24 / 32 px.
+- Section rhythm: `py-16` on mobile, `py-24` on desktop.
+- Product grid: 2 columns on mobile, 3 on small tablets, 4 on desktop. Product images are 4:5 with a 20 px radius.
+- Home page order:
+  1. Hero (street + shop window)
+  2. **Browse the shops** (shopfront street)
+  3. Featured
+  4. Promo banners
+  5. Just arrived
+  6. On offer
+  7. Most viewed
+  8. How ordering works
+  9. Footer
 
-- Textures: subtle parchment grain, candle glow (radial gradients), faint star fields on dark sections.
-- Ornaments: thin gold dividers, corner flourishes on cards, wax-seal badges for "Featured" and "Sale".
-- Product photos: warm lighting, consistent backgrounds, 4:5 ratio for product cards.
-- Use SVG for ornaments so they stay sharp and can be animated later.
+## Motion
 
-## Motion (GSAP / Motion: to be added by the team)
+Libraries: **GSAP + ScrollTrigger** (scroll-linked), **Lenis** (smooth scroll), **Motion for React** (UI feedback and page transitions). Setup is in `src/lib/motion.js` and `src/components/motion/SmoothScroll.jsx`.
 
-Build components so motion can be layered on later:
+Motion is deliberate, not sprinkled everywhere:
 
-- Give each section and card a stable wrapper element and accept `className` and `ref`.
-- Keep animation code in its own hooks or components (e.g. `useReveal`, `<FloatIn>`), separate from data fetching.
+| Moment | What happens | Why |
+|---|---|---|
+| Page load (hero) | Windows light up, lamps flicker on one by one, the headline rises, the shop-window shutter lifts | The one orchestrated moment that sets the scene |
+| Hero scroll-out | Far buildings drift slower than the near row | Depth |
+| Browse the shops (desktop) | The section pins and you walk sideways past the shopfronts; signs swing with your scroll speed | The signature interaction |
+| Shopfront hover / focus | The window "lights up" (image brightens) | Shows the card is interactive |
+| Add to cart | The + turns into a ✓, and the cart badge bounces | Confirms the action happened |
+| Route change | A short fade and slide | Keeps navigation smooth |
 
-Ideas:
+**Please avoid:**
 
-- Hero: floating candles drifting slowly, title revealed letter by letter
-- Product cards: lift slightly with a gold-glow border on hover
-- Add to Trunk: the item flies to the trunk icon with a sparkle burst, and the count badge bounces
-- Page transitions: parchment fade or page-turn
-- Track your Owl: an owl moves along the status timeline
+- A fade-up on every section
+- Hover animations on everything
+- Looping attention-seekers
 
-Always respect `prefers-reduced-motion: reduce` by turning off parallax, floating and flying effects. Animate only `transform` and `opacity`.
+Every new animation needs a reason from the table above.
 
-## Accessibility
+**Accessibility:**
 
-- Every ornament is decorative: use `aria-hidden="true"` or an empty `alt`.
-- Focus outlines must be visible (a gold outline on dark backgrounds, an ink outline on parchment).
-- Tap targets are at least 44×44 px, and the layout works at 360 px wide.
+- `prefers-reduced-motion` turns off Lenis, the GSAP timelines (content shows in its final state), fog and flicker, and Motion animations (`MotionConfig reducedMotion="user"`).
+- Animate only `transform`, `opacity` and `clip-path`.
+- **Never leave a `transform` or `filter` on `<main>` or any ancestor of a pinned section.** It breaks ScrollTrigger pinning.
+
+## Components
+
+- `Button` / `ButtonLink` variants:
+  - `lamp`: primary, one per view
+  - `outline-night`: secondary on dark backgrounds
+  - `outline`: secondary on fog backgrounds
+  - `quiet`: text link
+- `ProductCard`: image well, sale / new / out-of-stock badge, round add button, category, name, price.
+- `ProductSection`: heading + intro + "See all" link + `grid` or `rail` layout, with skeletons while loading.
+- `PriceTag`: sale price plus the struck-through regular price (proposal §18).

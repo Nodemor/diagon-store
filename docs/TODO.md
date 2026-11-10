@@ -42,18 +42,19 @@ Task checklist grouped by the phases in [ROADMAP.md](ROADMAP.md). Tick `[x]` ite
 - [x] Fixed `test-db.js` false positive
 - [x] Tested every endpoint against XAMPP MariaDB 10.4
 
-## Phase 2 — Design system + landing page
+## Phase 2 — Design system + landing page ✅
 
-- [ ] Install `gsap`, `lenis`, `motion`
-- [ ] Theme tokens in `index.css` (`@theme`) + fonts
-- [ ] `lib/api.js` (fetch wrapper), `lib/format.js` (LKR prices, asset URLs)
-- [ ] `SettingsProvider` (store info from `/api/settings`)
-- [ ] Motion utilities: `SmoothScroll` (Lenis + ScrollTrigger), `Reveal`, `PageTransition`, reduced-motion support
-- [ ] UI components: Button, ProductCard, PriceTag, SectionHeading, Skeleton
-- [ ] `StoreLayout`: AnnouncementBar, Header (search, cart icon, mobile menu), Footer, WhatsApp floating button
-- [ ] Landing page: hero, categories, featured, offers, promo banners, new arrivals, popular, CTA
-- [ ] Route transitions + 404 page
-- [ ] Responsive pass 360 → 1920 px
+- [x] Install `gsap`, `@gsap/react`, `lenis`, `motion`
+- [x] Theme tokens in `index.css` (`@theme`) + fonts (IM Fell English, Figtree)
+- [x] `lib/api.js` (fetch wrapper), `lib/format.js` (Rs prices, asset URLs, WhatsApp links)
+- [x] `SettingsProvider`, `CartProvider` (localStorage)
+- [x] Motion: Lenis + ScrollTrigger sync, route transitions, reduced-motion support everywhere
+- [x] UI: Button, PriceTag, ProductCard, ProductSection (grid/rail), Skeleton, icons
+- [x] `StoreLayout`: announcement, sticky header (search, cart badge, mobile menu), footer, floating WhatsApp button
+- [x] Landing page: animated hero (street scene + banner window), shopfront category street (pinned sideways scroll), featured, promo banners, new arrivals, offers, most viewed, how ordering works
+- [x] 404 + placeholders for later pages; admin pages lazy-loaded
+- [x] Checked at 1440 px, 390 px (mobile emulation) and with reduced motion
+- [ ] Split the GSAP/Motion code into a separate chunk if the bundle grows (currently ~195 kB gzip) *(Phase 6)*
 
 ## Phase 3 — Shop, product page, cart
 

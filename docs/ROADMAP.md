@@ -9,8 +9,8 @@ Phases are listed in build order, and each ends with a **Done when** check. The 
 ```
 Phase 0  Foundation & repo hygiene                               ✅ done
 Phase 1  Backend foundation & full data model                    ✅ done
-Phase 2  Design system + animated landing page                   ← next
-Phase 3  Shop, categories, product page, search, filters, cart
+Phase 2  Design system + animated landing page                   ✅ done
+Phase 3  Shop, categories, product page, search, filters, cart   ← next
 Phase 4  Order / inquiry flow: WhatsApp, email, tracking
 Phase 5  Admin panel UI
 Phase 6  Content pages, contact, SEO & performance
@@ -92,7 +92,7 @@ Settings moved into environment variables, `.env.example` files, repo cleanup, R
 
 **Done when:** ✅ all endpoints were tested against XAMPP MariaDB 10.4.
 
-## Phase 2 — Design system + animated landing page
+## Phase 2 — Design system + animated landing page ✅
 
 **Goal:** a wizarding-themed design system and a landing page that sets the visual standard. See [THEME-GUIDE.md](THEME-GUIDE.md).
 
