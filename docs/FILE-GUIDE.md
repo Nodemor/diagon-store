@@ -1,6 +1,6 @@
 # Diagon Store — File Guide
 
-What each file in the repository does. Installed packages (`node_modules/`), lock files and build output (`dist/`) are not listed.
+What each file in the repository does. Installed packages (`node_modules/`), lock files, build output and `backend/uploads/` are not listed.
 
 When you add a file, add a line here in the same commit.
 
@@ -10,107 +10,133 @@ When you add a file, add a line here in the same commit.
 
 | File | Purpose |
 |---|---|
-| `README.md` | Project overview, setup and run instructions, scripts, current API |
-| `.gitignore` | Keeps `.env`, `node_modules`, build output, uploads, editor and AI-assistant folders out of git. `.env.example` is still committed. |
-| `docs/` | Project documentation (this folder) |
+| `README.md` | Overview, setup (XAMPP), scripts, API summary |
+| `.gitignore` | Ignores `.env`, `node_modules`, build output, uploads, editor and AI-assistant folders (`.env.example` is still committed) |
+| `docs/` | Project documentation |
 
 ## docs/
 
 | File | Purpose |
 |---|---|
-| `ROADMAP.md` | The build phases in order, with goals and "done when" criteria |
-| `TODO.md` | Task checklist per phase + known issues in the current code |
-| `ARCHITECTURE.md` | System overview, target folder layout, data model, API list, order flow, WhatsApp and PayHere design, security |
+| `README.md` | Reading order + current phase |
+| `ROADMAP.md` | Build phases, with a table mapping each proposal section to its phase |
+| `TODO.md` | Task checklist per phase + known issues |
+| `ARCHITECTURE.md` | Structure, data model, full API, order flow, security |
 | `FILE-GUIDE.md` | This file |
-| `THEME-GUIDE.md` | Wizarding visual and copy guidelines for the UI |
+| `THEME-GUIDE.md` | Wizarding visual style, wording and motion rules |
 
 ---
 
 ## backend/
 
-Express 5 REST API using Prisma ORM on MySQL/MariaDB.
+| File | Purpose |
+|---|---|
+| `package.json` | Dependencies and scripts (`dev`, `start`, `db:*`, `create-admin`) |
+| `.env.example` | Every environment variable, explained. Copy it to `.env`. |
+| `server.js` | Starts the API on `HOST:PORT`; shuts down cleanly on SIGINT / SIGTERM |
+| `app.js` | Builds the Express app: helmet, CORS, JSON limit, request logging, `/uploads` static files, `/api/health`, routes, 404 and error handlers |
+| `prisma.js` | Shared Prisma client using the MariaDB adapter. Connection details come from `DATABASE_URL`. |
+| `prisma.config.ts` | Prisma CLI config: schema, migrations folder, seed command, `DATABASE_URL` |
+| `create-admin.js` | `npm run create-admin`: creates a SUPER_ADMIN from `ADMIN_NAME`, `ADMIN_EMAIL` and `ADMIN_PASSWORD` |
+| `test-db.js` | `npm run db:test`: runs a real query to check the database connection |
+
+### backend/config/
 
 | File | Purpose |
 |---|---|
-| `package.json` | Dependencies and npm scripts (`dev`, `start`, `db:*`, `create-admin`) |
-| `.env.example` | Template for every backend environment variable, tagged by roadmap phase. Copy it to `.env`. |
-| `server.js` | App entry point. Loads `.env`, stops if `JWT_SECRET` is missing, sets up CORS (`CLIENT_URL`) and JSON parsing, mounts `/api/admin`, `/api/products` and `/api/categories`, adds a health route at `/` and a 404 handler, and listens on `HOST:PORT`. |
-| `prisma.js` | Creates the shared `PrismaClient` using the MariaDB driver adapter. Connection details are parsed from `DATABASE_URL`. Every route imports this one client. |
-| `prisma.config.ts` | Prisma CLI config: schema path, migrations folder, and the `DATABASE_URL` used by `migrate`/`studio` |
-| `create-admin.js` | One-off script (`npm run create-admin`). Creates the first admin from `ADMIN_NAME`, `ADMIN_EMAIL` and `ADMIN_PASSWORD`, with the password hashed by bcrypt. |
-| `test-db.js` | Connection check (`npm run db:test`). Connects to the database and prints success or failure. |
-
-### backend/middleware/
-
-| File | Purpose |
-|---|---|
-| `authMiddleware.js` | Checks the `Authorization: Bearer <token>` header with `JWT_SECRET`, puts the decoded admin on `req.admin`, and returns 401 if the token is missing or invalid. Used on every admin-only route. |
+| `env.js` | The only file that reads `process.env`. Checks the required variables and exports a typed `env` object (server, JWT, rate limits, uploads, store, email). |
 
 ### backend/routes/
 
 | File | Purpose |
 |---|---|
-| `adminRoutes.js` | `POST /api/admin/login` checks the email and bcrypt password and returns a 1-day JWT plus admin info. `GET /api/admin/profile` 🔒 returns the logged-in admin. |
-| `productRoutes.js` | `GET /api/products` lists products with category, subcategory and images, newest first. `POST` 🔒 creates, `PUT /:id` 🔒 updates and `DELETE /:id` 🔒 deletes a product (name, price ≥ 0 and stock ≥ 0 are checked). `POST /:productId/images` 🔒 attaches an image URL. |
-| `categoryRoutes.js` | `GET /api/categories` lists categories with subcategories, A–Z. `POST /` 🔒 and `DELETE /:id` 🔒 for categories; `POST /subcategories` 🔒 and `DELETE /subcategories/:id` 🔒 for subcategories (duplicates return 409). Deleting a category also deletes its subcategories, and its products have their category cleared. |
+| `store.routes.js` | Public routes under `/api`: home, products, categories, banners, settings, pages, place order, track order. Attaches validators and rate limits. |
+| `admin.routes.js` | Admin routes under `/api/admin`. `/login` is public; everything else needs `requireAuth`, and `/admins` also needs SUPER_ADMIN. |
+
+### backend/controllers/
+
+| File | Purpose |
+|---|---|
+| `store.controller.js` | Public handlers: home bundle, product list/detail/related, categories, active banners (date-window aware), settings, pages |
+| `inquiry.controller.js` | Public handlers: place an order, track an order |
+| `admin/auth.controller.js` | Login (updates `lastLoginAt`), profile, change password |
+| `admin/catalog.controller.js` | Products CRUD, stock, product images (upload / URL / reorder / alt text / delete), categories, subcategories |
+| `admin/sales.controller.js` | Dashboard, orders (list / detail / status / notes / delete), customers |
+| `admin/content.controller.js` | Generic image upload, banners, settings, content pages, admin users |
+
+### backend/services/
+
+| File | Purpose |
+|---|---|
+| `product.service.js` | Product queries and rules: visibility, search across name/SKU/brand/tags/category, filters, sorting, related products, home sections, create/update (sale < price, subcategory must belong to its category, slugs, related IDs), stock, images |
+| `category.service.js` | Category and subcategory queries with product counts; CRUD with unique slugs; deletes old images |
+| `inquiry.service.js` | Order placement (phone normalisation, stock check, server pricing, transaction, order number, WhatsApp message, emails), tracking, admin list/detail/status/notes/delete |
+| `dashboard.service.js` | Dashboard numbers: product counts, orders by status, recent orders, stock alerts |
+| `settings.service.js` | Allowed setting keys + defaults, cached read, save |
+| `email.service.js` | nodemailer SMTP sender (logs to the console when disabled); new-order emails to the business and the customer |
+| `storage.service.js` | Safely deletes uploaded files when an image, banner or category is removed |
+
+### backend/validators/
+
+| File | Purpose |
+|---|---|
+| `common.js` | Shared Zod helpers: `optionalText`, `id`, `idParams`, `boolQuery`, `money`, paging |
+| `product.js` | Product create/update, stock update, public and admin list queries, image schemas |
+| `category.js` | Category and subcategory create/update |
+| `inquiry.js` | Order form (with a honeypot field), tracking query, admin list query, status and notes updates |
+| `admin.js` | Login, create/update admin, change password |
+| `content.js` | Banners, settings, pages |
+
+### backend/middleware/
+
+| File | Purpose |
+|---|---|
+| `auth.js` | `requireAuth` (JWT + active admin check, sets `req.admin`), `requireRole(...roles)` |
+| `validate.js` | `validate({ params, query, body })`: runs Zod schemas and puts the results in `req.valid` |
+| `errorHandler.js` | 404 handler and the central error → JSON converter |
+| `rateLimiters.js` | `loginLimiter`, `inquiryLimiter`, `trackLimiter` |
+| `upload.js` | Multer image upload to `uploads/<folder>/` with type and size checks and random names |
+
+### backend/utils/
+
+| File | Purpose |
+|---|---|
+| `httpError.js` | `HttpError` + `badRequest`, `unauthorized`, `forbidden`, `notFound`, `conflict` |
+| `slugify.js` | `slugify(text)` and `uniqueSlug(model, text, { excludeId, scope })` |
+| `phone.js` | `normalizePhone()`: Sri Lankan and international numbers → digits like `94771234567` |
+| `serialize.js` | Prisma → JSON (Decimal → number, computed price and stock fields, tags array), pagination helpers |
+| `format.js` | `formatMoney` (LKR), `round2`, `escapeHtml`, `formatOrderNumber` |
+| `whatsapp.js` | Builds the proposal §9 WhatsApp order message and the `wa.me` link |
 
 ### backend/prisma/
 
 | File | Purpose |
 |---|---|
-| `schema.prisma` | Database schema: `Product`, `Category`, `Subcategory`, `ProductImage`, `Admin`, and their relations and delete rules. **Edit this file to change the database**, then run `npm run db:migrate`. |
-| `migrations/20260928151607_init/` | Creates the `Product` table |
-| `migrations/20260928153143_add_categories/` | Adds `Category`, `Subcategory` and the product → category/subcategory foreign keys |
-| `migrations/20260928171640_add_product_images/` | Adds `ProductImage` |
-| `migrations/20260929141111_add_admin/` | Adds `Admin` |
-| `migrations/migration_lock.toml` | Locks the migration provider to MySQL. Don't edit it. |
+| `schema.prisma` | The data model (see ARCHITECTURE.md). Edit this, then run `npm run db:migrate`. |
+| `seed.js` | `npm run db:seed`: demo categories, products, banners and pages. Safe to re-run. |
+| `migrations/20260928151607_init` | Creates `Product` |
+| `migrations/20260928153143_add_categories` | `Category`, `Subcategory`, product foreign keys (⚠️ lowercase table name — see TODO) |
+| `migrations/20260928171640_add_product_images` | `ProductImage` |
+| `migrations/20260929141111_add_admin` | `Admin` |
+| `migrations/20261110120000_catalogue_inquiries_content` | Phase 1: product, category and image fields; customers, orders, history; banners, settings, pages; related products; slug backfill; first admin → SUPER_ADMIN |
+| `migrations/migration_lock.toml` | Locks the provider to MySQL |
 
 ---
 
 ## frontend/
 
-React 19 single-page app built with Vite 8, Tailwind CSS 4 and React Router 7. It contains both the storefront and the admin panel.
-
 | File | Purpose |
 |---|---|
 | `package.json` | Dependencies and scripts (`dev`, `build`, `preview`, `lint`) |
-| `.env.example` | Template for `VITE_*` variables (API URL, store name, WhatsApp number). Copy it to `.env`. These values are public. |
-| `index.html` | HTML shell: page title, meta description and favicon. The app mounts into `#root`. |
-| `vite.config.js` | Vite config with the React and Tailwind CSS plugins |
-| `.oxlintrc.json` | Lint rules for `npm run lint` (oxlint) |
-| `.gitignore` | Frontend-specific ignores (dist, logs, editor files) |
-| `public/favicon.svg` | Browser tab icon, served as-is |
-
-### frontend/src/
-
-| File | Purpose |
-|---|---|
-| `main.jsx` | Starts React: imports the global CSS and renders `<App />` in StrictMode |
-| `App.jsx` | Route table: `/` → Home, `/admin/login` → AdminLogin, `/admin/dashboard` → AdminDashboard, `*` → Home |
-| `index.css` | Global stylesheet and Tailwind entry point. Theme tokens go here in Phase 3. |
-| `services/api.js` | API client. `API_BASE_URL` comes from `VITE_API_URL`. Exports `adminLogin`, `getProducts` and `getCategories`. |
-
-### frontend/src/pages/
-
-| File | Purpose |
-|---|---|
-| `Home.jsx` | Storefront home: announcement bar, header with search and bag counter, hero, featured product grid, about section, footer. **It still uses 4 hard-coded demo products** and the bag is only a counter. Phase 3 connects it to the API and the cart. |
-| `Home.css` | Styles for the home page (the `.store-*` classes) |
-| `AdminLogin.jsx` | Admin login form. Calls `adminLogin`, saves the JWT as `adminToken` in `localStorage` and goes to the dashboard. |
-| `AdminDashboard.jsx` | Admin shell: sidebar (links don't work yet), header, and stat cards. Product and category counts are real; orders and customers show 0 for now. It has no route guard yet. |
-
----
-
-## Files to be added (by phase)
-
-The full target layout is in [ARCHITECTURE.md](ARCHITECTURE.md#target-folder-structure). Main additions:
-
-| Phase | Files |
-|---|---|
-| 1 | `backend/app.js`, `config/env.js`, `middleware/{errorHandler,validate,rateLimiters}.js`, `controllers/*`, `services/*`, `validators/*`, `utils/{asyncHandler,slugify,money}.js`, `prisma/seed.js` |
-| 2 | `middleware/upload.js`, `services/storage.service.js`, `frontend/src/services/http.js`, `components/admin/*`, `pages/admin/{Products,Categories}.jsx`, `components/ProtectedRoute.jsx` |
-| 3 | `components/ui/*`, `components/store/*`, `context/CartContext.jsx`, `pages/store/{Shop,Product,Cart,NotFound,...}.jsx`, `utils/formatPrice.js` |
-| 4 | `services/order.service.js`, `utils/{phone,orderNumber}.js`, `routes/orderRoutes.js`, `pages/store/{Checkout,OrderSuccess,Track}.jsx`, `pages/admin/Orders.jsx` |
-| 5 | `services/whatsapp.service.js`, `routes/whatsappRoutes.js`, `frontend/src/utils/whatsappLink.js`, `components/store/WhatsAppButton.jsx` |
-| 6 | `services/{report,inventory,coupon,email}.service.js`, `pages/admin/{Inventory,Offers,Coupons,Customers,Settings,Users}.jsx` |
-| 7 | `services/payhere.service.js`, `routes/paymentRoutes.js` |
+| `.env.example` | `VITE_API_URL`. Copy it to `.env`. |
+| `index.html` | HTML shell + meta |
+| `vite.config.js` | Vite with the React and Tailwind plugins |
+| `.oxlintrc.json` | oxlint rules |
+| `public/favicon.svg` | Tab icon |
+| `src/main.jsx` | React entry |
+| `src/App.jsx` | Route table |
+| `src/index.css` | Global CSS / Tailwind entry |
+| `src/services/api.js` | API client (admin login, products, categories) |
+| `src/pages/Home.jsx` / `Home.css` | Current home page (static demo, replaced in Phase 2) |
+| `src/pages/AdminLogin.jsx` | Admin login form; stores the JWT |
+| `src/pages/AdminDashboard.jsx` | Admin shell with product and category counts (replaced in Phase 5) |

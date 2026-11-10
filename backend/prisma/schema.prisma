@@ -6,57 +6,241 @@ datasource db {
   provider = "mysql"
 }
 
+// =====================================================================
+// Catalogue
+// =====================================================================
+
+enum ProductStatus {
+  ACTIVE        // visible and orderable
+  INACTIVE      // hidden from the website
+  OUT_OF_STOCK  // visible, cannot be ordered
+  DRAFT         // being prepared, hidden
+}
+
 model Product {
-  id            Int           @id @default(autoincrement())
-  name          String
-  description   String?       @db.Text
-  price         Decimal       @db.Decimal(10, 2)
-  stock         Int           @default(0)
+  id                Int           @id @default(autoincrement())
+  name              String
+  slug              String        @unique
+  sku               String?       @unique
+  brand             String?
+  shortDescription  String?       @db.VarChar(500)
+  description       String?       @db.Text
+  price             Decimal       @db.Decimal(10, 2) // regular price
+  salePrice         Decimal?      @db.Decimal(10, 2) // discounted price (null = no sale)
+  stock             Int           @default(0)
+  lowStockThreshold Int           @default(5)
+  status            ProductStatus @default(ACTIVE)
+  /// [{ "label": "Battery", "value": "20 hours" }]
+  specifications    Json?
+  /// comma-separated, used by search ("bluetooth,wireless,speaker")
+  tags              String?       @db.VarChar(500)
+  isFeatured        Boolean       @default(false)
+  isNewArrival      Boolean       @default(false)
+  viewCount         Int           @default(0)
+  metaTitle         String?
+  metaDescription   String?       @db.VarChar(300)
+
   categoryId    Int?
   subcategoryId Int?
-  category      Category?     @relation(fields: [categoryId], references: [id], onDelete: SetNull)
-  subcategory   Subcategory?  @relation(fields: [subcategoryId], references: [id], onDelete: SetNull)
-  images        ProductImage[]
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+  category      Category?    @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  subcategory   Subcategory? @relation(fields: [subcategoryId], references: [id], onDelete: SetNull)
+
+  images       ProductImage[]
+  inquiryItems InquiryItem[]
+
+  // hand-picked related products (proposal §20 "selected products")
+  relatedTo   Product[] @relation("RelatedProducts")
+  relatedFrom Product[] @relation("RelatedProducts")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([isFeatured])
+  @@index([isNewArrival])
 }
 
 model Category {
-  id            Int           @id @default(autoincrement())
-  name          String        @unique
-  description   String?       @db.Text
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-  subcategories Subcategory[]
-  products      Product[]
+  id              Int           @id @default(autoincrement())
+  name            String        @unique
+  slug            String        @unique
+  description     String?       @db.Text
+  imageUrl        String?       @db.VarChar(1000)
+  isActive        Boolean       @default(true)
+  sortOrder       Int           @default(0)
+  metaTitle       String?
+  metaDescription String?       @db.VarChar(300)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  subcategories   Subcategory[]
+  products        Product[]
 }
 
 model Subcategory {
-  id         Int          @id @default(autoincrement())
+  id         Int       @id @default(autoincrement())
   name       String
+  slug       String
   categoryId Int
-  category   Category     @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  isActive   Boolean   @default(true)
+  sortOrder  Int       @default(0)
+  category   Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   products   Product[]
-  createdAt  DateTime     @default(now())
-  updatedAt  DateTime     @updatedAt
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 
   @@unique([name, categoryId])
+  @@unique([slug, categoryId])
 }
 
 model ProductImage {
   id        Int      @id @default(autoincrement())
-  url       String
+  url       String   @db.VarChar(1000)
+  altText   String?
+  sortOrder Int      @default(0) // 0 = main image
   productId Int
-  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
 }
 
-model Admin {
-  id        Int      @id @default(autoincrement())
+// =====================================================================
+// Orders / inquiries (COD — payment is collected on delivery)
+// =====================================================================
+
+enum InquiryStatus {
+  NEW
+  CONTACTED
+  CONFIRMED
+  PROCESSING
+  COMPLETED
+  CANCELLED
+}
+
+enum InquiryChannel {
+  WHATSAPP
+  EMAIL
+  WEB
+}
+
+model Customer {
+  id        Int       @id @default(autoincrement())
   name      String
-  email     String   @unique
-  password  String
-  role      String   @default("ADMIN")
-  createdAt DateTime @default(now())
+  phone     String    @unique // normalised 94XXXXXXXXX
+  email     String?
+  address   String?   @db.Text
+  inquiries Inquiry[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Inquiry {
+  id            Int            @id @default(autoincrement())
+  inquiryNumber String         @unique // DS-2026-000123
+  customerId    Int?
+  customer      Customer?      @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  // snapshot of what the customer submitted
+  name          String
+  phone         String
+  email         String?
+  address       String         @db.Text
+  city          String?
+  notes         String?        @db.Text
+  channel       InquiryChannel @default(WHATSAPP)
+  status        InquiryStatus  @default(NEW)
+  itemCount     Int
+  estimatedTotal Decimal       @db.Decimal(10, 2)
+  adminNotes    String?        @db.Text // internal, never shown to the customer
+  items         InquiryItem[]
+  history       InquiryStatusHistory[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+}
+
+model InquiryItem {
+  id          Int      @id @default(autoincrement())
+  inquiryId   Int
+  inquiry     Inquiry  @relation(fields: [inquiryId], references: [id], onDelete: Cascade)
+  productId   Int?
+  product     Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+  productName String
+  sku         String?
+  unitPrice   Decimal  @db.Decimal(10, 2)
+  quantity    Int
+  lineTotal   Decimal  @db.Decimal(10, 2)
+}
+
+model InquiryStatusHistory {
+  id        Int           @id @default(autoincrement())
+  inquiryId Int
+  inquiry   Inquiry       @relation(fields: [inquiryId], references: [id], onDelete: Cascade)
+  status    InquiryStatus
+  note      String?       @db.VarChar(500)
+  adminId   Int?
+  admin     Admin?        @relation(fields: [adminId], references: [id], onDelete: SetNull)
+  createdAt DateTime      @default(now())
+}
+
+// =====================================================================
+// Website content
+// =====================================================================
+
+enum BannerPlacement {
+  HERO   // home page hero slider
+  PROMO  // promotional strip / cards
+}
+
+model Banner {
+  id          Int             @id @default(autoincrement())
+  title       String
+  subtitle    String?         @db.VarChar(500)
+  imageUrl    String          @db.VarChar(1000)
+  buttonText  String?
+  buttonLink  String?         @db.VarChar(500)
+  placement   BannerPlacement @default(HERO)
+  isActive    Boolean         @default(true)
+  sortOrder   Int             @default(0)
+  startsAt    DateTime?
+  endsAt      DateTime?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+}
+
+/// Store-wide key/value settings (business details, WhatsApp, social links, ...)
+model Setting {
+  key       String   @id
+  value     String   @db.Text
   updatedAt DateTime @updatedAt
+}
+
+/// Editable content pages: about, privacy-policy, terms, delivery, returns
+model Page {
+  id              Int      @id @default(autoincrement())
+  slug            String   @unique
+  title           String
+  content         String   @db.LongText // HTML
+  metaTitle       String?
+  metaDescription String?  @db.VarChar(300)
+  isPublished     Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+// =====================================================================
+// Admin users
+// =====================================================================
+
+model Admin {
+  id          Int      @id @default(autoincrement())
+  name        String
+  email       String   @unique
+  password    String
+  role        String   @default("ADMIN") // SUPER_ADMIN | ADMIN
+  isActive    Boolean  @default(true)
+  lastLoginAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  statusChanges InquiryStatusHistory[]
 }

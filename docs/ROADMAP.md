@@ -1,220 +1,214 @@
 # Diagon Store — Build Roadmap
 
-The phases below are in the order they should be built. Each phase depends on the ones before it, and each ends with a **Done when** check so you know when to move on. The task-by-task checklist is in [TODO.md](TODO.md).
+This roadmap follows the client proposal, *Diagon Store — E-Commerce Website & Admin Panel Development Proposal*.
+
+**How customers order:** customers browse, fill a cart, and send an **order/inquiry** through WhatsApp or email. Each order is saved with an order number such as `DS-2026-000123`. Payment is **cash on delivery**, and customers can **track** their order status on the website. Online payment is a future upgrade.
+
+Phases are listed in build order, and each ends with a **Done when** check. The task checklist is in [TODO.md](TODO.md).
 
 ```
-Phase 0  Foundation & repo hygiene          ✅ done
-Phase 1  Backend hardening & structure      ← start here
-Phase 2  Catalogue upgrade + admin catalogue CRUD
-Phase 3  Wizarding-themed storefront + cart
-Phase 4  Cash-on-Delivery checkout + order tracking
-Phase 5  WhatsApp integration
-Phase 6  Admin operations: inventory, offers, coupons, sales, email
-Phase 7  PayHere online payments
-Phase 8  Polish, testing & deployment
+Phase 0  Foundation & repo hygiene                               ✅ done
+Phase 1  Backend foundation & full data model                    ✅ done
+Phase 2  Design system + animated landing page                   ← next
+Phase 3  Shop, categories, product page, search, filters, cart
+Phase 4  Order / inquiry flow: WhatsApp, email, tracking
+Phase 5  Admin panel UI
+Phase 6  Content pages, contact, SEO & performance
+Phase 7  QA, security review & launch
+Future   Proposal §30 upgrades (payments, accounts, reviews, ...)
 ```
 
-Why this order:
+**Why this order**
 
-- **The backend comes before the UI.** The storefront and admin pages need a stable API to call.
-- **Catalogue → storefront → orders.** You can't check out without a cart, and the cart needs real products.
-- **COD before WhatsApp.** WhatsApp messages are triggered by order events, so orders have to exist first.
-- **PayHere comes late.** COD is the main payment method. PayHere is added on top of the order model without changing it.
-- **Animations (GSAP / Motion) can go in from Phase 3 onwards.** Build the layouts so they can be animated later, and keep motion separate from data logic.
-
----
-
-## Phase 0 — Foundation & repo hygiene ✅
-
-**Goal:** a clean repo that any developer can clone and run.
-
-- Settings moved out of the code and into environment variables (`DATABASE_URL`, `PORT`, `HOST`, `CLIENT_URL`, `JWT_SECRET`, `VITE_API_URL`)
-- `.env.example` files for the backend and frontend
-- AI-tool and template leftovers removed, one root `.gitignore`
-- README and the `docs/` folder
-
-**Done when:** a new developer can follow the README and reach the admin dashboard.
+- **Phase 1 builds the whole API and database first.** Every later phase is front-end work against a stable API.
+- **Phase 2 (landing page) comes first on the front end.** It sets the look and the motion system that every other page reuses.
+- **Phases 3 → 4 follow the customer journey:** browse, then cart, then send the order, then track it.
+- **Phase 5 (admin UI) can run in parallel with Phases 3–4.** It only depends on Phase 1. Seed data stands in for real products until it's done.
 
 ---
 
-## Phase 1 — Backend hardening & structure
+## Proposal coverage
 
-**Goal:** a secure, consistent API that is ready to grow.
-
-1. **Restructure** into `routes/ → controllers/ → services/`, with `validators/`, `utils/` and `config/` folders (see the target layout in [ARCHITECTURE.md](ARCHITECTURE.md#target-folder-structure)).
-2. **Central error handler and `asyncHandler`.** Every error comes back as `{ message, errors? }` with the correct status code. Prisma error codes are mapped to statuses: `P2002` → 409 (duplicate), `P2025` → 404 (not found), `P2003` → 400 (bad reference).
-3. **Request validation** with Zod on every write endpoint.
-4. **Security:** `helmet`, `express-rate-limit` on `/admin/login` (and later on order placement), a request body size limit, and CORS restricted to `CLIENT_URL` (already done).
-5. **Missing endpoints:** `GET /products/:id`, `PUT /categories/:id`, `PUT /categories/subcategories/:id`, `DELETE /products/:productId/images/:imageId`.
-6. **Products list query params:** `?search=&category=&subcategory=&minPrice=&maxPrice=&sort=&page=&limit=`. The response includes `{ items, total, page, pages }`.
-7. **Check that a subcategory belongs to the chosen category** when creating or updating a product.
-8. **Return `Decimal` prices as numbers** in API responses.
-9. **Seed script** (`prisma/seed.js`) with themed demo categories and products.
-10. **Request logging** with `morgan` in development.
-
-**Done when:** every endpoint returns consistent errors, invalid input gets a 400 response, login is rate-limited, and the seed fills the database with themed demo data.
-
----
-
-## Phase 2 — Catalogue upgrade + admin catalogue CRUD
-
-**Goal:** the owner can fully manage the catalogue from the admin panel.
-
-**Schema changes:**
-
-- `Product`: add `slug`, `sku`, `compareAtPrice` (the "was" price, used for sale offers), `isFeatured`, `isActive`, `lowStockThreshold`
-- `Category`: add `slug`, `imageUrl`, `sortOrder`, `isActive`
-- `ProductImage`: add `altText`, `sortOrder`
-
-**Backend:**
-
-- Public endpoints only return active products. Add a `?featured=true` filter and a `GET /products/slug/:slug` endpoint.
-- **Image uploads** with `multer`. Files are stored either locally (`uploads/`) or on Cloudinary, chosen by `STORAGE_DRIVER`. Reorder and delete images.
-- Archive products (`isActive=false`) instead of hard-deleting them once they appear in orders.
-
-**Frontend (admin):**
-
-- An `AdminLayout` with a working sidebar, wrapped in `ProtectedRoute`. On a 401 response it clears the token and redirects to the login page.
-- **Products:** table with search and filters, create/edit form with a drag-to-reorder image uploader, and toggles for featured and active.
-- **Categories and subcategories:** list, create, edit, delete and reorder.
-- Toast notifications and confirmation dialogs.
-
-**Done when:** the owner can create a product with photos, mark it as featured or on sale, edit it, and archive it, all without touching the database.
+| Proposal section | Phase | Status |
+|---|---|---|
+| §3 Home page (hero, featured, new, popular, categories, banners, offers, WhatsApp button, footer) | API 1 · UI 2 | API ✅ |
+| §3 Shop page (filters, sort, search, pagination) | API 1 · UI 3 | API ✅ |
+| §3 Category pages | API 1 · UI 3 | API ✅ |
+| §3 Product details (gallery, price/discount, specs, SKU, stock, related, qty, cart, WhatsApp, email, share) | API 1 · UI 3 | API ✅ |
+| §4 Product fields: SKU, brand, short description, regular/sale price, discount, stock, specs, tags, featured, new arrival, status | 1 | ✅ |
+| §4 Product status Active / Inactive / Out of Stock / Draft | 1 | ✅ |
+| §5 Multiple product images + ordering | API 1 · UI 5 | API ✅ |
+| §6 Category & subcategory CRUD, image, description, active flag | API 1 · UI 5 | API ✅ |
+| §7 Search: name, code, brand, category, tags | 1 | ✅ |
+| §8 Shopping cart | 3 | — |
+| §9 WhatsApp order message (single product and whole cart) | API 1 · UI 4 | API ✅ |
+| §10 Email inquiry to the business email | API 1 · UI 4 | API ✅ |
+| §11 Customer order form | API 1 · UI 4 | API ✅ |
+| §12 Admin order/inquiry management + statuses + internal notes | API 1 · UI 5 | API ✅ |
+| §13 Dashboard statistics | API 1 · UI 5 | API ✅ |
+| §14 Admin users, Super Admin / Admin roles | API 1 · UI 5 | API ✅ |
+| §15 Banner management | API 1 · UI 5 | API ✅ |
+| §16–18 Featured, new arrivals, sale price / discount % | 1 | ✅ |
+| §19 Stock management | API 1 · UI 5 | API ✅ |
+| §20 Related products (same category / subcategory / hand-picked) | 1 | ✅ |
+| §21–22 Responsive, mobile-friendly | 2–6 | — |
+| §23 SEO (URLs, titles, meta, alt text, sitemap) | slugs + meta fields 1 · rest 6 | partly |
+| §24–25 Contact info, Google Map, social links, hours | settings 1 · UI 6 | API ✅ |
+| §26 Website content management (pages, banners, settings) | API 1 · UI 5 | API ✅ |
+| §27 Pages: About, Contact, Privacy, Terms, Delivery, Returns | API 1 · UI 6 | API ✅ |
+| §31 Security | 1 + 7 | partly |
+| §32 Performance (optimised images, pagination, caching) | 1 + 6 | partly |
+| Extra (not in proposal): COD order tracking page | API 1 · UI 4 | API ✅ |
+| §30 Future upgrades | Future | — |
 
 ---
 
-## Phase 3 — Wizarding-themed storefront + cart
+## Phase 0 — Foundation ✅
 
-**Goal:** the customer-facing shop, fully themed and connected to the API. See [THEME-GUIDE.md](THEME-GUIDE.md).
+Settings moved into environment variables, `.env.example` files, repo cleanup, README and docs.
 
-1. **Design system:** colour and font tokens in Tailwind 4 `@theme`, fonts, and shared components (`Button`, `Card`, `Badge`, `PriceTag`, `Input`, `Modal`, `Skeleton`, `EmptyState`).
-2. **Layout:** themed `Header` (logo, navigation, search, cart icon with a count), `Footer`, and an announcement bar.
-3. **Home:** hero, featured products (from the API), category "shopfronts", offers banner and a "new arrivals" row.
-4. **Shop page** (`/shop`, `/shop/:categorySlug`): filters, sorting, search and pagination, all kept in the URL query string.
-5. **Product page** (`/product/:slug`): gallery, price and offer price, stock status, quantity selector, add to cart, related products.
-6. **Cart** (`CartContext` saved to `localStorage`): a slide-out drawer and a `/cart` page. Quantities are checked against stock.
-7. **Pages:** 404 ("You seem to have Apparated to the wrong place"), About, Contact, Delivery and Returns policy.
-8. **SEO basics:** page titles and meta tags for each route, Open Graph image.
-9. **Ready for animation:** components accept a `className` and `ref`, and `prefers-reduced-motion` is respected.
+## Phase 1 — Backend foundation & full data model ✅
 
-**Done when:** a visitor can browse real products, filter and search, open a product and build a cart that survives a page refresh, on both mobile and desktop.
+- **Structure:** `routes → controllers → services`, plus `validators`, `middleware`, `utils` and `config`.
+- **Request handling:** every request is validated with Zod, and errors come back in one format.
+- **Security:**
+  - `helmet` headers, CORS allow-list, 1 MB body limit
+  - Rate limits on admin login, order placement and order tracking
+  - Admin accounts are re-checked on every request (deactivating one takes effect immediately)
+  - Super Admin / Admin roles
+- **Data model:**
+  - Full product fields, product status, product images, related products
+  - Categories and subcategories with slugs, images and an active flag
+  - Customers, orders (inquiries), order items and status history
+  - Banners, settings and content pages
+- **APIs:** the full public API and admin API. See [ARCHITECTURE.md](ARCHITECTURE.md#api).
+- **Orders:**
+  - Prices are recalculated on the server, and stock and availability are checked
+  - A WhatsApp message and link are generated for each order
+  - Emails go to the business and the customer (SMTP)
+  - Order tracking needs the order number plus the phone number
+- **Image uploads:** local disk, type and size checks, random file names.
+- **Seed data:** 8 categories, 28 products, banners and policy pages.
 
----
+**Done when:** ✅ all endpoints were tested against XAMPP MariaDB 10.4.
 
-## Phase 4 — Cash-on-Delivery checkout + order tracking
+## Phase 2 — Design system + animated landing page
 
-**Goal:** customers can place COD orders and track them, and the admin can process them.
+**Goal:** a wizarding-themed design system and a landing page that sets the visual standard. See [THEME-GUIDE.md](THEME-GUIDE.md).
 
-**Schema:** `Customer`, `Order`, `OrderItem`, `OrderStatusHistory`, `DeliveryZone`, `StockMovement`. Details are in [ARCHITECTURE.md](ARCHITECTURE.md#data-model).
+1. **Design tokens:** colours, fonts and spacing in Tailwind 4 `@theme`, with fonts loaded.
+2. **Motion system:**
+   - GSAP + ScrollTrigger for scroll-driven animation
+   - Lenis for smooth scrolling
+   - Motion for React for page transitions and small interactions
+   - Everything respects `prefers-reduced-motion`
+3. **Store layout:** announcement bar, sticky header with search, cart count and mobile menu; footer with contact details and social links from the settings API; floating WhatsApp button.
+4. **Landing page** (`/`), driven by `GET /api/home`:
+   - An animated hero
+   - Category "shopfronts", featured products, new arrivals, offers and promo banners, popular products
+   - Call-to-action sections
 
-**Backend:**
+   Each section has a scroll-reveal animation, and products have hover effects.
+5. **Animated route transitions**, plus loading skeletons and error states.
 
-- `POST /orders` (public, rate-limited):
-  - Validates the cart.
-  - **Recalculates all prices on the server** and ignores any prices sent by the client.
-  - Adds the delivery fee for the customer's district.
-  - In **one transaction**: checks stock, decrements it, creates the order and its items, and writes the status history and stock movements.
-  - Returns an order number (e.g. `DS-2026-000123`).
-- `GET /orders/track?orderNumber=&phone=`: public tracking. Both values must match, so nobody can look up other people's orders.
-- Admin: `GET /admin/orders` (filter by status, date and search), `GET /admin/orders/:id`, `PATCH /admin/orders/:id/status` (checks that the status change is allowed and records who made it), and `PATCH /admin/orders/:id` (courier name, tracking number, notes).
-- Cancelling an order **puts the stock back**.
-- Sri Lankan phone numbers are normalised to `94XXXXXXXXX`.
+**Done when:** the home page shows live API data, scrolls smoothly at 60 fps on mid-range phones, works from 360 px to 1920 px, and turns its animations off when reduced motion is requested.
 
-**Frontend:**
+## Phase 3 — Shop, categories, product page, cart
 
-- `/checkout`: customer details, delivery address, district drop-down (fee updates as you choose), order summary, "Pay on delivery" label.
-- `/order/success/:orderNumber`: confirmation page with a "Send to us on WhatsApp" button (wired up in Phase 5).
-- `/track`: enter the order number and phone to see a status timeline.
-- Admin **Orders** page: list, detail drawer, status buttons, print/packing slip.
+- `/shop`:
+  - Filters for category, subcategory, price range, availability, featured / new / on sale
+  - Sorting, search, "Load more" or pagination
+  - All filters kept in the URL
+- `/category/:slug`: category header (image and description) plus the same product grid.
+- `/product/:slug`:
+  - Image gallery with zoom and swipe
+  - Regular and sale price with discount %, SKU, brand, stock status, specifications table
+  - Quantity selector, Add to Cart, Order via WhatsApp (single product), Email inquiry
+  - Share (Web Share API, with copy-link as a fallback), related products
+- **Cart** (`CartContext` + `localStorage`):
+  - Drawer and `/cart` page with increase / decrease / remove
+  - Subtotal and estimated total
+  - "Continue shopping" and "Proceed to order"
+- **Search** in the header with instant suggestions.
 
-**Done when:** a customer can place a COD order, stock goes down, the admin sees the order and moves it through each status, and the customer sees every change on `/track`.
+**Done when:** a visitor can find any product by search or filters, view it, and build a cart that survives a page refresh.
 
----
+## Phase 4 — Order / inquiry flow
 
-## Phase 5 — WhatsApp integration
+- `/checkout` (order form, proposal §11):
+  - Full name, mobile, email, delivery address, city, notes
+  - Choose how to send the order: **WhatsApp** or **Email**
+- On submit, `POST /api/inquiries` saves the order, then:
+  - **WhatsApp:** open the returned `whatsappUrl`, which already contains the message.
+  - **Email:** the server emails the business and the customer.
+- `/order/success/:number`: order number, summary, "Send on WhatsApp again" and "Track order" buttons.
+- `/track`: order number + mobile → status timeline (New → Contacted → Confirmed → Processing → Completed, or Cancelled).
+- Quick "Order via WhatsApp" from the product page, a single-product version of the same flow.
 
-**Goal:** the shop and the customers are notified on WhatsApp, and customers can order through WhatsApp.
+**Done when:** an order placed on the site appears in the admin API, opens in WhatsApp with the correct message (or arrives by email), and shows on `/track`.
 
-Done in two layers (design in [ARCHITECTURE.md](ARCHITECTURE.md#whatsapp-integration)):
+## Phase 5 — Admin panel UI
 
-1. **Click-to-chat (free, no Meta approval needed):**
-   - A "Confirm / ask about this order on WhatsApp" button on the success page and on `/track`. It opens `wa.me/<shop>` with a pre-filled message containing the order number and items.
-   - An "Order this item via WhatsApp" button on product pages.
-   - A floating WhatsApp chat button.
-2. **WhatsApp Cloud API (automatic messages):**
-   - `services/whatsapp.service.js` sends approved template messages.
-   - Each new order triggers an alert to the shop number and an "order received" message to the customer.
-   - Each status change triggers an `order_status_update` message to the customer.
-   - Messages are sent **without blocking**: a WhatsApp failure never fails an order. Every attempt is logged in `NotificationLog`.
-   - Webhook `GET/POST /api/whatsapp/webhook` handles verification, delivery status and incoming messages (optional: reply with the order status when a customer sends their order number).
-   - Admin: "Resend WhatsApp" button on an order, and an on/off switch in Settings.
+`AdminLayout` with a protected route (redirects to login on a 401). The panel is calm and functional, in the same palette as the shop.
 
-**Prerequisites (owner's side):** a Meta Business account, a verified business, a WhatsApp Business phone number and an approved message template. Start this paperwork **during Phase 3**, because approval takes time.
+- **Dashboard:** stat cards (proposal §13), recent orders, stock alerts.
+- **Products:**
+  - List with search and filters (status, stock, category)
+  - Add / edit form with every proposal §4 field, a specifications editor and tag input
+  - Drag-and-drop multi-image uploader with reordering and alt text
+  - Related-products picker; featured, new-arrival and status toggles; publish
+- **Stock:** quick stock edit and ± adjustment, low-stock and out-of-stock filters.
+- **Categories and subcategories:** CRUD, image upload, active toggle, sort order.
+- **Orders / inquiries:**
+  - Tabs by status, detail drawer, status change with a note, internal notes
+  - "Message customer on WhatsApp" button, delete
+- **Customers:** list and order history.
+- **Banners:** CRUD with image upload, placement, schedule (start and end dates), active toggle.
+- **Settings:** business details, WhatsApp, email, address, map embed, hours, social links, announcement, SEO defaults.
+- **Pages:** rich-text editor for About and the policy pages.
+- **Admin users** (Super Admin only), and change my password.
 
-**Done when:** placing an order sends a WhatsApp alert to the shop and a confirmation to the customer, and changing the status in the admin panel sends the customer an update.
+**Done when:** the owner can complete the proposal §29 workflow (log in → add product → upload images → mark featured / new / sale → publish → it appears on the site) without a developer.
 
----
+## Phase 6 — Content, contact, SEO & performance
 
-## Phase 6 — Admin operations, offers & email
+- Pages: About, Contact (form, map, hours, social links), Privacy, Terms, Delivery Information, Return / Refund (`/pages/:slug`).
+- SEO:
+  - Page titles and meta per route (product and category meta fields), Open Graph tags
+  - `sitemap.xml` generated from the API, `robots.txt`
+  - Product JSON-LD structured data
+- Performance:
+  - Responsive image sizes, lazy loading
+  - Admin route code-splitting
+  - API cache headers for public GETs
 
-**Goal:** the owner can run the business day to day from the admin panel.
+## Phase 7 — QA, security & launch
 
-- **Dashboard:**
-  - Revenue (today, week and month), orders by status, average order value
-  - Sales chart, top products, low-stock list, recent orders
-- **Inventory:**
-  - Stock list with low-stock alerts
-  - Manual stock adjustments with a reason (`StockMovement` log)
-  - CSV export
-- **Featured products:** pick and order the featured products shown on the home page.
-- **Offers:**
-  - Per-product sale price (`compareAtPrice`)
-  - Category-wide % discount campaigns with start and end dates
-  - Home page promo banners (`Promotion` model)
-- **Coupons:**
-  - % or fixed amount, minimum order, usage limit, date range
-  - Applied at checkout and validated on the server
-- **Customers:** list built from orders (phone is the key), order history and lifetime value for each customer.
-- **Settings:**
-  - Store info, WhatsApp number, delivery fee per district, free-delivery threshold
-  - Turn COD and PayHere on or off
-- **Admin users:** add or remove admins, change password, roles (`ADMIN`, `STAFF`).
-- **Email (Resend or SMTP):** order confirmation to the customer (if they gave an email), new-order email to the owner, status-change emails.
+- API tests (Vitest + Supertest) for orders, auth and products. End-to-end test of the order flow (Playwright).
+- Security review: run `npm audit`; check uploads, rate limits and admin-only routes.
+- Accessibility pass (WCAG AA contrast, keyboard navigation, reduced motion).
+- Deployment:
+  - API on a Node host or VPS with MySQL, plus a persistent `uploads/` volume
+  - Static frontend; HTTPS and a domain
+  - `prisma migrate deploy` during deploy
+- Daily database and uploads backups, uptime monitoring.
+- ⚠️ Fix the lowercase `product` table name in migration `20260928153143` before deploying to Linux (see TODO known issues).
 
-**Done when:** the owner can answer "what sold, what's running low, what's pending" from the dashboard, and run a coupon or sale without help from a developer.
+## Future (proposal §30)
 
----
+Ordered roughly by value:
 
-## Phase 7 — PayHere online payments
-
-**Goal:** card and online payment as an alternative to COD.
-
-- `paymentMethod: PAYHERE` on `Order`. The order is created as `PENDING_PAYMENT`.
-- `POST /payments/payhere/checkout` builds the payment form fields and the **MD5 hash on the server** (the merchant secret never reaches the browser).
-- `POST /payments/payhere/notify`:
-  - Checks `md5sig`.
-  - Updates `paymentStatus`.
-  - Confirms the order and sends notifications.
-  - Can safely receive the same notification more than once.
-- If payment fails or is cancelled, the stock is released after a timeout.
-- Admin: payment status and PayHere payment ID shown on each order.
-- Test against the PayHere sandbox. The notify URL must be publicly reachable (ngrok or cloudflared in development).
-
-**Done when:** a sandbox card payment marks the order as paid automatically, and a failed payment doesn't keep the stock reserved.
-
----
-
-## Phase 8 — Polish, testing & deployment
-
-- **Testing:** API tests (Vitest/Jest + Supertest) for orders, stock and auth. End-to-end checkout test (Playwright).
-- **Performance:** image optimisation (Cloudinary transforms or `sharp`), lazy loading, code-splitting for admin routes.
-- **Accessibility pass:** keyboard navigation, colour contrast on parchment backgrounds, reduced-motion support.
-- **SEO:** sitemap, `robots.txt`, product structured data (JSON-LD).
-- **Deployment:**
-  - The API runs on a Node host (Render, Railway or a VPS) with managed MySQL; the frontend runs on Netlify, Vercel or Render static hosting.
-  - `prisma migrate deploy` runs during deploy.
-  - HTTPS and a custom domain.
-- **Operations:** daily database backups, uptime monitoring, error tracking (Sentry).
-- **Legal pages:** privacy policy, terms, returns policy.
-
-**Done when:** the site runs in production on its domain, with backups and monitoring in place.
+- WhatsApp Cloud API automation (automatic order and status messages)
+- PayHere online payments
+- Discount coupons
+- Sales reports
+- SMS notifications
+- Customer accounts and order history
+- Wishlist
+- Reviews and ratings
+- Automated invoices (PDF)
+- Courier integration and delivery management
+- Loyalty points
+- Abandoned-cart reminders
+- Advanced analytics
+- Cloudinary image hosting

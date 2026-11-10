@@ -1,27 +1,28 @@
 # 🪄 Diagon Store
 
-**Diagon Store** is a single-shop e-commerce website styled like a wizarding high street — think a magical alley of shopfronts, parchment, candlelight and gold, built for one store.
+**Diagon Store** is a multi-category e-commerce website styled like a wizarding high street: one enchanted alley of shopfronts, parchment, candlelight and gold, built for a single store.
 
-Customers browse the catalogue, add items to their trunk (cart), place **Cash-on-Delivery** orders, get updates on **WhatsApp**, and **track their order** on the website. The shop owner runs everything from an **admin panel**: catalogue, inventory, featured products, offers, orders and sales.
+Customers browse electronics, fashion, beauty, home goods and more, then fill a cart and **send their order through WhatsApp or email**. Payment is **cash on delivery**, and customers **track the order** on the website using its order number. The shop team runs everything from a secure **admin panel**: products, images, prices, stock, categories, banners, featured products, offers, orders, customers, pages and settings.
 
-> **Status:** early development. The catalogue API and admin login work today; ordering, WhatsApp, tracking and the themed storefront are being built. See [docs/ROADMAP.md](docs/ROADMAP.md) for the full plan.
+> **Status:** Phase 1 (backend + full data model) is complete. The themed, animated storefront is next. See [docs/ROADMAP.md](docs/ROADMAP.md).
 
 ---
 
 ## Features
 
-| Feature | Status |
-|---|---|
-| Product / category / subcategory API with admin-only write access | ✅ Done |
-| Admin login (JWT) | ✅ Done |
-| Admin dashboard (counts only) | 🟡 Started |
-| Storefront home page (static demo products) | 🟡 Started |
-| Wizarding-themed storefront, shop, product page, cart | ⏳ Planned — Phase 3 |
-| Cash-on-Delivery checkout + order tracking page | ⏳ Planned — Phase 4 |
-| WhatsApp order alerts, status updates, "order via WhatsApp" | ⏳ Planned — Phase 5 |
-| Admin: orders, inventory, featured products, offers, coupons, sales reports | ⏳ Planned — Phases 2 & 6 |
-| Email notifications | ⏳ Planned — Phase 6 |
-| PayHere online card payments | ⏳ Planned — Phase 7 |
+| Feature | API | UI |
+|---|---|---|
+| Products: SKU, brand, regular / sale price, discount %, stock, specifications, tags, multiple images, status (Active / Inactive / Out of stock / Draft) | ✅ | Phase 3 / 5 |
+| Categories & subcategories with images and active flag | ✅ | Phase 3 / 5 |
+| Search (name, code, brand, category, tags), filters, sorting, pagination | ✅ | Phase 3 |
+| Featured, new arrivals, popular, on-sale sections; related products | ✅ | Phase 2 / 3 |
+| Home page banners and promo banners (scheduled) | ✅ | Phase 2 / 5 |
+| Cart → order form → WhatsApp message / email inquiry (COD) | ✅ | Phase 3 / 4 |
+| Order tracking (order number + mobile) | ✅ | Phase 4 |
+| Admin: dashboard, orders/inquiries with statuses & notes, customers, stock | ✅ | Phase 5 |
+| Admin: banners, settings (contact, WhatsApp, social, hours, map), content pages | ✅ | Phase 5 / 6 |
+| Admin users with Super Admin / Admin roles | ✅ | Phase 5 |
+| Wizarding theme, smooth animations, responsive design | — | Phase 2 → 6 |
 
 ---
 
@@ -29,160 +30,106 @@ Customers browse the catalogue, add items to their trunk (cart), place **Cash-on
 
 | Layer | Technology |
 |---|---|
-| Frontend | React 19, Vite 8, React Router 7, Tailwind CSS 4 |
-| Backend | Node.js, Express 5 |
-| Database | MySQL 8 / MariaDB 10.6+ via Prisma ORM 7 (MariaDB driver adapter) |
-| Auth | JSON Web Tokens + bcrypt |
-| Planned integrations | WhatsApp Cloud API, PayHere, Resend / SMTP, Cloudinary |
-| Planned UI/animation | GSAP, Motion and component libraries (added later) |
+| Frontend | React 19, Vite 8, React Router 7, Tailwind CSS 4 (GSAP, Lenis and Motion from Phase 2) |
+| Backend | Node.js 20+, Express 5, Zod, helmet, express-rate-limit, multer, nodemailer |
+| Database | MySQL 8 / MariaDB 10.4+ (XAMPP) via Prisma ORM 7 |
+| Auth | JWT + bcrypt, roles `SUPER_ADMIN` / `ADMIN` |
 
 ---
 
-## Project structure
-
-```
-diagon-store/
-├── backend/            Express REST API
-│   ├── middleware/     Auth guard
-│   ├── routes/         API route handlers (admin, products, categories)
-│   ├── prisma/         Database schema + migrations
-│   ├── server.js       App entry point
-│   └── .env.example    Backend environment template
-├── frontend/           React storefront + admin panel (Vite)
-│   ├── src/pages/      Page components
-│   ├── src/services/   API client
-│   └── .env.example    Frontend environment template
-└── docs/               Roadmap, TODO, architecture, file guide, theme guide
-```
-
-A description of every file is in [docs/FILE-GUIDE.md](docs/FILE-GUIDE.md).
-
----
-
-## Getting started
+## Getting started (Windows + XAMPP)
 
 ### Prerequisites
 
-- **Node.js 20.19+** (22 LTS recommended) and npm
-- **MySQL 8** or **MariaDB 10.6+** running locally
+- **Node.js 20.19+** (22 LTS recommended)
+- **XAMPP** with MySQL/MariaDB, or MySQL 8
 - Git
 
-### 1. Clone
+### 1. Start MySQL and create the database
 
-```bash
-git clone https://github.com/Yasintha787/diagon-store.git
-cd diagon-store
-```
-
-### 2. Create the database
+Open the **XAMPP Control Panel** and start **MySQL**. Then open phpMyAdmin (http://localhost/phpmyadmin) and run:
 
 ```sql
 CREATE DATABASE diagon_store CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ```
 
-### 3. Set up the backend
+### 2. Backend
 
 ```bash
 cd backend
 npm install
-cp .env.example .env        # Windows PowerShell: Copy-Item .env.example .env
+cp .env.example .env        # PowerShell: Copy-Item .env.example .env
 ```
 
-Edit `backend/.env` and set at least:
+Edit `backend/.env`:
 
-- `DATABASE_URL` — e.g. `mysql://root:yourpassword@localhost:3306/diagon_store`
-- `JWT_SECRET` — generate one with
-  `node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"`
-- `ADMIN_EMAIL` / `ADMIN_PASSWORD` — your first admin login (password ≥ 10 characters)
-
-Then create the tables, generate the Prisma client and add the admin:
+| Key | Value |
+|---|---|
+| `DATABASE_URL` | XAMPP default: `mysql://root:@localhost:3306/diagon_store` (root user, no password) |
+| `JWT_SECRET` | Generate with `node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"` |
+| `ADMIN_EMAIL` / `ADMIN_PASSWORD` | Your first admin login (password ≥ 10 characters) |
 
 ```bash
-npm run db:deploy        # apply migrations to the database
-npm run db:generate      # generate the Prisma client
-npm run db:test          # optional: check the database connection
-npm run create-admin     # create the first admin from ADMIN_* in .env
-npm run dev              # start the API on http://127.0.0.1:5000 (auto-restarts on changes)
+npm run db:deploy       # create / update the tables
+npm run db:generate     # generate the Prisma client
+npm run db:seed         # optional: demo categories, products, banners, pages
+npm run create-admin    # first admin (SUPER_ADMIN) from ADMIN_* in .env
+npm run dev             # API on http://127.0.0.1:5000
 ```
 
-### 4. Set up the frontend
-
-In a second terminal:
+### 3. Frontend
 
 ```bash
 cd frontend
 npm install
-cp .env.example .env        # Windows PowerShell: Copy-Item .env.example .env
-npm run dev                 # http://localhost:5173
+cp .env.example .env
+npm run dev             # http://localhost:5173
 ```
-
-### 5. Open it
 
 | URL | What |
 |---|---|
 | http://localhost:5173 | Storefront |
-| http://localhost:5173/admin/login | Admin login (use `ADMIN_EMAIL` / `ADMIN_PASSWORD`) |
-| http://127.0.0.1:5000 | API health check |
+| http://localhost:5173/admin/login | Admin login |
+| http://127.0.0.1:5000/api/health | API health check |
+| http://127.0.0.1:5000/api/home | Home page data (JSON) |
 
 ---
 
 ## Scripts
 
-### Backend (`backend/`)
+**Backend** (`backend/`)
 
 | Command | What it does |
 |---|---|
-| `npm run dev` | Start the API with auto-restart on file changes |
-| `npm start` | Start the API (production) |
-| `npm run db:migrate` | Create + apply a new migration after editing `schema.prisma` (development) |
+| `npm run dev` | API with auto-restart on changes |
+| `npm start` | API (production) |
+| `npm run db:migrate` | After editing `schema.prisma`: create + apply a migration (dev) |
 | `npm run db:deploy` | Apply existing migrations (fresh setup / production) |
 | `npm run db:generate` | Regenerate the Prisma client |
-| `npm run db:studio` | Open Prisma Studio to browse the database |
-| `npm run db:test` | Test the database connection |
-| `npm run create-admin` | Create the first admin account |
+| `npm run db:seed` | Load demo data (safe to re-run) |
+| `npm run db:studio` | Browse the database in Prisma Studio |
+| `npm run db:test` | Check the database connection |
+| `npm run create-admin` | Create a SUPER_ADMIN from `.env` |
 
-### Frontend (`frontend/`)
-
-| Command | What it does |
-|---|---|
-| `npm run dev` | Start the Vite dev server |
-| `npm run build` | Production build into `frontend/dist` |
-| `npm run preview` | Preview the production build |
-| `npm run lint` | Lint with oxlint |
+**Frontend** (`frontend/`): `npm run dev`, `npm run build`, `npm run preview`, `npm run lint`.
 
 ---
 
 ## Environment variables
 
-Templates with every key (database, JWT, WhatsApp Cloud API, PayHere, email, image storage) are committed:
+- [backend/.env.example](backend/.env.example): database, JWT, first admin, store, SMTP email, uploads, rate limits, plus placeholders for future WhatsApp Cloud API, PayHere and Cloudinary keys.
+- [frontend/.env.example](frontend/.env.example): `VITE_API_URL`.
 
-- [backend/.env.example](backend/.env.example)
-- [frontend/.env.example](frontend/.env.example)
-
-Each key is tagged with the roadmap phase that needs it. **Never commit a real `.env` file.** Frontend variables (`VITE_*`) are visible in the browser, so secrets only ever go in the backend `.env`.
+Business details (phone, WhatsApp number, email, address, social links, hours) are **not** in `.env`. They are edited in **Admin → Settings** and stored in the database. Never commit a real `.env`.
 
 ---
 
-## API (current)
+## API
 
-Base URL: `http://127.0.0.1:5000/api` — 🔒 = needs `Authorization: Bearer <admin token>`
+The full reference is in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md#api). In summary:
 
-| Method | Endpoint | Description |
-|---|---|---|
-| POST | `/admin/login` | Admin login → returns JWT |
-| GET | `/admin/profile` 🔒 | Current admin |
-| GET | `/products` | List products (with category, subcategory, images) |
-| POST | `/products` 🔒 | Create product |
-| PUT | `/products/:id` 🔒 | Update product |
-| DELETE | `/products/:id` 🔒 | Delete product |
-| POST | `/products/:productId/images` 🔒 | Add image (by URL) |
-| GET | `/categories` | List categories with subcategories |
-| POST | `/categories` 🔒 | Create category |
-| DELETE | `/categories/:id` 🔒 | Delete category |
-| POST | `/categories/subcategories` 🔒 | Create subcategory |
-| DELETE | `/categories/subcategories/:id` 🔒 | Delete subcategory |
-
-Planned endpoints (orders, tracking, WhatsApp, coupons, reports…) are listed in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+- **Public** `/api`: `home`, `products` (search, filters, sort, pages), `products/:slug`, `products/:slug/related`, `categories`, `banners`, `settings`, `pages/:slug`, `POST inquiries` (place an order), `inquiries/track`
+- **Admin** `/api/admin` (JWT): `login`, `dashboard`, `products` (+ images, stock), `categories`, `subcategories`, `inquiries`, `customers`, `banners`, `uploads`, `settings`, `pages`, `admins`
 
 ---
 
@@ -190,17 +137,17 @@ Planned endpoints (orders, tracking, WhatsApp, coupons, reports…) are listed i
 
 | Doc | Purpose |
 |---|---|
-| [docs/ROADMAP.md](docs/ROADMAP.md) | Build phases in order, with "done when" criteria |
-| [docs/TODO.md](docs/TODO.md) | Task checklist per phase + known issues |
-| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Data model, API design, order flow, WhatsApp & payment design |
-| [docs/FILE-GUIDE.md](docs/FILE-GUIDE.md) | What every file in the project does |
-| [docs/THEME-GUIDE.md](docs/THEME-GUIDE.md) | Wizarding visual theme: colours, fonts, wording, motion |
+| [docs/ROADMAP.md](docs/ROADMAP.md) | Phases in order, mapped to the client proposal |
+| [docs/TODO.md](docs/TODO.md) | Checklist per phase + known issues |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Data model, API, order flow, security |
+| [docs/FILE-GUIDE.md](docs/FILE-GUIDE.md) | What every file does |
+| [docs/THEME-GUIDE.md](docs/THEME-GUIDE.md) | Wizarding theme, colours, fonts, motion |
 
 ---
 
 ## Contributing
 
-1. Create a branch from `main` (`feature/<short-name>`).
-2. Keep secrets out of commits — only `.env.example` files are tracked.
-3. After changing `backend/prisma/schema.prisma`, run `npm run db:migrate` and commit the generated migration folder.
-4. Tick off items in [docs/TODO.md](docs/TODO.md) as you finish them.
+1. Branch from `main` (`feature/<phase>-<name>`), then open a pull request into `main`.
+2. Only `.env.example` files are tracked. Never commit secrets or `backend/uploads/`.
+3. After changing `schema.prisma`, run `npm run db:migrate` and commit the new migration folder.
+4. Update [docs/TODO.md](docs/TODO.md) and [docs/FILE-GUIDE.md](docs/FILE-GUIDE.md) in the same PR.

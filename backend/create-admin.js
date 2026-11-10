@@ -30,7 +30,7 @@ async function createAdmin() {
         name,
         email: email.trim(),
         password: hashedPassword,
-        role: "ADMIN",
+        role: "SUPER_ADMIN", // first admin can manage other admins
       },
     });
 
