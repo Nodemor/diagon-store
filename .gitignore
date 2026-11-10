@@ -1,9 +1,17 @@
-# Environment variables
+# Environment variables (keep the committed examples)
 .env
 .env.*
+!.env.example
 
-# Node modules
+# Dependencies
 node_modules/
+
+# Build output
+dist/
+dist-ssr/
+
+# Uploaded files (local storage during development)
+backend/uploads/
 
 # Logs
 *.log
@@ -13,5 +21,16 @@ npm-debug.log*
 .DS_Store
 Thumbs.db
 
-# VS Code local settings
+# Editor / IDE settings
 .vscode/
+.idea/
+
+# AI coding-assistant files (generated locally, never committed)
+.claude/
+.agents/
+.cursor/
+.devin/
+.windsurf/
+.github/copilot-instructions.md
+CLAUDE.md
+AGENTS.md

@@ -1,4 +1,5 @@
-const API_BASE_URL = "http://127.0.0.1:5000/api";
+// Set VITE_API_URL in frontend/.env (see frontend/.env.example)
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:5000/api";
 
 // ===============================
 // ADMIN LOGIN
