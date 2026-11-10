@@ -14,7 +14,7 @@ function AdminDashboard() {
         const products = await getProducts();
         const categories = await getCategories();
 
-        setProductCount(products.length);
+        setProductCount(products.total);
         setCategoryCount(categories.length);
       } catch (error) {
         console.error("Failed to load dashboard data:", error);
