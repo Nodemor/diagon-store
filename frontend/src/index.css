@@ -1,1 +1,136 @@
 @import "tailwindcss";
+@import "lenis/dist/lenis.css";
+
+/* =====================================================================
+   Diagon Store design tokens — "the alley at lamplight"
+   See docs/THEME-GUIDE.md before adding colours or fonts.
+   ===================================================================== */
+@theme {
+  /* night street */
+  --color-night: #1c2230;        /* page chrome, hero, footer */
+  --color-night-deep: #141924;   /* sky, deepest shadows */
+  --color-cobble: #2b3345;       /* raised surfaces on night */
+  --color-cobble-line: #3a4357;  /* borders on night */
+  /* light */
+  --color-lamp: #f2b544;         /* lamplight — primary accent, CTAs */
+  --color-lamp-soft: #f7d38a;
+  --color-lamp-deep: #8a5a00;    /* lamp text on fog (≥ 4.5:1 contrast) */
+  /* fog — product sections */
+  --color-fog: #e8ecef;
+  --color-fog-deep: #d9dfe5;     /* image wells, dividers */
+  --color-mist: #f5f7f8;         /* cards on fog */
+  /* signage */
+  --color-verdigris: #4fa39a;    /* copper patina — signs, success, in stock */
+  --color-verdigris-deep: #2f6f68;
+  --color-oxblood: #8e2f3c;      /* sale tags, errors */
+  --color-plum: #4a3550;         /* shopfront variety */
+  /* text */
+  --color-ink: #1c2230;
+  --color-ink-soft: #4b5568;
+  --color-moon: #e9edf3;         /* text on night */
+  --color-moon-soft: #a9b3c4;
+
+  --font-sign: "IM Fell English", "Iowan Old Style", Georgia, serif;
+  --font-sans: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --ease-alley: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    margin: 0;
+    background: var(--color-fog);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-sign);
+    font-weight: 400;
+    line-height: 1.08;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  img {
+    display: block;
+    max-width: 100%;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-lamp);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  ::selection {
+    background: var(--color-lamp);
+    color: var(--color-night);
+  }
+}
+
+@layer components {
+  /* lamp halo used by the hero lamps and the floating WhatsApp button */
+  .lamp-halo {
+    background: radial-gradient(circle, rgb(242 181 68 / 0.55) 0%, rgb(242 181 68 / 0.18) 35%, transparent 70%);
+  }
+
+  /* hide scrollbar on horizontal rails, keep them scrollable */
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* slow fog drift in the hero */
+@keyframes fog-drift {
+  from {
+    transform: translateX(-4%);
+  }
+  to {
+    transform: translateX(4%);
+  }
+}
+
+/* gentle candle flicker for lit lamps */
+@keyframes flicker {
+  0%, 100% { opacity: 1; }
+  42% { opacity: 0.86; }
+  44% { opacity: 1; }
+  71% { opacity: 0.92; }
+}
+
+.animate-fog {
+  animation: fog-drift 18s ease-in-out infinite alternate;
+}
+.animate-flicker {
+  animation: flicker 5s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fog,
+  .animate-flicker {
+    animation: none;
+  }
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+  }
+}
