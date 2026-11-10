@@ -4,7 +4,7 @@
 
 Customers browse electronics, fashion, beauty, home goods and more, then fill a cart and **send their order through WhatsApp or email**. Payment is **cash on delivery**, and customers **track the order** on the website using its order number. The shop team runs everything from a secure **admin panel**: products, images, prices, stock, categories, banners, featured products, offers, orders, customers, pages and settings.
 
-> **Status:** Phase 1 (backend + full data model) and Phase 2 (design system + animated landing page) are complete. Shop, product pages and cart are next. See [docs/ROADMAP.md](docs/ROADMAP.md).
+> **Status:** Phase 1 (backend + full data model) is complete. The themed, animated storefront is next. See [docs/ROADMAP.md](docs/ROADMAP.md).
 
 ---
 
@@ -22,7 +22,7 @@ Customers browse electronics, fashion, beauty, home goods and more, then fill a 
 | Admin: dashboard, orders/inquiries with statuses & notes, customers, stock | ✅ | Phase 5 |
 | Admin: banners, settings (contact, WhatsApp, social, hours, map), content pages | ✅ | Phase 5 / 6 |
 | Admin users with Super Admin / Admin roles | ✅ | Phase 5 |
-| Wizarding theme, smooth animations, responsive design | — | ✅ Landing page · rest Phase 3 → 6 |
+| Wizarding theme, smooth animations, responsive design | — | Phase 2 → 6 |
 
 ---
 

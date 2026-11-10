@@ -1,13 +1,61 @@
-// Admin API helpers (the admin panel UI is rebuilt in Phase 5)
-import { request, API_BASE_URL } from "../lib/api";
+// Set VITE_API_URL in frontend/.env (see frontend/.env.example)
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:5000/api";
 
-const token = () => localStorage.getItem("adminToken");
+// ===============================
+// ADMIN LOGIN
+// ===============================
+export async function adminLogin(email, password) {
+  const response = await fetch(`${API_BASE_URL}/admin/login`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      email,
+      password,
+    }),
+  });
 
-export const adminLogin = (email, password) => request("/admin/login", { method: "POST", body: { email, password } });
-export const getAdminDashboard = () => request("/admin/dashboard", { token: token() });
+  const data = await response.json();
 
-// kept for older pages
-export const getProducts = () => request("/products", { query: { limit: 1 } });
-export const getCategories = () => request("/categories");
+  if (!response.ok) {
+    throw new Error(data.message || "Login failed");
+  }
 
+  return data;
+}
+
+// ===============================
+// GET ALL PRODUCTS
+// ===============================
+export async function getProducts() {
+  const response = await fetch(`${API_BASE_URL}/products`);
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to fetch products");
+  }
+
+  return data;
+}
+
+// ===============================
+// GET ALL CATEGORIES
+// ===============================
+export async function getCategories() {
+  const response = await fetch(`${API_BASE_URL}/categories`);
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to fetch categories");
+  }
+
+  return data;
+}
+
+// ===============================
+// API BASE URL
+// ===============================
 export { API_BASE_URL };
