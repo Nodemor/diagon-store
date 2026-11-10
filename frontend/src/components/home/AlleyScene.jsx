@@ -14,7 +14,7 @@ function seeded(seed) {
   };
 }
 
-const WIDTH = 1440;
+const WIDTH = 3000; // wide drawing: its height follows the screen width, so nothing is cropped
 const HEIGHT = 440;
 const GROUND = 392;
 
@@ -65,7 +65,7 @@ function windowsFor(building, rand) {
   return wins;
 }
 
-const LAMPS = [130, 470, 820, 1150, 1380];
+const LAMPS = Array.from({ length: 9 }, (_, i) => 160 + i * 335);
 
 function AlleySceneBase({ className = "" }) {
   const rand = seeded(7);
@@ -86,9 +86,14 @@ function AlleySceneBase({ className = "" }) {
           <stop offset="0.25" stopColor="#f2b544" stopOpacity="0.35" />
           <stop offset="1" stopColor="#f2b544" stopOpacity="0" />
         </radialGradient>
+        <linearGradient id="streetFog" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#a9b3c4" stopOpacity="0" />
+          <stop offset="0.6" stopColor="#a9b3c4" stopOpacity="0.08" />
+          <stop offset="1" stopColor="#a9b3c4" stopOpacity="0" />
+        </linearGradient>
         <linearGradient id="ground" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#1a2030" />
-          <stop offset="1" stopColor="#11151e" />
+          <stop offset="0" stopColor="#151a26" />
+          <stop offset="1" stopColor="#1c2230" />
         </linearGradient>
       </defs>
 
@@ -134,9 +139,12 @@ function AlleySceneBase({ className = "" }) {
 
       {/* cobbled ground */}
       <rect x="0" y={GROUND} width={WIDTH} height={HEIGHT - GROUND} fill="url(#ground)" />
-      {Array.from({ length: 48 }, (_, i) => (
+      {Array.from({ length: 98 }, (_, i) => (
         <ellipse key={`c${i}`} cx={i * 31 + (i % 2) * 14} cy={GROUND + 18 + (i % 3) * 9} rx="12" ry="3" fill="#232a3a" />
       ))}
+
+      {/* low fog along the street */}
+      <rect x="0" y={GROUND - 26} width={WIDTH} height="40" fill="url(#streetFog)" />
 
       {/* street lamps */}
       {LAMPS.map((x, i) => (

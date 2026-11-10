@@ -1,8 +1,11 @@
-import { useRef } from "react";
+import { lazy, Suspense, useRef } from "react";
 import { gsap, useGSAP, REDUCED_MOTION } from "../../lib/motion";
 import { ButtonLink } from "../ui/Button";
 import { AlleyScene } from "./AlleyScene";
 import { HeroWindow } from "./HeroWindow";
+
+// WebGL snow (React Bits "Pixel Snow") is loaded separately so it never delays the first paint.
+const PixelSnow = lazy(() => import("../reactbits/PixelSnow"));
 
 /**
  * Landing hero: the street at night. On load the windows light up, then the lamps
@@ -65,9 +68,30 @@ export function Hero({ banners, fallbackImage }) {
       <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(120%_70%_at_70%_0%,#2b3550_0%,#1c2230_45%,#141924_100%)]" />
       <div className="animate-fog pointer-events-none absolute -inset-x-20 bottom-[14%] -z-10 h-40 rounded-[50%] bg-moon/[0.05] blur-3xl" />
 
-      <AlleyScene className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-[clamp(170px,26vh,320px)] w-full opacity-90" />
+      {/* falling snow over the empty sky; flakes drift aside from the cursor */}
+      <div className="pointer-events-none absolute inset-0 -z-10">
+        <Suspense fallback={null}>
+          <PixelSnow
+            color="#e9edf3"
+            variant="round"
+            density={0.32}
+            speed={0.55}
+            wind={0.18}
+            sway={0.6}
+            flakeSize={0.85}
+            pixelSize={2}
+            depth={0.75}
+            glow={0.7}
+            twinkle={0.3}
+            opacity={0.8}
+          />
+        </Suspense>
+      </div>
 
-      <div className="hero-content mx-auto grid min-h-[calc(100svh-4rem)] max-w-7xl items-center gap-12 px-4 pb-[clamp(160px,22vh,290px)] pt-12 sm:px-6 md:min-h-[calc(100svh-4.5rem)] lg:grid-cols-[1.15fr_0.85fr] lg:gap-16 lg:px-8 lg:pt-10">
+      {/* the street: height follows the width (no cropping) from md up; cropped at the sides on phones */}
+      <AlleyScene className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-[190px] w-full md:aspect-[3000/440] md:h-auto" />
+
+      <div className="hero-content mx-auto grid min-h-[calc(100svh-4rem)] max-w-7xl items-center gap-12 px-4 pb-[170px] pt-12 md:pb-[calc(14.7vw+1rem)] sm:px-6 md:min-h-[calc(100svh-4.5rem)] lg:grid-cols-[1.15fr_0.85fr] lg:gap-16 lg:px-8 lg:pt-10">
         <div className="max-w-2xl">
           <h1 id="hero-title" className="text-[clamp(3.25rem,8.5vw,7rem)] leading-[0.95]">
             <span className="block overflow-hidden pb-[0.08em]">

@@ -163,14 +163,15 @@ React 19 + Vite 8 + Tailwind CSS 4. Motion: GSAP + ScrollTrigger, Lenis, Motion 
 | File | Purpose |
 |---|---|
 | `motion/SmoothScroll.jsx` | Lenis smooth scrolling synced with the GSAP ticker and ScrollTrigger; `useLenis`, `scrollToTop` |
-| `layout/StoreLayout.jsx` | Skip link, announcement bar, header, animated page area (Motion `AnimatePresence` + `useOutlet`), footer, WhatsApp button |
-| `layout/Header.jsx` | Sticky header: logo, navigation, search (goes to `/shop?search=`), cart badge, animated mobile menu |
+| `layout/StoreLayout.jsx` | Skip link, header, animated page area (Motion `AnimatePresence` + `useOutlet`), footer, WhatsApp button |
+| `layout/Header.jsx` | Sticky header (translucent once scrolled): logo, React Bits PillNav links, search (goes to `/shop?search=`), cart badge, animated Menu/Close toggle; exports `NAV_ITEMS` and `SearchForm` |
+| `layout/MobileMenu.jsx` | Full-height mobile menu: staggered GSAP layers and links, focus handling, Escape to close, scroll lock |
 | `layout/Footer.jsx` | Shop and help links, contact details, hours and social links from settings |
 | `layout/WhatsAppButton.jsx` | Floating chat button (hidden until a WhatsApp number is set in settings) |
 | `home/Hero.jsx` | Landing hero + GSAP load sequence and scroll parallax |
-| `home/AlleyScene.jsx` | SVG night street (seeded buildings, windows, signs, lamps) |
+| `home/AlleyScene.jsx` | SVG night street, 3000 × 440 (seeded buildings, windows, signs, 9 lamps, street fog). The ground fades into the next section's colour. |
 | `home/HeroWindow.jsx` | Arched shop window rotating the HERO banners from the admin panel |
-| `home/CategoryAlley.jsx` | "Browse the shops": categories drawn as shopfronts; pinned sideways scroll and swinging signs on desktop |
+| `home/CategoryAlley.jsx` | "Browse the shops": categories drawn as shopfronts. On desktop, 4 per page, pinned and snapping page by page, with prev/next buttons and a progress bar. On mobile, a swipe row. |
 | `home/PromoBanners.jsx` | PROMO banners from the admin panel |
 | `home/HowToOrder.jsx` | Three-step ordering explainer + WhatsApp link |
 | `product/ProductCard.jsx` | Product tile with badges and an add-to-cart button that confirms with a tick |
@@ -179,6 +180,8 @@ React 19 + Vite 8 + Tailwind CSS 4. Motion: GSAP + ScrollTrigger, Lenis, Motion 
 | `ui/PriceTag.jsx` | Sale and regular price |
 | `ui/Skeleton.jsx` | Product card loading placeholder |
 | `ui/icons.jsx` | Inline SVG icons + the lamp logo mark |
+| `reactbits/PillNav.jsx` | React Bits Pill Nav (desktop navigation) |
+| `reactbits/PixelSnow.jsx` | React Bits Pixel Snow (WebGL2 hero snow; lazy-loaded) |
 
 ### src/pages/
 

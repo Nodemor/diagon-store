@@ -54,6 +54,7 @@ Task checklist grouped by the phases in [ROADMAP.md](ROADMAP.md). Tick `[x]` ite
 - [x] Landing page: animated hero (street scene + banner window), shopfront category street (pinned sideways scroll), featured, promo banners, new arrivals, offers, most viewed, how ordering works
 - [x] 404 + placeholders for later pages; admin pages lazy-loaded
 - [x] Checked at 1440 px, 390 px (mobile emulation) and with reduced motion
+- [x] Review fixes: skyline no longer cropped on wide screens, hero joins the next section seamlessly, pixel-snow sky, announcement bar removed, PillNav + staggered mobile menu, "Browse the shops" shows 4 per page aligned to the content width
 - [ ] Split the GSAP/Motion code into a separate chunk if the bundle grows (currently ~195 kB gzip) *(Phase 6)*
 
 ## Phase 3 — Shop, product page, cart
