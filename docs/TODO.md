@@ -68,13 +68,16 @@ Task checklist grouped by the phases in [ROADMAP.md](ROADMAP.md). Tick `[x]` ite
 - [x] Header search with instant suggestions (keyboard accessible)
 - [x] Demo products whose photos didn't match were renamed (power bank, canvas tote, watermelon)
 
-## Phase 4 — Order flow
+## Phase 4 — Order flow ✅
 
-- [ ] `/checkout` order form (WhatsApp or Email)
-- [ ] `/order/success/:number`
-- [ ] `/track` status timeline
-- [ ] Single-product "Order via WhatsApp"
-- [ ] Clear the cart after an order succeeds; handle "item unavailable" errors
+- [x] `/checkout` order form (proposal §11): name, mobile, email, address, city, notes; WhatsApp or email; client + server validation shown next to each field; honeypot
+- [x] Cart checkout and single-product "Order now" (`/checkout?buy=<slug>&qty=<n>`, cart untouched)
+- [x] WhatsApp opens with the order written out; the success page has a fallback button if the popup is blocked
+- [x] "Remember my details on this device" (opt-in, localStorage)
+- [x] `/order/success/:number`: order number with copy button, summary, WhatsApp / track / keep shopping
+- [x] `/track`: order number + mobile, animated status timeline (New → Contacted → Confirmed → Processing → Completed / Cancelled), items, "Ask about this order"; recent orders on this device as one-tap chips
+- [x] Cart cleared after a cart order; unavailable items refresh the cart and block sending
+- [x] End-to-end test: cart → checkout → WhatsApp → success → admin status changes → tracking; wrong phone is rejected
 
 ## Phase 5 — Admin panel UI
 

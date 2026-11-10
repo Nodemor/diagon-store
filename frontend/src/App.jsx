@@ -7,6 +7,9 @@ import ComingSoon from "./pages/ComingSoon";
 import Shop from "./pages/Shop";
 import Product from "./pages/Product";
 import Cart from "./pages/Cart";
+import Checkout from "./pages/Checkout";
+import OrderSuccess from "./pages/OrderSuccess";
+import Track from "./pages/Track";
 
 // admin pages are loaded on demand so shoppers never download them
 const AdminLogin = lazy(() => import("./pages/AdminLogin"));
@@ -24,9 +27,10 @@ function App() {
           <Route path="/category/:slug" element={<Shop />} />
           <Route path="/product/:slug" element={<Product />} />
           <Route path="/cart" element={<Cart />} />
-          {/* Phase 4 */}
-          <Route path="/checkout" element={<ComingSoon title="Send your order" phase={4} />} />
-          <Route path="/track" element={<ComingSoon title="Track an order" phase={4} />} />
+          {/* Phase 4: ordering */}
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/order/success/:number" element={<OrderSuccess />} />
+          <Route path="/track" element={<Track />} />
           {/* Phase 6 */}
           <Route path="/contact" element={<ComingSoon title="Contact us" phase={6} />} />
           <Route path="/pages/:slug" element={<ComingSoon title="Information" phase={6} />} />

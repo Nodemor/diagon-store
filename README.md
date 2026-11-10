@@ -4,7 +4,7 @@
 
 Customers browse electronics, fashion, beauty, home goods and more, then fill a cart and **send their order through WhatsApp or email**. Payment is **cash on delivery**, and customers **track the order** on the website using its order number. The shop team runs everything from a secure **admin panel**: products, images, prices, stock, categories, banners, featured products, offers, orders, customers, pages and settings.
 
-> **Status:** Phases 1–3 are complete: backend, animated landing page, shop, category and product pages, and cart. The order flow (checkout, WhatsApp, email, tracking) is next. See [docs/ROADMAP.md](docs/ROADMAP.md).
+> **Status:** Phases 1–4 are complete. Customers can browse the animated storefront, fill a cart, send the order on WhatsApp or by email (cash on delivery) and track it. The admin panel UI is next; until then, orders and products are managed through the admin API. See [docs/ROADMAP.md](docs/ROADMAP.md).
 
 ---
 
@@ -17,8 +17,8 @@ Customers browse electronics, fashion, beauty, home goods and more, then fill a 
 | Search (name, code, brand, category, tags), filters, sorting, pagination | ✅ | Phase 3 |
 | Featured, new arrivals, popular, on-sale sections; related products | ✅ | Phase 2 / 3 |
 | Home page banners and promo banners (scheduled) | ✅ | Phase 2 / 5 |
-| Cart → order form → WhatsApp message / email inquiry (COD) | ✅ | Phase 3 / 4 |
-| Order tracking (order number + mobile) | ✅ | Phase 4 |
+| Cart → order form → WhatsApp message / email inquiry (COD) | ✅ | ✅ |
+| Order tracking (order number + mobile) | ✅ | ✅ |
 | Admin: dashboard, orders/inquiries with statuses & notes, customers, stock | ✅ | Phase 5 |
 | Admin: banners, settings (contact, WhatsApp, social, hours, map), content pages | ✅ | Phase 5 / 6 |
 | Admin users with Super Admin / Admin roles | ✅ | Phase 5 |

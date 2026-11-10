@@ -9,4 +9,4 @@ Start here if you're new to the project.
 5. **[FILE-GUIDE.md](FILE-GUIDE.md)**: what every file does.
 6. **[THEME-GUIDE.md](THEME-GUIDE.md)**: the wizarding look, colours, fonts, wording and motion rules.
 
-**Current phase:** Phase 4, the order flow (checkout, WhatsApp, email, tracking). Phases 0–3 are done.
+**Current phase:** Phase 5, the admin panel UI. Phases 0–4 are done: customers can browse, order on WhatsApp or by email, and track their orders.
