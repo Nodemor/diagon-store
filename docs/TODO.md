@@ -57,13 +57,16 @@ Task checklist grouped by the phases in [ROADMAP.md](ROADMAP.md). Tick `[x]` ite
 - [x] Review fixes: skyline no longer cropped on wide screens, hero joins the next section seamlessly, pixel-snow sky, announcement bar removed, PillNav + staggered mobile menu, "Browse the shops" shows 4 per page aligned to the content width
 - [ ] Split the GSAP/Motion code into a separate chunk if the bundle grows (currently ~195 kB gzip) *(Phase 6)*
 
-## Phase 3 — Shop, product page, cart
+## Phase 3 — Shop, product page, cart ✅
 
-- [ ] `/shop` with URL-synced filters, sorting, search, load more
-- [ ] `/category/:slug`
-- [ ] `/product/:slug`: gallery, price/discount, SKU, stock, specs, quantity, add to cart, WhatsApp, email, share, related
-- [ ] `CartContext` + `localStorage`, cart drawer, `/cart`
-- [ ] Header search suggestions
+- [x] `/shop` with URL-synced filters (category, subcategory, price range, availability, on offer / new / featured), sorting, search, active-filter chips, "Show more products"
+- [x] `/category/:slug`: image header, description, subcategory chips, same grid and filters
+- [x] Mobile filter sheet
+- [x] `/product/:slug`: zoom gallery + swipe on mobile, sale price + savings, stock status, SKU, brand, short description, quantity, add to cart, "Order now", WhatsApp order message (proposal §9 format), email inquiry, share, specifications, tags, related products, sticky mobile bar
+- [x] Product descriptions sanitised with DOMPurify
+- [x] Cart drawer + `/cart` page (quantities, remove, offer savings, estimated total); prices and stock refreshed from the API (`GET /api/products?ids=`)
+- [x] Header search with instant suggestions (keyboard accessible)
+- [x] Demo products whose photos didn't match were renamed (power bank, canvas tote, watermelon)
 
 ## Phase 4 — Order flow
 

@@ -149,12 +149,12 @@ React 19 + Vite 8 + Tailwind CSS 4. Motion: GSAP + ScrollTrigger, Lenis, Motion 
 | File | Purpose |
 |---|---|
 | `lib/api.js` | `request()` fetch wrapper, `ApiError`, `API_BASE_URL`, `API_ORIGIN` |
-| `lib/format.js` | `formatPrice` (Rs), `assetUrl` (adds the API origin to `/uploads` paths), `imageAt` (resized Unsplash URLs), `whatsappLink` |
+| `lib/format.js` | `formatPrice` (Rs), `assetUrl` (adds the API origin to `/uploads` paths), `imageAt` (resized Unsplash URLs), `whatsappLink`, `productWhatsAppMessage` (single-product order message) |
 | `lib/motion.js` | Registers GSAP plugins (ScrollTrigger, RoughEase, useGSAP); reduced-motion helpers |
 | `hooks/useAsync.js` | Loads data with abort handling → `{ data, error, loading }` |
 | `hooks/usePageTitle.js` | Sets `document.title` per page |
 | `context/SettingsContext.jsx` | Store settings from `/api/settings` (name, WhatsApp, contact details, social links) with fallbacks |
-| `context/CartContext.jsx` | Cart saved in `localStorage`: `add`, `setQuantity`, `remove`, `clear`, `count`, `subtotal` |
+| `context/CartContext.jsx` | Cart saved in `localStorage`: `add`, `setQuantity`, `remove`, `clear`, `refresh` (re-reads prices and stock from the API), `count`, `subtotal`, `savings`, drawer `isOpen` / `openCart` / `closeCart` |
 | `services/store.js` | Public API calls (home, settings, categories, products, product, related, page, place order, track) |
 | `services/api.js` | Admin API calls used by the current admin pages |
 
@@ -165,6 +165,13 @@ React 19 + Vite 8 + Tailwind CSS 4. Motion: GSAP + ScrollTrigger, Lenis, Motion 
 | `motion/SmoothScroll.jsx` | Lenis smooth scrolling synced with the GSAP ticker and ScrollTrigger; `useLenis`, `scrollToTop` |
 | `layout/StoreLayout.jsx` | Skip link, header, animated page area (Motion `AnimatePresence` + `useOutlet`), footer, WhatsApp button |
 | `layout/Header.jsx` | Sticky header (translucent once scrolled): logo, React Bits PillNav links, search (goes to `/shop?search=`), cart badge, animated Menu/Close toggle; exports `NAV_ITEMS` and `SearchForm` |
+| `layout/SearchForm.jsx` | Search box with instant product suggestions (debounced, arrow keys / Enter / Escape) |
+| `cart/CartLines.jsx` | Cart rows (image, name, code, price, quantity stepper, remove) shared by the drawer and the cart page |
+| `cart/CartDrawer.jsx` | Slide-out cart with estimated total, "Send my order" and "View cart" |
+| `shop/FilterPanel.jsx` | Shop filters: category / subcategory, price range, availability, show only (offer / new / featured) |
+| `product/ProductGallery.jsx` | Product images: hover zoom + thumbnails on desktop, swipe strip on mobile |
+| `product/ShareButton.jsx` | Share sheet / copy link / WhatsApp / Facebook |
+| `ui/QuantityStepper.jsx` | − n + quantity control |
 | `layout/MobileMenu.jsx` | Full-height mobile menu: staggered GSAP layers and links, focus handling, Escape to close, scroll lock |
 | `layout/Footer.jsx` | Shop and help links, contact details, hours and social links from settings |
 | `layout/WhatsAppButton.jsx` | Floating chat button (hidden until a WhatsApp number is set in settings) |
@@ -189,6 +196,9 @@ React 19 + Vite 8 + Tailwind CSS 4. Motion: GSAP + ScrollTrigger, Lenis, Motion 
 |---|---|
 | `Home.jsx` | Landing page from `GET /api/home` |
 | `NotFound.jsx` | Themed 404 |
+| `Shop.jsx` | `/shop` and `/category/:slug`: header, filters (sidebar / mobile sheet), sort, chips, animated grid, "Show more products" |
+| `Product.jsx` | `/product/:slug`: gallery, price, stock, buttons (cart, order now, WhatsApp, email, share), description, specifications, related |
+| `Cart.jsx` | `/cart`: cart lines + order summary |
 | `ComingSoon.jsx` | Placeholder for pages scheduled in later phases |
 | `AdminLogin.jsx` | Admin login (stores the JWT) — rebuilt in Phase 5 |
 | `AdminDashboard.jsx` | Admin shell with counts — rebuilt in Phase 5 |

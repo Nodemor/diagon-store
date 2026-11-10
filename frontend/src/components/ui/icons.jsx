@@ -123,3 +123,46 @@ export const LampMark = (p) => (
     </defs>
   </svg>
 );
+
+export const MinusIcon = (p) => (
+  <svg {...base} {...p}>
+    <path d="M5 12h14" />
+  </svg>
+);
+
+export const TrashIcon = (p) => (
+  <svg {...base} {...p}>
+    <path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12" />
+  </svg>
+);
+
+export const ShareIcon = (p) => (
+  <svg {...base} {...p}>
+    <circle cx="18" cy="5.5" r="2.5" />
+    <circle cx="6" cy="12" r="2.5" />
+    <circle cx="18" cy="18.5" r="2.5" />
+    <path d="m8.2 10.8 7.6-4.1M8.2 13.2l7.6 4.1" />
+  </svg>
+);
+
+export const FilterIcon = (p) => (
+  <svg {...base} {...p}>
+    <path d="M4 6h16M7 12h10M10 18h4" />
+  </svg>
+);
+
+export const ChevronIcon = ({ direction = "right", ...p }) => {
+  const d = { right: "M9 6l6 6-6 6", left: "M15 6l-6 6 6 6", down: "M6 9l6 6 6-6", up: "M6 15l6-6 6 6" }[direction];
+  return (
+    <svg {...base} {...p}>
+      <path d={d} />
+    </svg>
+  );
+};
+
+export const LinkIcon = (p) => (
+  <svg {...base} {...p}>
+    <path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1" />
+    <path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1" />
+  </svg>
+);

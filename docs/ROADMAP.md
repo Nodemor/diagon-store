@@ -10,8 +10,8 @@ Phases are listed in build order, and each ends with a **Done when** check. The 
 Phase 0  Foundation & repo hygiene                               ✅ done
 Phase 1  Backend foundation & full data model                    ✅ done
 Phase 2  Design system + animated landing page                   ✅ done
-Phase 3  Shop, categories, product page, search, filters, cart   ← next
-Phase 4  Order / inquiry flow: WhatsApp, email, tracking
+Phase 3  Shop, categories, product page, search, filters, cart   ✅ done
+Phase 4  Order / inquiry flow: WhatsApp, email, tracking          ← next
 Phase 5  Admin panel UI
 Phase 6  Content pages, contact, SEO & performance
 Phase 7  QA, security review & launch
@@ -40,7 +40,7 @@ Future   Proposal §30 upgrades (payments, accounts, reviews, ...)
 | §5 Multiple product images + ordering | API 1 · UI 5 | API ✅ |
 | §6 Category & subcategory CRUD, image, description, active flag | API 1 · UI 5 | API ✅ |
 | §7 Search: name, code, brand, category, tags | 1 | ✅ |
-| §8 Shopping cart | 3 | — |
+| §8 Shopping cart | 3 | ✅ |
 | §9 WhatsApp order message (single product and whole cart) | API 1 · UI 4 | API ✅ |
 | §10 Email inquiry to the business email | API 1 · UI 4 | API ✅ |
 | §11 Customer order form | API 1 · UI 4 | API ✅ |
@@ -113,7 +113,7 @@ Settings moved into environment variables, `.env.example` files, repo cleanup, R
 
 **Done when:** the home page shows live API data, scrolls smoothly at 60 fps on mid-range phones, works from 360 px to 1920 px, and turns its animations off when reduced motion is requested.
 
-## Phase 3 — Shop, categories, product page, cart
+## Phase 3 — Shop, categories, product page, cart ✅
 
 - `/shop`:
   - Filters for category, subcategory, price range, availability, featured / new / on sale
