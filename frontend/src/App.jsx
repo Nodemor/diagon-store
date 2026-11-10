@@ -1,16 +1,38 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { lazy, Suspense } from "react";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { StoreLayout } from "./components/layout/StoreLayout";
 import Home from "./pages/Home";
-import AdminLogin from "./pages/AdminLogin";
-import AdminDashboard from "./pages/AdminDashboard";
+import NotFound from "./pages/NotFound";
+import ComingSoon from "./pages/ComingSoon";
+
+// admin pages are loaded on demand so shoppers never download them
+const AdminLogin = lazy(() => import("./pages/AdminLogin"));
+const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/admin/login" element={<AdminLogin />} />
-        <Route path="/admin/dashboard" element={<AdminDashboard />} />
-        <Route path="*" element={<Home />} />
+        {/* Storefront */}
+        <Route element={<StoreLayout />}>
+          <Route path="/" element={<Home />} />
+          {/* Phase 3 */}
+          <Route path="/shop" element={<ComingSoon title="Shop all products" phase={3} />} />
+          <Route path="/category/:slug" element={<ComingSoon title="Category" phase={3} />} />
+          <Route path="/product/:slug" element={<ComingSoon title="Product details" phase={3} />} />
+          <Route path="/cart" element={<ComingSoon title="Your cart" phase={3} />} />
+          {/* Phase 4 */}
+          <Route path="/checkout" element={<ComingSoon title="Send your order" phase={4} />} />
+          <Route path="/track" element={<ComingSoon title="Track an order" phase={4} />} />
+          {/* Phase 6 */}
+          <Route path="/contact" element={<ComingSoon title="Contact us" phase={6} />} />
+          <Route path="/pages/:slug" element={<ComingSoon title="Information" phase={6} />} />
+          <Route path="*" element={<NotFound />} />
+        </Route>
+
+        {/* Admin (rebuilt in Phase 5) */}
+        <Route path="/admin/login" element={<Suspense fallback={null}><AdminLogin /></Suspense>} />
+        <Route path="/admin/dashboard" element={<Suspense fallback={null}><AdminDashboard /></Suspense>} />
       </Routes>
     </BrowserRouter>
   );

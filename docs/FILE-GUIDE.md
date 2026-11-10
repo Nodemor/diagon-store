@@ -125,18 +125,70 @@ When you add a file, add a line here in the same commit.
 
 ## frontend/
 
+React 19 + Vite 8 + Tailwind CSS 4. Motion: GSAP + ScrollTrigger, Lenis, Motion for React.
+
 | File | Purpose |
 |---|---|
 | `package.json` | Dependencies and scripts (`dev`, `build`, `preview`, `lint`) |
 | `.env.example` | `VITE_API_URL`. Copy it to `.env`. |
-| `index.html` | HTML shell + meta |
+| `index.html` | HTML shell, meta, Google Fonts (IM Fell English + Figtree) |
 | `vite.config.js` | Vite with the React and Tailwind plugins |
 | `.oxlintrc.json` | oxlint rules |
 | `public/favicon.svg` | Tab icon |
-| `src/main.jsx` | React entry |
-| `src/App.jsx` | Route table |
-| `src/index.css` | Global CSS / Tailwind entry |
-| `src/services/api.js` | API client (admin login, products, categories) |
-| `src/pages/Home.jsx` / `Home.css` | Current home page (static demo, replaced in Phase 2) |
-| `src/pages/AdminLogin.jsx` | Admin login form; stores the JWT |
-| `src/pages/AdminDashboard.jsx` | Admin shell with product and category counts (replaced in Phase 5) |
+
+### frontend/src/
+
+| File | Purpose |
+|---|---|
+| `main.jsx` | Entry: `MotionConfig` (respects reduced motion) → `SettingsProvider` → `CartProvider` → `SmoothScroll` → `App` |
+| `App.jsx` | Routes. Storefront pages sit inside `StoreLayout`; placeholders for Phase 3–6 pages; admin pages are lazy-loaded. |
+| `index.css` | Tailwind import, **design tokens** (`@theme`), base styles, fog and flicker keyframes, reduced-motion rules |
+
+### src/lib/ · src/hooks/ · src/context/ · src/services/
+
+| File | Purpose |
+|---|---|
+| `lib/api.js` | `request()` fetch wrapper, `ApiError`, `API_BASE_URL`, `API_ORIGIN` |
+| `lib/format.js` | `formatPrice` (Rs), `assetUrl` (adds the API origin to `/uploads` paths), `imageAt` (resized Unsplash URLs), `whatsappLink` |
+| `lib/motion.js` | Registers GSAP plugins (ScrollTrigger, RoughEase, useGSAP); reduced-motion helpers |
+| `hooks/useAsync.js` | Loads data with abort handling → `{ data, error, loading }` |
+| `hooks/usePageTitle.js` | Sets `document.title` per page |
+| `context/SettingsContext.jsx` | Store settings from `/api/settings` (name, WhatsApp, contact details, social links) with fallbacks |
+| `context/CartContext.jsx` | Cart saved in `localStorage`: `add`, `setQuantity`, `remove`, `clear`, `count`, `subtotal` |
+| `services/store.js` | Public API calls (home, settings, categories, products, product, related, page, place order, track) |
+| `services/api.js` | Admin API calls used by the current admin pages |
+
+### src/components/
+
+| File | Purpose |
+|---|---|
+| `motion/SmoothScroll.jsx` | Lenis smooth scrolling synced with the GSAP ticker and ScrollTrigger; `useLenis`, `scrollToTop` |
+| `layout/StoreLayout.jsx` | Skip link, header, animated page area (Motion `AnimatePresence` + `useOutlet`), footer, WhatsApp button |
+| `layout/Header.jsx` | Sticky header (translucent once scrolled): logo, React Bits PillNav links, search (goes to `/shop?search=`), cart badge, animated Menu/Close toggle; exports `NAV_ITEMS` and `SearchForm` |
+| `layout/MobileMenu.jsx` | Full-height mobile menu: staggered GSAP layers and links, focus handling, Escape to close, scroll lock |
+| `layout/Footer.jsx` | Shop and help links, contact details, hours and social links from settings |
+| `layout/WhatsAppButton.jsx` | Floating chat button (hidden until a WhatsApp number is set in settings) |
+| `home/Hero.jsx` | Landing hero + GSAP load sequence and scroll parallax |
+| `home/AlleyScene.jsx` | SVG night street, 3000 × 440 (seeded buildings, windows, signs, 9 lamps, street fog). The ground fades into the next section's colour. |
+| `home/HeroWindow.jsx` | Arched shop window rotating the HERO banners from the admin panel |
+| `home/CategoryAlley.jsx` | "Browse the shops": categories drawn as shopfronts. On desktop, 4 per page, pinned and snapping page by page, with prev/next buttons and a progress bar. On mobile, a swipe row. |
+| `home/PromoBanners.jsx` | PROMO banners from the admin panel |
+| `home/HowToOrder.jsx` | Three-step ordering explainer + WhatsApp link |
+| `product/ProductCard.jsx` | Product tile with badges and an add-to-cart button that confirms with a tick |
+| `product/ProductRail.jsx` | `ProductSection`: titled grid or horizontal rail with skeletons |
+| `ui/Button.jsx` | `Button`, `ButtonLink`, `buttonClass` variants |
+| `ui/PriceTag.jsx` | Sale and regular price |
+| `ui/Skeleton.jsx` | Product card loading placeholder |
+| `ui/icons.jsx` | Inline SVG icons + the lamp logo mark |
+| `reactbits/PillNav.jsx` | React Bits Pill Nav (desktop navigation) |
+| `reactbits/PixelSnow.jsx` | React Bits Pixel Snow (WebGL2 hero snow; lazy-loaded) |
+
+### src/pages/
+
+| File | Purpose |
+|---|---|
+| `Home.jsx` | Landing page from `GET /api/home` |
+| `NotFound.jsx` | Themed 404 |
+| `ComingSoon.jsx` | Placeholder for pages scheduled in later phases |
+| `AdminLogin.jsx` | Admin login (stores the JWT) — rebuilt in Phase 5 |
+| `AdminDashboard.jsx` | Admin shell with counts — rebuilt in Phase 5 |
