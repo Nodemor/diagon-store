@@ -11,8 +11,8 @@ Phase 0  Foundation & repo hygiene                               ✅ done
 Phase 1  Backend foundation & full data model                    ✅ done
 Phase 2  Design system + animated landing page                   ✅ done
 Phase 3  Shop, categories, product page, search, filters, cart   ✅ done
-Phase 4  Order / inquiry flow: WhatsApp, email, tracking          ← next
-Phase 5  Admin panel UI
+Phase 4  Order / inquiry flow: WhatsApp, email, tracking          ✅ done
+Phase 5  Admin panel UI                                           ← next
 Phase 6  Content pages, contact, SEO & performance
 Phase 7  QA, security review & launch
 Future   Proposal §30 upgrades (payments, accounts, reviews, ...)
@@ -41,9 +41,9 @@ Future   Proposal §30 upgrades (payments, accounts, reviews, ...)
 | §6 Category & subcategory CRUD, image, description, active flag | API 1 · UI 5 | API ✅ |
 | §7 Search: name, code, brand, category, tags | 1 | ✅ |
 | §8 Shopping cart | 3 | ✅ |
-| §9 WhatsApp order message (single product and whole cart) | API 1 · UI 4 | API ✅ |
-| §10 Email inquiry to the business email | API 1 · UI 4 | API ✅ |
-| §11 Customer order form | API 1 · UI 4 | API ✅ |
+| §9 WhatsApp order message (single product and whole cart) | API 1 · UI 4 | ✅ |
+| §10 Email inquiry to the business email | API 1 · UI 4 | ✅ |
+| §11 Customer order form | API 1 · UI 4 | ✅ |
 | §12 Admin order/inquiry management + statuses + internal notes | API 1 · UI 5 | API ✅ |
 | §13 Dashboard statistics | API 1 · UI 5 | API ✅ |
 | §14 Admin users, Super Admin / Admin roles | API 1 · UI 5 | API ✅ |
@@ -58,7 +58,7 @@ Future   Proposal §30 upgrades (payments, accounts, reviews, ...)
 | §27 Pages: About, Contact, Privacy, Terms, Delivery, Returns | API 1 · UI 6 | API ✅ |
 | §31 Security | 1 + 7 | partly |
 | §32 Performance (optimised images, pagination, caching) | 1 + 6 | partly |
-| Extra (not in proposal): COD order tracking page | API 1 · UI 4 | API ✅ |
+| Extra (not in proposal): COD order tracking page | API 1 · UI 4 | ✅ |
 | §30 Future upgrades | Future | — |
 
 ---
@@ -133,7 +133,7 @@ Settings moved into environment variables, `.env.example` files, repo cleanup, R
 
 **Done when:** a visitor can find any product by search or filters, view it, and build a cart that survives a page refresh.
 
-## Phase 4 — Order / inquiry flow
+## Phase 4 — Order / inquiry flow ✅
 
 - `/checkout` (order form, proposal §11):
   - Full name, mobile, email, delivery address, city, notes

@@ -151,6 +151,7 @@ React 19 + Vite 8 + Tailwind CSS 4. Motion: GSAP + ScrollTrigger, Lenis, Motion 
 | `lib/api.js` | `request()` fetch wrapper, `ApiError`, `API_BASE_URL`, `API_ORIGIN` |
 | `lib/format.js` | `formatPrice` (Rs), `assetUrl` (adds the API origin to `/uploads` paths), `imageAt` (resized Unsplash URLs), `whatsappLink`, `productWhatsAppMessage` (single-product order message) |
 | `lib/motion.js` | Registers GSAP plugins (ScrollTrigger, RoughEase, useGSAP); reduced-motion helpers |
+| `lib/recentOrders.js` | Orders placed on this device (for one-tap tracking) and opt-in saved customer details |
 | `hooks/useAsync.js` | Loads data with abort handling → `{ data, error, loading }` |
 | `hooks/usePageTitle.js` | Sets `document.title` per page |
 | `context/SettingsContext.jsx` | Store settings from `/api/settings` (name, WhatsApp, contact details, social links) with fallbacks |
@@ -172,6 +173,7 @@ React 19 + Vite 8 + Tailwind CSS 4. Motion: GSAP + ScrollTrigger, Lenis, Motion 
 | `product/ProductGallery.jsx` | Product images: hover zoom + thumbnails on desktop, swipe strip on mobile |
 | `product/ShareButton.jsx` | Share sheet / copy link / WhatsApp / Facebook |
 | `ui/QuantityStepper.jsx` | − n + quantity control |
+| `order/StatusTimeline.jsx` | Customer-facing order status names + animated tracking timeline |
 | `layout/MobileMenu.jsx` | Full-height mobile menu: staggered GSAP layers and links, focus handling, Escape to close, scroll lock |
 | `layout/Footer.jsx` | Shop and help links, contact details, hours and social links from settings |
 | `layout/WhatsAppButton.jsx` | Floating chat button (hidden until a WhatsApp number is set in settings) |
@@ -199,6 +201,9 @@ React 19 + Vite 8 + Tailwind CSS 4. Motion: GSAP + ScrollTrigger, Lenis, Motion 
 | `Shop.jsx` | `/shop` and `/category/:slug`: header, filters (sidebar / mobile sheet), sort, chips, animated grid, "Show more products" |
 | `Product.jsx` | `/product/:slug`: gallery, price, stock, buttons (cart, order now, WhatsApp, email, share), description, specifications, related |
 | `Cart.jsx` | `/cart`: cart lines + order summary |
+| `Checkout.jsx` | `/checkout`: order form, WhatsApp / email choice, summary; cart or single product (`?buy=`) |
+| `OrderSuccess.jsx` | `/order/success/:number`: confirmation, order number, WhatsApp fallback button, summary |
+| `Track.jsx` | `/track`: look up by order number + mobile, status timeline, items |
 | `ComingSoon.jsx` | Placeholder for pages scheduled in later phases |
 | `AdminLogin.jsx` | Admin login (stores the JWT) — rebuilt in Phase 5 |
 | `AdminDashboard.jsx` | Admin shell with counts — rebuilt in Phase 5 |
