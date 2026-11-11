@@ -17,6 +17,7 @@ export default defineConfig(({ mode }) => {
         "/uploads": api,
         "/sitemap.xml": api,
         "/robots.txt": api,
+        "/s/": api, // share links with WhatsApp / Facebook previews
       },
     },
     preview: {
@@ -25,6 +26,7 @@ export default defineConfig(({ mode }) => {
         "/uploads": api,
         "/sitemap.xml": api,
         "/robots.txt": api,
+        "/s/": api, // share links with WhatsApp / Facebook previews
       },
     },
   };

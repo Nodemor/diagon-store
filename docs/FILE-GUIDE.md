@@ -38,6 +38,7 @@ When you add a file, add a line here in the same commit.
 | `app.js` | Builds the Express app: helmet, CORS, JSON limit, request logging, `/uploads` static files, `/api/health`, routes, 404 and error handlers |
 | `prisma.js` | Shared Prisma client using the MariaDB adapter. Connection details come from `DATABASE_URL`. |
 | `prisma.config.ts` | Prisma CLI config: schema, migrations folder, seed command, `DATABASE_URL` |
+| `tests/share.test.js` | `npm test`: share links, link previews and the WhatsApp number setting (9 tests) |
 | `tests/security.test.js` | `npm test`: 16 security tests (sessions, CSRF, lockout, passwords, uploads, HTML cleaning, public surface) |
 | `create-admin.js` | `npm run create-admin`: creates a SUPER_ADMIN, asking for the details at the terminal (password typing hidden). `-- --reset` sets a new password, unlocks the account and ends its sessions |
 | `test-db.js` | `npm run db:test`: runs a real query to check the database connection |
@@ -54,6 +55,7 @@ When you add a file, add a line here in the same commit.
 | File | Purpose |
 |---|---|
 | `store.routes.js` | Public routes under `/api`: home, products, categories, banners, settings, pages, place order, track order. Attaches validators and rate limits. |
+| `share.routes.js` | Share links under `/s`: order and product preview pages and their preview images (rate-limited) |
 | `admin.routes.js` | Admin routes under `/api/admin`. `/login` is public; everything else needs `requireAuth`, and `/admins` also needs SUPER_ADMIN. |
 
 ### backend/controllers/
@@ -67,6 +69,7 @@ When you add a file, add a line here in the same commit.
 | `admin/sales.controller.js` | Dashboard, orders (list / detail / status / notes / delete), customers |
 | `contact.controller.js` | Contact form: save + email (public), list / mark read / delete (admin) |
 | `seo.controller.js` | `/sitemap.xml` and `/robots.txt` |
+| `share.controller.js` | Share-link pages (preview tags + redirect), preview images, friendly 404 |
 | `admin/content.controller.js` | Generic image upload, banners, settings, content pages, admin users |
 
 ### backend/services/
@@ -75,9 +78,10 @@ When you add a file, add a line here in the same commit.
 |---|---|
 | `product.service.js` | Product queries and rules: visibility, search across name/SKU/brand/tags/category, filters, sorting, related products, home sections, create/update (sale < price, subcategory must belong to its category, slugs, related IDs), stock, images |
 | `category.service.js` | Category and subcategory queries with product counts; CRUD with unique slugs; deletes old images |
-| `inquiry.service.js` | Order placement (phone normalisation, stock check, server pricing, transaction, order number, WhatsApp message, emails), tracking, admin list/detail/status/notes/delete |
+| `inquiry.service.js` | Order placement (phone normalisation, stock check, server pricing, transaction, order number, share code, WhatsApp message with order link, emails), tracking, admin list/detail (customer WhatsApp message with status + order link)/status/notes/delete |
 | `dashboard.service.js` | Dashboard numbers: product counts, orders by status, recent orders, stock alerts |
-| `settings.service.js` | Allowed setting keys + defaults, cached read, save |
+| `settings.service.js` | Allowed setting keys + defaults, cached read, save; checks and normalises the WhatsApp number |
+| `share.service.js` | Share links: random order codes, preview data (no customer details), preview page HTML, 1200×630 preview cards with sharp (cached) |
 | `email.service.js` | nodemailer SMTP sender (logs to the console when disabled); new-order emails to the business and the customer |
 | `storage.service.js` | Safely deletes uploaded files when an image, banner or category is removed |
 
@@ -114,7 +118,7 @@ When you add a file, add a line here in the same commit.
 | `phone.js` | `normalizePhone()`: Sri Lankan and international numbers → digits like `94771234567` |
 | `serialize.js` | Prisma → JSON (Decimal → number, computed price and stock fields, tags array), pagination helpers |
 | `format.js` | `formatMoney` (LKR), `round2`, `escapeHtml`, `formatOrderNumber` |
-| `whatsapp.js` | Builds the proposal §9 WhatsApp order message and the `wa.me` link |
+| `whatsapp.js` | Builds the proposal §9 WhatsApp order message (with the order link), the shop → customer message (status + order link) and the `wa.me` link |
 | `password.js` | Admin password rules (`passwordProblem`) |
 | `sanitizeHtml.js` | Server-side cleaning of rich text (product descriptions, pages) |
 
@@ -161,7 +165,7 @@ React 19 + Vite 8 + Tailwind CSS 4. Motion: GSAP + ScrollTrigger, Lenis, Motion 
 |---|---|
 | `lib/adminPath.js` | Secret back-office address: hashes the first part of the address and compares it with `VITE_ADMIN_PATH_HASH`; `adminPath()` builds admin links |
 | `lib/api.js` | `request()` fetch wrapper, `ApiError`, `API_BASE_URL`, `API_ORIGIN` |
-| `lib/format.js` | `formatPrice` (Rs), `assetUrl` (adds the API origin to `/uploads` paths), `imageAt` (resized Unsplash URLs), `whatsappLink`, `productWhatsAppMessage` (single-product order message) |
+| `lib/format.js` | `formatPrice` (Rs), `assetUrl` (adds the API origin to `/uploads` paths), `imageAt` (resized Unsplash URLs), `whatsappDigits` (0771234567 → 94771234567), `whatsappLink`, `productShareUrl` (/s/p/ link with preview), `productWhatsAppMessage` (single-product order message with product link) |
 | `lib/motion.js` | Registers GSAP plugins (ScrollTrigger, RoughEase, useGSAP); reduced-motion helpers |
 | `lib/recentOrders.js` | Orders placed on this device (for one-tap tracking) and opt-in saved customer details |
 | `hooks/useAsync.js` | Loads data with abort handling → `{ data, error, loading }` |
@@ -183,7 +187,7 @@ React 19 + Vite 8 + Tailwind CSS 4. Motion: GSAP + ScrollTrigger, Lenis, Motion 
 | `cart/CartDrawer.jsx` | Slide-out cart with estimated total, "Send my order" and "View cart" |
 | `shop/FilterPanel.jsx` | Shop filters: category / subcategory, price range, availability, show only (offer / new / featured) |
 | `product/ProductGallery.jsx` | Product images: hover zoom + thumbnails on desktop, swipe strip on mobile |
-| `product/ShareButton.jsx` | Share sheet / copy link / WhatsApp / Facebook |
+| `product/ShareButton.jsx` | Share sheet / copy link / WhatsApp / Facebook, using the product share link (photo + price preview) |
 | `ui/QuantityStepper.jsx` | − n + quantity control |
 | `ui/Img.jsx` | `<img>` that shows a lamp placeholder instead of a broken image when a photo is missing |
 | `order/StatusTimeline.jsx` | Customer-facing order status names + animated tracking timeline |

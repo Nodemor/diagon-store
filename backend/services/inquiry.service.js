@@ -3,7 +3,8 @@ const prisma = require("../prisma");
 const { serializeInquiry, serializeProduct, paginate, pageResult } = require("../utils/serialize");
 const { normalizePhone } = require("../utils/phone");
 const { round2, formatOrderNumber } = require("../utils/format");
-const { buildInquiryMessage, whatsappLink } = require("../utils/whatsapp");
+const { buildInquiryMessage, buildCustomerMessage, whatsappLink } = require("../utils/whatsapp");
+const { newShareToken, orderShareUrl, ensureShareToken } = require("./share.service");
 const { badRequest, notFound } = require("../utils/httpError");
 const { VISIBLE } = require("./product.service");
 const { getSettings } = require("./settings.service");
@@ -66,6 +67,7 @@ async function createInquiry(input) {
     const inquiry = await tx.inquiry.create({
       data: {
         inquiryNumber: `TMP-${crypto.randomUUID()}`,
+        shareToken: newShareToken(),
         customerId: customer.id,
         name: input.name,
         phone,
@@ -90,10 +92,11 @@ async function createInquiry(input) {
 
   const inquiry = serializeInquiry(saved);
   const settings = await getSettings();
-  const whatsappMessage = buildInquiryMessage(inquiry, settings);
+  const shareUrl = orderShareUrl(inquiry.shareToken);
+  const whatsappMessage = buildInquiryMessage(inquiry, settings, shareUrl);
 
   // fire-and-forget: email problems must never fail an order
-  sendInquiryEmails(inquiry, settings).catch((error) => console.error("Inquiry email error:", error));
+  sendInquiryEmails(inquiry, settings, shareUrl).catch((error) => console.error("Inquiry email error:", error));
 
   return {
     inquiryNumber: inquiry.inquiryNumber,
@@ -103,6 +106,7 @@ async function createInquiry(input) {
     itemCount: inquiry.itemCount,
     items: inquiry.items.map(({ productName, sku, quantity, unitPrice, lineTotal }) => ({ productName, sku, quantity, unitPrice, lineTotal })),
     createdAt: inquiry.createdAt,
+    shareUrl,
     whatsappMessage,
     whatsappUrl: whatsappLink(settings.whatsappNumber, whatsappMessage),
     email: settings.email || null,
@@ -190,8 +194,10 @@ async function getAdmin(id) {
   if (!inquiry) throw notFound("Order");
   const settings = await getSettings();
   const serialized = serializeInquiry(inquiry);
-  // link for the admin to message the customer directly
-  return { ...serialized, customerWhatsappUrl: whatsappLink(inquiry.phone, `Hello ${inquiry.name}, this is ${settings.storeName} regarding your order ${inquiry.inquiryNumber}.`) };
+  // link for the admin to message the customer directly, with the order link (and its WhatsApp preview)
+  const shareUrl = orderShareUrl(await ensureShareToken(inquiry));
+  const customerMessage = buildCustomerMessage(serialized, settings, shareUrl);
+  return { ...serialized, shareUrl, customerMessage, customerWhatsappUrl: whatsappLink(inquiry.phone, customerMessage) };
 }
 
 async function updateStatus(id, { status, note }, adminId) {
