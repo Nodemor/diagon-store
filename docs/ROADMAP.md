@@ -14,7 +14,7 @@ Phase 3  Shop, categories, product page, search, filters, cart   ✅ done
 Phase 4  Order / inquiry flow: WhatsApp, email, tracking          ✅ done
 Phase 5  Admin panel UI                                           ✅ done
 Phase 6  Content pages, contact, SEO & performance               ✅ done
-Phase 7  QA, security review & launch                             ← next
+Phase 7  QA, security review & launch                             ◐ security done
 Future   Proposal §30 upgrades (payments, accounts, reviews, ...)
 ```
 
@@ -56,7 +56,7 @@ Future   Proposal §30 upgrades (payments, accounts, reviews, ...)
 | §24–25 Contact info, Google Map, social links, hours | settings 1 · UI 6 | ✅ |
 | §26 Website content management (pages, banners, settings) | API 1 · UI 5 | ✅ |
 | §27 Pages: About, Contact, Privacy, Terms, Delivery, Returns | API 1 · UI 6 | ✅ |
-| §31 Security | 1 + 7 | partly |
+| §31 Security | 1 + 7 | ✅ (see SECURITY.md) |
 | §32 Performance (optimised images, pagination, caching) | 1 + 6 | ✅ |
 | Extra (not in proposal): COD order tracking page | API 1 · UI 4 | ✅ |
 | §30 Future upgrades | Future | — |

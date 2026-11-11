@@ -1,8 +1,9 @@
-import { lazy, Suspense } from "react";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { lazy, Suspense, useEffect, useState } from "react";
+import { BrowserRouter, Route, Routes, useParams } from "react-router-dom";
 import { StoreLayout } from "./components/layout/StoreLayout";
 import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
+import { recogniseAdminSegment } from "./lib/adminPath";
 
 // The home page loads with the app; every other page is downloaded when it's first visited.
 const Shop = lazy(() => import("./pages/Shop"));
@@ -31,6 +32,38 @@ const AdminLoading = () => (
 
 const page = (element) => <Suspense fallback={<PageLoading />}>{element}</Suspense>;
 
+/**
+ * Any address the shop doesn't know ends up here. Only the secret back-office address
+ * (see lib/adminPath.js) opens the admin panel; everything else, /admin included, is a
+ * normal "page not found", identical to any other wrong link.
+ */
+function AddressGate() {
+  const { segment } = useParams();
+  const [result, setResult] = useState({ segment: null, isAdmin: false });
+
+  useEffect(() => {
+    let alive = true;
+    recogniseAdminSegment(segment).then((isAdmin) => alive && setResult({ segment, isAdmin }));
+    return () => {
+      alive = false;
+    };
+  }, [segment]);
+
+  if (result.segment !== segment) return null; // checking (takes a millisecond)
+  if (result.isAdmin) {
+    return (
+      <Suspense fallback={<AdminLoading />}>
+        <AdminApp />
+      </Suspense>
+    );
+  }
+  return (
+    <StoreLayout>
+      <NotFound />
+    </StoreLayout>
+  );
+}
+
 function App() {
   return (
     <BrowserRouter>
@@ -47,18 +80,10 @@ function App() {
           <Route path="/track" element={page(<Track />)} />
           <Route path="/contact" element={page(<Contact />)} />
           <Route path="/pages/:slug" element={page(<ContentPage />)} />
-          <Route path="*" element={<NotFound />} />
         </Route>
 
-        {/* Back office */}
-        <Route
-          path="/admin/*"
-          element={
-            <Suspense fallback={<AdminLoading />}>
-              <AdminApp />
-            </Suspense>
-          }
-        />
+        {/* Unknown addresses: "page not found", or the back office at its secret address */}
+        <Route path="/:segment/*" element={<AddressGate />} />
       </Routes>
     </BrowserRouter>
   );

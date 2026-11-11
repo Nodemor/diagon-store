@@ -4,6 +4,7 @@ import { adminApi } from "../api";
 import { usePageTitle } from "../../hooks/usePageTitle";
 import { slugifyText } from "../util";
 import { Badge, Button, EmptyState, ErrorBox, Input, LoadingRows, Modal, PageHeader, formatDateTime, useAdminData } from "../ui";
+import { adminPath } from "../../lib/adminPath";
 
 // Content pages (proposal §26–§27): About, Privacy, Terms, Delivery, Returns…
 export default function Pages() {
@@ -25,7 +26,7 @@ export default function Pages() {
         <ul className="divide-y divide-ink/10 rounded-2xl bg-mist ring-1 ring-ink/5">
           {data?.map((p) => (
             <li key={p.id}>
-              <Link to={`/admin/pages/${p.slug}`} className="flex flex-wrap items-center gap-x-4 gap-y-1 px-5 py-4 hover:bg-fog/60">
+              <Link to={adminPath(`/pages/${p.slug}`)} className="flex flex-wrap items-center gap-x-4 gap-y-1 px-5 py-4 hover:bg-fog/60">
                 <span className="font-semibold">{p.title}</span>
                 <span className="text-sm text-ink-soft">/pages/{p.slug}</span>
                 {!p.isPublished && <Badge>Hidden</Badge>}
@@ -43,7 +44,7 @@ export default function Pages() {
         footer={
           <>
             <Button variant="quiet" onClick={() => setAdding(false)}>Cancel</Button>
-            <Button disabled={title.trim().length < 2} onClick={() => navigate(`/admin/pages/${slugifyText(title)}?title=${encodeURIComponent(title.trim())}`)}>
+            <Button disabled={title.trim().length < 2} onClick={() => navigate(adminPath(`/pages/${slugifyText(title)}?title=${encodeURIComponent(title.trim())}`))}>
               Continue
             </Button>
           </>

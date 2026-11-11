@@ -47,7 +47,6 @@ function robots(req, res) {
     .send(
       [
         "User-agent: *",
-        "Disallow: /admin",
         "Disallow: /cart",
         "Disallow: /checkout",
         "Disallow: /order/",

@@ -19,10 +19,11 @@ import PageEditor from "./pages/PageEditor";
 import Settings from "./pages/Settings";
 import Admins from "./pages/Admins";
 import Profile from "./pages/Profile";
+import { adminPath } from "../lib/adminPath";
 
 function AdminNotFound() {
   usePageTitle("Admin");
-  return <EmptyState title="Nothing here" text="That admin page doesn't exist." action={<ButtonLink to="/admin">Go to the dashboard</ButtonLink>} />;
+  return <EmptyState title="Nothing here" text="That admin page doesn't exist." action={<ButtonLink to={adminPath("")}>Go to the dashboard</ButtonLink>} />;
 }
 
 /** The whole back office (lazy-loaded from App.jsx, so shoppers never download it). */

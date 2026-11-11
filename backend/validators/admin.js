@@ -1,7 +1,7 @@
 const { z } = require("./common");
 
 const ROLES = ["SUPER_ADMIN", "ADMIN"];
-const password = z.string().min(10, "Password must be at least 10 characters").max(200);
+const password = z.string().min(12, "Password must be at least 12 characters").max(200);
 
 const login = z.object({
   email: z.email("Enter a valid email").max(191),

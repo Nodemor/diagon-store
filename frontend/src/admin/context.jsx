@@ -1,34 +1,33 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { adminApi, setUnauthorizedHandler, tokenStore } from "./api";
+import { adminApi, setUnauthorizedHandler } from "./api";
 
 // ---------------------------------------------------------------------------
-// Auth: who is signed in. The token lives in localStorage; the profile is
-// re-read on load so a deactivated admin is signed out immediately.
+// Auth: who is signed in. The session is an httpOnly cookie, so on load we simply ask the API
+// who we are. A blocked admin or a revoked session is signed out immediately.
 // ---------------------------------------------------------------------------
 const AuthContext = createContext(null);
 
 export function AdminAuthProvider({ children }) {
-  const [state, setState] = useState({ admin: null, checking: Boolean(tokenStore.get()), notice: null });
+  const [state, setState] = useState({ admin: null, checking: true, notice: null });
 
-  const logout = useCallback((notice = null) => {
-    tokenStore.set(null);
-    setState({ admin: null, checking: false, notice });
-  }, []);
+  /** Local sign-out (session already gone on the server). */
+  const signedOut = useCallback((notice = null) => setState({ admin: null, checking: false, notice }), []);
+
+  /** "Sign out" button: ends this admin's sessions on the server too. */
+  const logout = useCallback(async () => {
+    await adminApi.logout().catch(() => {});
+    signedOut();
+  }, [signedOut]);
 
   useEffect(() => {
-    setUnauthorizedHandler(() => logout("Your session has ended. Please sign in again."));
-    if (!tokenStore.get()) return;
-    adminApi
-      .profile()
-      .then(({ admin }) => setState({ admin, checking: false, notice: null }))
-      .catch(() => logout());
-  }, [logout]);
+    setUnauthorizedHandler(() => signedOut("Your session has ended. Please sign in again."));
+    adminApi.currentAdmin().then((admin) => setState({ admin, checking: false, notice: null }));
+  }, [signedOut]);
 
   const login = useCallback(async (email, password) => {
-    const { token, admin } = await adminApi.login(email, password);
-    tokenStore.set(token);
+    const { admin } = await adminApi.login(email, password);
     setState({ admin, checking: false, notice: null });
     return admin;
   }, []);

@@ -7,6 +7,7 @@ import { formatPrice, imageAt } from "../../lib/format";
 import { Img } from "../../components/ui/Img";
 import { MailIcon, PhoneIcon, PinIcon, WhatsAppIcon } from "../../components/ui/icons";
 import { Button, ErrorBox, LoadingRows, ORDER_STATUSES, PageHeader, Panel, Select, StatusBadge, Textarea, formatDateTime, useAdminData } from "../ui";
+import { adminPath } from "../../lib/adminPath";
 
 // One order: customer, items, status changes with notes, internal notes (proposal §12).
 export default function OrderDetail() {
@@ -64,7 +65,7 @@ export default function OrderDetail() {
     try {
       await adminApi.inquiries.remove(id);
       toast.success("Order deleted");
-      navigate("/admin/orders");
+      navigate(adminPath("/orders"));
     } catch (err) {
       toast.error(err.message);
     }
@@ -77,7 +78,7 @@ export default function OrderDetail() {
   return (
     <>
       <PageHeader
-        back={<Link to="/admin/orders" className="mb-2 inline-block text-sm text-ink-soft hover:text-ink">← All orders</Link>}
+        back={<Link to={adminPath("/orders")} className="mb-2 inline-block text-sm text-ink-soft hover:text-ink">← All orders</Link>}
         title={<span className="font-sans font-semibold tracking-tight tabular-nums">{order.inquiryNumber}</span>}
         description={`Placed ${formatDateTime(order.createdAt)} via ${order.channel.toLowerCase()}. Cash on delivery.`}
         actions={
@@ -97,7 +98,7 @@ export default function OrderDetail() {
                   <Img src={imageAt(item.product?.images?.[0]?.url, 120)} alt="" className="h-14 w-11 shrink-0 rounded-lg object-cover" />
                   <div className="min-w-0 flex-1 text-sm">
                     {item.product ? (
-                      <Link to={`/admin/products/${item.product.id}`} className="font-semibold hover:underline">{item.productName}</Link>
+                      <Link to={adminPath(`/products/${item.product.id}`)} className="font-semibold hover:underline">{item.productName}</Link>
                     ) : (
                       <span className="font-semibold">{item.productName} <span className="font-normal text-ink-soft">(product removed)</span></span>
                     )}
@@ -166,7 +167,7 @@ export default function OrderDetail() {
                 </a>
               )}
               {order.customer && (
-                <Link to={`/admin/customers/${order.customer.id}`} className="inline-flex h-10 items-center rounded-full border border-ink/20 px-4 text-sm font-semibold hover:border-ink">
+                <Link to={adminPath(`/customers/${order.customer.id}`)} className="inline-flex h-10 items-center rounded-full border border-ink/20 px-4 text-sm font-semibold hover:border-ink">
                   {order.customer._count.inquiries} order{order.customer._count.inquiries === 1 ? "" : "s"} from this customer
                 </Link>
               )}

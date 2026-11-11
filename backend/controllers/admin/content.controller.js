@@ -5,6 +5,8 @@ const { getSettings, updateSettings: saveSettings } = require("../../services/se
 const { removeUploadedFile } = require("../../services/storage.service");
 const { publicPath } = require("../../middleware/upload");
 const { badRequest, notFound } = require("../../utils/httpError");
+const { passwordProblem } = require("../../utils/password");
+const { sanitizeHtml } = require("../../utils/sanitizeHtml");
 
 // ---- Generic upload (banners, categories, content) ----------------------------
 
@@ -65,10 +67,11 @@ async function getPage(req, res) {
 // PUT /api/admin/pages/:slug — create or update
 async function savePage(req, res) {
   const { slug } = req.valid.params;
+  const body = { ...req.valid.body, content: sanitizeHtml(req.valid.body.content) };
   const page = await prisma.page.upsert({
     where: { slug },
-    create: { slug, ...req.valid.body },
-    update: req.valid.body,
+    create: { slug, ...body },
+    update: body,
   });
   res.json(page);
 }
@@ -90,8 +93,10 @@ async function listAdmins(req, res) {
 
 async function createAdmin(req, res) {
   const { password, ...rest } = req.valid.body;
+  const problem = passwordProblem(password, rest);
+  if (problem) throw badRequest(problem, [{ path: "password", message: problem }]);
   const admin = await prisma.admin.create({
-    data: { ...rest, password: await bcrypt.hash(password, 10) },
+    data: { ...rest, password: await bcrypt.hash(password, 12) },
     select: adminSelect,
   });
   res.status(201).json(admin);
@@ -105,8 +110,21 @@ async function updateAdmin(req, res) {
     throw badRequest("You cannot deactivate or demote your own account");
   }
 
+  const existing = await prisma.admin.findUnique({ where: { id }, select: { email: true, name: true, role: true, isActive: true } });
+  if (!existing) throw notFound("Admin");
+
   const data = { ...rest };
-  if (password) data.password = await bcrypt.hash(password, 10);
+  if (password) {
+    const problem = passwordProblem(password, { ...existing, ...rest });
+    if (problem) throw badRequest(problem, [{ path: "password", message: problem }]);
+    data.password = await bcrypt.hash(password, 12);
+  }
+  // a new password, a role change or blocking the account signs that admin out everywhere
+  if (password || (rest.role && rest.role !== existing.role) || rest.isActive === false) {
+    data.tokenVersion = { increment: 1 };
+  }
+  // unblocking also clears any sign-in lock
+  if (rest.isActive === true) Object.assign(data, { failedLogins: 0, lockedUntil: null });
 
   const admin = await prisma.admin.update({ where: { id }, data, select: adminSelect });
   res.json(admin);

@@ -20,6 +20,19 @@ if (missing.length) {
 
 const nodeEnv = process.env.NODE_ENV || "development";
 
+// The session-signing secret must be long and random. Placeholders and short values are refused.
+const jwtSecret = process.env.JWT_SECRET;
+const weakSecret =
+  jwtSecret.length < 32 || /replace|change|secret|example|placeholder|^(.)\1+$/i.test(jwtSecret);
+if (weakSecret) {
+  const help = 'Generate one with: node -e "console.log(require(\'crypto\').randomBytes(48).toString(\'hex\'))"';
+  if (nodeEnv === "production") {
+    console.error(`JWT_SECRET is too weak (needs 32+ random characters). ${help}`);
+    process.exit(1);
+  }
+  console.warn(`⚠️  JWT_SECRET is weak. Fine for local testing only. ${help}`);
+}
+
 const env = {
   nodeEnv,
   isProduction: nodeEnv === "production",
@@ -33,8 +46,18 @@ const env = {
   // Public address of the storefront (sitemap.xml, robots.txt, links in emails)
   siteUrl: (process.env.SITE_URL || (process.env.CLIENT_URL || "http://localhost:5173").split(",")[0]).trim().replace(/\/$/, ""),
 
-  jwtSecret: process.env.JWT_SECRET,
-  jwtExpiresIn: process.env.JWT_EXPIRES_IN || "1d",
+  jwtSecret,
+  // admin sessions: short-lived, stored in an httpOnly cookie
+  jwtExpiresIn: process.env.JWT_EXPIRES_IN || "8h",
+  sessionCookie: {
+    name: "ds_admin",
+    // HTTPS-only cookie in production (set COOKIE_SECURE=false only for a local production test)
+    secure: process.env.COOKIE_SECURE ? toBool(process.env.COOKIE_SECURE) : nodeEnv === "production",
+  },
+  // account lock after repeated wrong passwords
+  maxFailedLogins: toInt(process.env.MAX_FAILED_LOGINS, 5),
+  lockMinutes: toInt(process.env.LOCK_MINUTES, 15),
+  apiRateLimit: toInt(process.env.API_RATE_LIMIT, 600),
 
   loginRateLimit: toInt(process.env.LOGIN_RATE_LIMIT, 10),
   orderRateLimit: toInt(process.env.ORDER_RATE_LIMIT, 10),

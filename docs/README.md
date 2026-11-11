@@ -7,6 +7,7 @@ Start here if you're new to the project.
 3. **[TODO.md](TODO.md)**: the current phase's checklist and known issues.
 4. **[ARCHITECTURE.md](ARCHITECTURE.md)**: data model, full API, order flow, security.
 5. **[FILE-GUIDE.md](FILE-GUIDE.md)**: what every file does.
-6. **[THEME-GUIDE.md](THEME-GUIDE.md)**: the wizarding look, colours, fonts, wording and motion rules.
+6. **[SECURITY.md](SECURITY.md)**: how the shop is protected, the secret admin address, admin accounts and the go-live checklist.
+7. **[THEME-GUIDE.md](THEME-GUIDE.md)**: the wizarding look, colours, fonts, wording and motion rules.
 
-**Current phase:** Phase 7, QA, security review and launch. Phases 0–6 are done: storefront, ordering, back office, content pages, contact, SEO and performance.
+**Current phase:** Phase 7. Security hardening is done; link previews, more tests, hosting and backups remain.

@@ -4,6 +4,7 @@ import { adminApi, fieldErrors } from "../api";
 import { useAdminAuth, useConfirm, useToast } from "../context";
 import { usePageTitle } from "../../hooks/usePageTitle";
 import { Badge, Button, ErrorBox, Input, LoadingRows, Modal, PageHeader, Select, Toggle, formatDateTime, useAdminData } from "../ui";
+import { adminPath } from "../../lib/adminPath";
 
 // Admin users and roles (proposal §14). Super admins only.
 const ROLE_TEXT = {
@@ -76,7 +77,7 @@ export default function Admins() {
   const { data, error, loading, reload } = useAdminData(() => (isSuper ? adminApi.admins.list() : Promise.resolve([])), [isSuper]);
   const [modal, setModal] = useState(null);
 
-  if (!isSuper) return <Navigate to="/admin" replace />;
+  if (!isSuper) return <Navigate to={adminPath("")} replace />;
 
   const remove = async (a) => {
     if (!(await confirm({ title: `Remove ${a.name}?`, body: "They will no longer be able to sign in.", confirmText: "Remove admin", danger: true }))) return;
