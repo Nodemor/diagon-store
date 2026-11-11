@@ -10,6 +10,7 @@ import {
   ExternalIcon,
   GearIcon,
   ImageIcon,
+  InboxIcon,
   LogoutIcon,
   OrdersIcon,
   PageIcon,
@@ -24,6 +25,7 @@ const NAV = [
   { to: "/admin/products", label: "Products", Icon: BoxIcon },
   { to: "/admin/categories", label: "Categories", Icon: TagIcon },
   { to: "/admin/banners", label: "Banners", Icon: ImageIcon },
+  { to: "/admin/messages", label: "Messages", Icon: InboxIcon, badge: "messages" },
   { to: "/admin/customers", label: "Customers", Icon: UsersIcon },
   { to: "/admin/pages", label: "Pages", Icon: PageIcon },
   { to: "/admin/settings", label: "Settings", Icon: GearIcon },
@@ -45,7 +47,7 @@ export function RequireAdmin({ children }) {
   return children;
 }
 
-function SideNav({ newOrders, onNavigate }) {
+function SideNav({ counts, onNavigate }) {
   const { admin, isSuper, logout } = useAdminAuth();
 
   return (
@@ -81,9 +83,9 @@ function SideNav({ newOrders, onNavigate }) {
                     )}
                     <Icon className={isActive ? "text-lamp" : ""} />
                     <span className="flex-1">{label}</span>
-                    {badge === "orders" && newOrders > 0 && (
-                      <span className="grid h-5 min-w-5 place-items-center rounded-full bg-lamp px-1.5 text-[0.7rem] font-bold text-night" aria-label={`${newOrders} new orders`}>
-                        {newOrders}
+                    {badge && counts[badge] > 0 && (
+                      <span className="grid h-5 min-w-5 place-items-center rounded-full bg-lamp px-1.5 text-[0.7rem] font-bold text-night" aria-label={`${counts[badge]} new`}>
+                        {counts[badge]}
                       </span>
                     )}
                   </>
@@ -115,16 +117,16 @@ function SideNav({ newOrders, onNavigate }) {
 
 export function AdminLayout() {
   const [open, setOpen] = useState(false);
-  const [newOrders, setNewOrders] = useState(0);
+  const [counts, setCounts] = useState({ orders: 0, messages: 0 });
   const location = useLocation();
 
-  // keep the "new orders" badge fresh
+  // keep the "new orders" / "unread messages" badges fresh
   useEffect(() => {
     let alive = true;
     const load = () =>
       adminApi
         .dashboard()
-        .then((d) => alive && setNewOrders(d.inquiries.new))
+        .then((d) => alive && setCounts({ orders: d.inquiries.new, messages: d.unreadMessages }))
         .catch(() => {});
     load();
     const id = setInterval(load, 60000);
@@ -146,7 +148,7 @@ export function AdminLayout() {
       </a>
 
       <aside className="sticky top-0 hidden h-svh lg:block">
-        <SideNav newOrders={newOrders} />
+        <SideNav counts={counts} />
       </aside>
 
       {/* mobile top bar */}
@@ -157,7 +159,7 @@ export function AdminLayout() {
         </Link>
         <button type="button" onClick={() => setOpen(true)} className="grid h-10 w-10 place-items-center" aria-label="Open menu" aria-expanded={open}>
           <MenuIcon />
-          {newOrders > 0 && <span className="absolute right-3 top-3 h-2 w-2 rounded-full bg-lamp" />}
+          {counts.orders + counts.messages > 0 && <span className="absolute right-3 top-3 h-2 w-2 rounded-full bg-lamp" />}
         </button>
       </div>
 
@@ -175,7 +177,7 @@ export function AdminLayout() {
               <button type="button" onClick={() => setOpen(false)} className="absolute right-3 top-5 z-10 grid h-10 w-10 place-items-center text-moon" aria-label="Close menu">
                 <CloseIcon />
               </button>
-              <SideNav newOrders={newOrders} onNavigate={() => setOpen(false)} />
+              <SideNav counts={counts} onNavigate={() => setOpen(false)} />
             </motion.div>
           </div>
         )}

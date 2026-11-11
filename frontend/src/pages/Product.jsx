@@ -4,10 +4,10 @@ import { AnimatePresence, motion } from "motion/react";
 import DOMPurify from "dompurify";
 import { getProduct, getRelatedProducts } from "../services/store";
 import { useAsync } from "../hooks/useAsync";
-import { usePageTitle } from "../hooks/usePageTitle";
+import { useSeo } from "../hooks/useSeo";
 import { useCart } from "../context/CartContext";
 import { useSettings } from "../context/SettingsContext";
-import { formatPrice, productWhatsAppMessage, whatsappLink } from "../lib/format";
+import { formatPrice, imageAt, productWhatsAppMessage, whatsappLink } from "../lib/format";
 import { ProductGallery } from "../components/product/ProductGallery";
 import { ShareButton } from "../components/product/ShareButton";
 import { ProductSection } from "../components/product/ProductRail";
@@ -54,15 +54,34 @@ export default function Product() {
 
   const { data: product, error, loading } = useAsync((signal) => getProduct(slug, { signal }), [slug]);
   const { data: related } = useAsync((signal) => getRelatedProducts(slug, { signal }), [slug]);
-  usePageTitle(product ? product.metaTitle || product.name : loading ? "Loading" : "Product not found");
+  useSeo({
+    title: product ? product.metaTitle || product.name : loading ? "Loading" : "Product not found",
+    description: product ? product.metaDescription || product.shortDescription || product.description : undefined,
+    image: product?.images?.[0] ? imageAt(product.images[0].url, 1200) : undefined,
+    type: product ? "product" : "website",
+    noindex: !loading && !product,
+    jsonLd: product
+      ? {
+          "@context": "https://schema.org",
+          "@type": "Product",
+          name: product.name,
+          sku: product.sku || undefined,
+          description: product.shortDescription || undefined,
+          image: product.images.map((i) => imageAt(i.url, 1200)),
+          category: product.category?.name,
+          brand: product.brand ? { "@type": "Brand", name: product.brand } : undefined,
+          offers: {
+            "@type": "Offer",
+            priceCurrency: "LKR",
+            price: product.finalPrice,
+            availability: product.inStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+            url: typeof window !== "undefined" ? window.location.href : undefined,
+          },
+        }
+      : undefined,
+  });
 
   useEffect(() => setQuantity(1), [slug]);
-
-  useEffect(() => {
-    if (product?.metaDescription || product?.shortDescription) {
-      document.querySelector('meta[name="description"]')?.setAttribute("content", product.metaDescription || product.shortDescription);
-    }
-  }, [product]);
 
   // sticky bar on phones once the main buttons scroll out of view
   useEffect(() => {

@@ -3,7 +3,7 @@ import { Link, useParams, useSearchParams } from "react-router-dom";
 import { AnimatePresence, motion } from "motion/react";
 import { getCategories, getProducts } from "../services/store";
 import { useAsync } from "../hooks/useAsync";
-import { usePageTitle } from "../hooks/usePageTitle";
+import { useSeo } from "../hooks/useSeo";
 import { ScrollTrigger } from "../lib/motion";
 import { imageAt } from "../lib/format";
 import { useLenis } from "../components/motion/SmoothScroll";
@@ -58,7 +58,11 @@ export default function Shop() {
   const queryKey = JSON.stringify(query);
 
   const title = pageTitle(params, category);
-  usePageTitle(category?.metaTitle || title);
+  useSeo({
+    title: category?.metaTitle || title,
+    description: category?.metaDescription || category?.description || undefined,
+    image: category?.imageUrl ? imageAt(category.imageUrl, 1200) : undefined,
+  });
 
   // first page whenever the filters change
   useEffect(() => {

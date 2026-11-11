@@ -17,6 +17,7 @@ async function getDashboard() {
     totalCustomers,
     recentInquiries,
     lowStockList,
+    unreadMessages,
   ] = await Promise.all([
     prisma.product.count(),
     prisma.product.count({ where: { status: "ACTIVE" } }),
@@ -33,6 +34,7 @@ async function getDashboard() {
       take: 6,
       include: { images: { orderBy: { sortOrder: "asc" }, take: 1 } },
     }),
+    prisma.contactMessage.count({ where: { isRead: false } }),
   ]);
 
   const byStatus = Object.fromEntries(statusGroups.map((g) => [g.status, g._count._all]));
@@ -48,6 +50,7 @@ async function getDashboard() {
     },
     totalCategories,
     totalCustomers,
+    unreadMessages,
     inquiries: {
       new: count("NEW"),
       pending: count("CONTACTED"),

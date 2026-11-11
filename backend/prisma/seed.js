@@ -129,8 +129,8 @@ const BANNERS = [
   },
 ];
 
-const placeholderPage = (title, body) =>
-  `<h2>${title}</h2>\n${body}\n<p><em>This is placeholder text — edit it from Admin → Pages.</em></p>`;
+// the page title is already shown as the page heading, so the body starts straight with the text
+const placeholderPage = (title, body) => `${body}\n<p><em>This is placeholder text — edit it from Admin → Pages.</em></p>`;
 
 const PAGES = [
   ["about", "About Us", "<p>Diagon Store is a little alley of everyday magic: carefully chosen electronics, fashion, beauty, home goods and treats, all in one place. Browse, add what you love to your cart, and send us your order on WhatsApp or email — we’ll confirm and deliver to your door, cash on delivery.</p>"],

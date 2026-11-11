@@ -9,4 +9,4 @@ Start here if you're new to the project.
 5. **[FILE-GUIDE.md](FILE-GUIDE.md)**: what every file does.
 6. **[THEME-GUIDE.md](THEME-GUIDE.md)**: the wizarding look, colours, fonts, wording and motion rules.
 
-**Current phase:** Phase 6, content pages, contact, SEO and performance. Phases 0–5 are done: the storefront, ordering and the full back office at `/admin`.
+**Current phase:** Phase 7, QA, security review and launch. Phases 0–6 are done: storefront, ordering, back office, content pages, contact, SEO and performance.

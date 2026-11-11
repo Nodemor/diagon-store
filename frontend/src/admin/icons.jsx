@@ -50,6 +50,12 @@ export const UsersIcon = (p) => (
     <path d="M2.5 20c.6-3.5 3.3-5.5 6.5-5.5s5.9 2 6.5 5.5M16 5.2a3.5 3.5 0 0 1 0 6.6M18 14.8c2 .7 3.2 2.5 3.5 5.2" />
   </svg>
 );
+export const InboxIcon = (p) => (
+  <svg {...base} {...p}>
+    <path d="M4 13.5 6.5 5h11l2.5 8.5V19a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-5.5Z" />
+    <path d="M4 13.5h4.5l1 2h5l1-2H20" />
+  </svg>
+);
 export const PageIcon = (p) => (
   <svg {...base} {...p}>
     <path d="M6 3.5h8.5L18 7v13.5H6V3.5Z" />

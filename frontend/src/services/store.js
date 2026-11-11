@@ -10,3 +10,4 @@ export const getRelatedProducts = (slug, options) => request(`/products/${encode
 export const getPage = (slug, options) => request(`/pages/${encodeURIComponent(slug)}`, options);
 export const placeInquiry = (body) => request("/inquiries", { method: "POST", body });
 export const trackInquiry = (number, phone) => request("/inquiries/track", { query: { number, phone } });
+export const sendContactMessage = (body) => request("/contact", { method: "POST", body });

@@ -76,6 +76,7 @@ Banner · Setting (key/value) · Page · Admin
 | `Banner` | `title`, `subtitle`, `imageUrl`, `buttonText`, `buttonLink`, `placement` (HERO · PROMO), `isActive`, `sortOrder`, `startsAt` / `endsAt` |
 | `Setting` | Key/value store settings: business details, WhatsApp, email, social links, hours, map, announcement, SEO defaults. Allowed keys and defaults are in `services/settings.service.js`. **Settings are public — never store secrets here.** |
 | `Page` | Editable content pages: `about`, `privacy-policy`, `terms`, `delivery-information`, `return-policy` |
+| `ContactMessage` | Contact form messages: `name`, `email`, `phone`, `subject`, `message`, `isRead` |
 | `Admin` | `role` (`SUPER_ADMIN` · `ADMIN`), `isActive`, `lastLoginAt` |
 
 ### What customers can see
@@ -119,6 +120,17 @@ Errors look like `{ "message": "...", "errors": [{ "path": "price", "message": "
 | GET | `/pages/:slug` | A published content page |
 | POST | `/inquiries` | Place an order. Body: `{ name, phone, email?, address, city?, notes?, channel: "WHATSAPP"\|"EMAIL", items: [{ productId, quantity }] }`. Returns `{ inquiryNumber, estimatedTotal, items, whatsappMessage, whatsappUrl, ... }`. Rate-limited. |
 | GET | `/inquiries/track?number=&phone=` | Order status + timeline. The phone must match the order. Rate-limited. |
+| POST | `/contact` | Contact form `{ name, email?, phone?, subject?, message }` (email or phone required). Saved + emailed to the business. 5 per hour per IP. |
+
+Also served by the API (outside `/api`):
+
+| Method | Path | Notes |
+|---|---|---|
+| GET | `/sitemap.xml` | Home, shop, contact, active categories, visible products, published pages, using `SITE_URL` |
+| GET | `/robots.txt` | Disallows admin, cart, checkout, order and tracking pages; points to the sitemap |
+| GET | `/uploads/<folder>/<file>?w=400` | Resized WebP copy (allowed widths 120–1600), generated once and cached in `uploads/.cache` |
+
+Public `GET /api/*` responses carry `Cache-Control: public, max-age=60, stale-while-revalidate=300`; tracking responses are `no-store`.
 
 ### Admin (`/api/admin`)
 
@@ -142,6 +154,8 @@ Errors look like `{ "message": "...", "errors": [{ "path": "price", "message": "
 | PATCH | `/inquiries/:id/status` | 🔒 `{ status, note? }` |
 | PATCH | `/inquiries/:id/notes` | 🔒 `{ adminNotes }` |
 | GET | `/customers` · `/customers/:id` | 🔒 |
+| GET | `/messages?unread=true` | 🔒 contact form messages + unread count |
+| PATCH · DELETE | `/messages/:id` | 🔒 `{ isRead }` / delete |
 | GET · POST | `/banners` · PUT · DELETE `/banners/:id` | 🔒 |
 | POST | `/uploads/:folder` | 🔒 folder = `banners` / `categories` / `content`, multipart `image` → `{ url }` |
 | GET · PUT | `/settings` | 🔒 PUT accepts any subset of the known keys; unknown keys are ignored |

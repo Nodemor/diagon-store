@@ -8,7 +8,7 @@ import { ButtonLink } from "../components/ui/Button";
 // /cart (proposal §8): change quantities, remove items, see the estimated total.
 export default function Cart() {
   const { items, count, subtotal, savings, refresh, hasUnavailable, clear } = useCart();
-  usePageTitle("Your cart");
+  usePageTitle("Your cart", { noindex: true });
 
   // pick up price / stock changes since the items were added
   useEffect(() => {

@@ -16,7 +16,7 @@ export default function OrderSuccess() {
   const reduce = useReducedMotion();
   const [copied, setCopied] = useState(false);
   const order = state?.order || findRecentOrder(number);
-  usePageTitle(`Order ${number}`);
+  usePageTitle(`Order ${number}`, { noindex: true });
 
   const copy = async () => {
     try {

@@ -2,7 +2,7 @@ import { ButtonLink } from "../components/ui/Button";
 import { usePageTitle } from "../hooks/usePageTitle";
 
 export default function NotFound() {
-  usePageTitle("Page not found");
+  usePageTitle("Page not found", { noindex: true });
   return (
     <section className="bg-night text-moon">
       <div className="mx-auto grid min-h-[70vh] max-w-2xl place-items-center px-4 py-24 text-center">

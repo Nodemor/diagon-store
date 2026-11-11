@@ -1,10 +1,9 @@
-import { useEffect } from "react";
-import { useSettings } from "../context/SettingsContext";
+import { useSeo } from "./useSeo";
 
-/** Sets document.title: "<title> — Diagon Store", or the store's SEO title for the home page (null). */
-export function usePageTitle(title) {
-  const { storeName, metaTitle } = useSettings();
-  useEffect(() => {
-    document.title = title ? `${title} — ${storeName}` : metaTitle || storeName;
-  }, [title, storeName, metaTitle]);
+/**
+ * Simple pages: sets the title (and resets description / previews to the store defaults).
+ * Pass { noindex: true } for private pages such as the cart or checkout.
+ */
+export function usePageTitle(title, options = {}) {
+  useSeo({ title, ...options });
 }

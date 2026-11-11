@@ -7,6 +7,8 @@ const env = require("./config/env");
 const storeRoutes = require("./routes/store.routes");
 const adminRoutes = require("./routes/admin.routes");
 const { notFoundHandler, errorHandler } = require("./middleware/errorHandler");
+const { imageResize } = require("./middleware/imageResize");
+const seo = require("./controllers/seo.controller");
 
 const app = express();
 
@@ -22,8 +24,12 @@ app.use(cors({ origin: env.clientUrls }));
 app.use(express.json({ limit: "1mb" }));
 if (!env.isProduction) app.use(morgan("dev"));
 
-// Uploaded images (product photos, banners, category images)
-app.use("/uploads", express.static(env.upload.dir, { maxAge: "30d", immutable: true, index: false }));
+// Uploaded images (product photos, banners, category images). ?w=400 serves a resized WebP copy.
+app.use("/uploads", imageResize, express.static(env.upload.dir, { maxAge: "30d", immutable: true, index: false, dotfiles: "deny" }));
+
+// Search engines
+app.get("/sitemap.xml", seo.sitemap);
+app.get("/robots.txt", seo.robots);
 
 app.get("/", (req, res) => res.send("Diagon Store API is running ✨"));
 app.get("/api/health", (req, res) => res.json({ status: "ok", time: new Date().toISOString() }));

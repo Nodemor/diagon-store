@@ -31,4 +31,13 @@ const trackLimiter = rateLimit({
   message: json("Too many tracking requests. Please wait a few minutes."),
 });
 
-module.exports = { loginLimiter, inquiryLimiter, trackLimiter };
+// Contact form: 5 messages per IP per hour
+const contactLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  limit: 5,
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+  message: json("You've sent several messages already. Please wait a little, or message us on WhatsApp."),
+});
+
+module.exports = { loginLimiter, inquiryLimiter, trackLimiter, contactLimiter };

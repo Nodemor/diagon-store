@@ -5,6 +5,8 @@ const auth = require("../controllers/admin/auth.controller");
 const catalog = require("../controllers/admin/catalog.controller");
 const sales = require("../controllers/admin/sales.controller");
 const content = require("../controllers/admin/content.controller");
+const contact = require("../controllers/contact.controller");
+const contactV = require("../validators/contact");
 const { requireAuth, requireRole } = require("../middleware/auth");
 const { validate } = require("../middleware/validate");
 const { loginLimiter } = require("../middleware/rateLimiters");
@@ -70,6 +72,11 @@ router.get("/inquiries/:id", validate({ params: idParams }), sales.getInquiry);
 router.patch("/inquiries/:id/status", validate({ params: idParams, body: inquiryV.statusUpdate }), sales.updateInquiryStatus);
 router.patch("/inquiries/:id/notes", validate({ params: idParams, body: inquiryV.notesUpdate }), sales.updateInquiryNotes);
 router.delete("/inquiries/:id", validate({ params: idParams }), sales.deleteInquiry);
+
+// ---- Contact messages ------------------------------------------------------------
+router.get("/messages", validate({ query: contactV.listQuery }), contact.list);
+router.patch("/messages/:id", validate({ params: idParams, body: contactV.updateMessage }), contact.update);
+router.delete("/messages/:id", validate({ params: idParams }), contact.remove);
 
 // ---- Customers -------------------------------------------------------------------
 router.get("/customers", sales.listCustomers);

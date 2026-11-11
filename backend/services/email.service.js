@@ -104,4 +104,23 @@ async function sendInquiryEmails(inquiry, settings) {
   return Promise.all(tasks);
 }
 
-module.exports = { sendMail, sendInquiryEmails };
+/** Contact form message → business email (reply goes straight to the customer). */
+async function sendContactEmail(message, settings) {
+  const to = env.email.adminNotify || settings.email;
+  if (!to) return { skipped: true };
+  return sendMail({
+    to,
+    replyTo: message.email || undefined,
+    subject: `Website message${message.subject ? `: ${message.subject}` : ""} — ${message.name}`,
+    html: `<h2 style="font-family:Georgia,serif">New message from the website</h2>
+      <p style="font-family:Arial,sans-serif;font-size:14px;line-height:1.6">
+        <strong>Name:</strong> ${escapeHtml(message.name)}<br>
+        <strong>Email:</strong> ${escapeHtml(message.email || "—")}<br>
+        <strong>Phone:</strong> ${escapeHtml(message.phone || "—")}<br>
+        <strong>Subject:</strong> ${escapeHtml(message.subject || "—")}
+      </p>
+      <p style="font-family:Arial,sans-serif;font-size:14px;line-height:1.6;white-space:pre-line">${escapeHtml(message.message)}</p>`,
+  });
+}
+
+module.exports = { sendMail, sendInquiryEmails, sendContactEmail };
