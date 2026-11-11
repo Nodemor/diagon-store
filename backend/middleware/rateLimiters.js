@@ -40,4 +40,13 @@ const contactLimiter = rateLimit({
   message: json("You've sent several messages already. Please wait a little, or message us on WhatsApp."),
 });
 
-module.exports = { loginLimiter, inquiryLimiter, trackLimiter, contactLimiter };
+// Every API request: API_RATE_LIMIT per IP per 5 minutes (stops scraping and floods)
+const apiLimiter = rateLimit({
+  windowMs: 5 * 60 * 1000,
+  limit: env.apiRateLimit,
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+  message: json("Too many requests. Please wait a moment and try again."),
+});
+
+module.exports = { apiLimiter, loginLimiter, inquiryLimiter, trackLimiter, contactLimiter };

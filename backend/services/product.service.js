@@ -4,6 +4,7 @@ const { serializeProduct, tagsToString, paginate, pageResult } = require("../uti
 const { uniqueSlug } = require("../utils/slugify");
 const { badRequest, notFound } = require("../utils/httpError");
 const { removeUploadedFile } = require("./storage.service");
+const { sanitizeHtml } = require("../utils/sanitizeHtml");
 
 // ---------------------------------------------------------------------------
 // Shared query pieces
@@ -241,6 +242,7 @@ async function buildProductData(input, existing) {
     "lowStockThreshold", "status", "isFeatured", "isNewArrival", "metaTitle", "metaDescription",
   ];
   for (const key of copy) if (input[key] !== undefined) data[key] = input[key];
+  if (input.description !== undefined) data.description = sanitizeHtml(input.description);
 
   if (input.specifications !== undefined) {
     data.specifications = input.specifications === null ? Prisma.DbNull : input.specifications;

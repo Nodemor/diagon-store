@@ -11,9 +11,10 @@ import { CartDrawer } from "../cart/CartDrawer";
  * Storefront shell: header, animated page area, footer, WhatsApp button, cart drawer.
  * Pages cross-fade between routes; the outgoing page is frozen with useOutlet().
  */
-export function StoreLayout() {
+export function StoreLayout({ children }) {
   const location = useLocation();
-  const outlet = useOutlet();
+  // children: used by the address gate to show "page not found" without a nested route
+  const outlet = useOutlet() ?? children;
   const lenis = useLenis();
   const reduce = useReducedMotion();
 

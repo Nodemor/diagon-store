@@ -24,6 +24,7 @@ When you add a file, add a line here in the same commit.
 | `ARCHITECTURE.md` | Structure, data model, full API, order flow, security |
 | `FILE-GUIDE.md` | This file |
 | `THEME-GUIDE.md` | Wizarding visual style, wording and motion rules |
+| `SECURITY.md` | Protections, secret admin address, admin accounts, go-live checklist, nginx example |
 
 ---
 
@@ -37,7 +38,8 @@ When you add a file, add a line here in the same commit.
 | `app.js` | Builds the Express app: helmet, CORS, JSON limit, request logging, `/uploads` static files, `/api/health`, routes, 404 and error handlers |
 | `prisma.js` | Shared Prisma client using the MariaDB adapter. Connection details come from `DATABASE_URL`. |
 | `prisma.config.ts` | Prisma CLI config: schema, migrations folder, seed command, `DATABASE_URL` |
-| `create-admin.js` | `npm run create-admin`: creates a SUPER_ADMIN from `ADMIN_NAME`, `ADMIN_EMAIL` and `ADMIN_PASSWORD` |
+| `tests/security.test.js` | `npm test`: 16 security tests (sessions, CSRF, lockout, passwords, uploads, HTML cleaning, public surface) |
+| `create-admin.js` | `npm run create-admin`: creates a SUPER_ADMIN, asking for the details at the terminal (password typing hidden). `-- --reset` sets a new password, unlocks the account and ends its sessions |
 | `test-db.js` | `npm run db:test`: runs a real query to check the database connection |
 | `scripts/localize-images.js` | `npm run images:localize` (`-- --dry` to preview): copies external product, category and banner images into `uploads/` and points the database at the local copies |
 
@@ -60,7 +62,7 @@ When you add a file, add a line here in the same commit.
 |---|---|
 | `store.controller.js` | Public handlers: home bundle, product list/detail/related, categories, active banners (date-window aware), settings, pages |
 | `inquiry.controller.js` | Public handlers: place an order, track an order |
-| `admin/auth.controller.js` | Login (updates `lastLoginAt`), profile, change password |
+| `admin/auth.controller.js` | Sign-in (lockout, constant-time answers, session cookie), sign-out, profile, change password (ends other sessions) |
 | `admin/catalog.controller.js` | Products CRUD, stock, product images (upload / URL / reorder / alt text / delete), categories, subcategories |
 | `admin/sales.controller.js` | Dashboard, orders (list / detail / status / notes / delete), customers |
 | `contact.controller.js` | Contact form: save + email (public), list / mark read / delete (admin) |
@@ -95,7 +97,8 @@ When you add a file, add a line here in the same commit.
 
 | File | Purpose |
 |---|---|
-| `auth.js` | `requireAuth` (JWT + active admin check, sets `req.admin`), `requireRole(...roles)` |
+| `auth.js` | Session cookie (`startSession` / `endSession`), `requireAuth` (cookie + session version + active check), `requireRole`, `requireCsrfHeader` |
+| `verifyImages.js` | Checks uploaded files are real images by reading them with sharp; deletes and refuses anything else |
 | `validate.js` | `validate({ params, query, body })`: runs Zod schemas and puts the results in `req.valid` |
 | `errorHandler.js` | 404 handler and the central error → JSON converter |
 | `rateLimiters.js` | `loginLimiter`, `inquiryLimiter`, `trackLimiter`, `contactLimiter` |
@@ -112,6 +115,8 @@ When you add a file, add a line here in the same commit.
 | `serialize.js` | Prisma → JSON (Decimal → number, computed price and stock fields, tags array), pagination helpers |
 | `format.js` | `formatMoney` (LKR), `round2`, `escapeHtml`, `formatOrderNumber` |
 | `whatsapp.js` | Builds the proposal §9 WhatsApp order message and the `wa.me` link |
+| `password.js` | Admin password rules (`passwordProblem`) |
+| `sanitizeHtml.js` | Server-side cleaning of rich text (product descriptions, pages) |
 
 ### backend/prisma/
 
@@ -134,7 +139,8 @@ React 19 + Vite 8 + Tailwind CSS 4. Motion: GSAP + ScrollTrigger, Lenis, Motion 
 
 | File | Purpose |
 |---|---|
-| `package.json` | Dependencies and scripts (`dev`, `build`, `preview`, `lint`) |
+| `package.json` | Dependencies and scripts (`dev`, `build`, `preview`, `lint`, `admin-path`) |
+| `scripts/admin-path.mjs` | `npm run admin-path`: creates a secret back-office address and prints its hash |
 | `.env.example` | `VITE_API_URL`. Copy it to `.env`. |
 | `index.html` | HTML shell, meta, Google Fonts (IM Fell English + Figtree) |
 | `vite.config.js` | Vite with the React and Tailwind plugins; dev proxy for `/sitemap.xml` and `/robots.txt` |
@@ -153,6 +159,7 @@ React 19 + Vite 8 + Tailwind CSS 4. Motion: GSAP + ScrollTrigger, Lenis, Motion 
 
 | File | Purpose |
 |---|---|
+| `lib/adminPath.js` | Secret back-office address: hashes the first part of the address and compares it with `VITE_ADMIN_PATH_HASH`; `adminPath()` builds admin links |
 | `lib/api.js` | `request()` fetch wrapper, `ApiError`, `API_BASE_URL`, `API_ORIGIN` |
 | `lib/format.js` | `formatPrice` (Rs), `assetUrl` (adds the API origin to `/uploads` paths), `imageAt` (resized Unsplash URLs), `whatsappLink`, `productWhatsAppMessage` (single-product order message) |
 | `lib/motion.js` | Registers GSAP plugins (ScrollTrigger, RoughEase, useGSAP); reduced-motion helpers |

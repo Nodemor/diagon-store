@@ -239,6 +239,11 @@ model Admin {
   role        String   @default("ADMIN") // SUPER_ADMIN | ADMIN
   isActive    Boolean  @default(true)
   lastLoginAt DateTime?
+  /// bumped on sign-out, password change or block: every older session token stops working
+  tokenVersion Int     @default(0)
+  /// failed sign-ins in a row; the account locks for a while after too many
+  failedLogins Int     @default(0)
+  lockedUntil  DateTime?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 

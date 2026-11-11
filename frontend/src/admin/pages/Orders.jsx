@@ -4,6 +4,7 @@ import { adminApi } from "../api";
 import { usePageTitle } from "../../hooks/usePageTitle";
 import { formatPrice } from "../../lib/format";
 import { EmptyState, ErrorBox, LoadingRows, ORDER_STATUSES, PageHeader, Pagination, StatusBadge, formatDateTime, useAdminData } from "../ui";
+import { adminPath } from "../../lib/adminPath";
 
 // Orders / inquiries (proposal §12): filter by status, search, open an order.
 export default function Orders() {
@@ -114,11 +115,11 @@ export default function Orders() {
                   {data.items.map((o) => (
                     <tr
                       key={o.id}
-                      onClick={() => navigate(`/admin/orders/${o.id}`)}
+                      onClick={() => navigate(adminPath(`/orders/${o.id}`))}
                       className="cursor-pointer border-b border-ink/5 transition-colors last:border-0 hover:bg-fog/70"
                     >
                       <td className="px-4 py-3">
-                        <Link to={`/admin/orders/${o.id}`} onClick={(e) => e.stopPropagation()} className="font-semibold tabular-nums hover:underline">
+                        <Link to={adminPath(`/orders/${o.id}`)} onClick={(e) => e.stopPropagation()} className="font-semibold tabular-nums hover:underline">
                           {o.inquiryNumber}
                         </Link>
                       </td>

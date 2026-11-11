@@ -7,7 +7,8 @@ const sales = require("../controllers/admin/sales.controller");
 const content = require("../controllers/admin/content.controller");
 const contact = require("../controllers/contact.controller");
 const contactV = require("../validators/contact");
-const { requireAuth, requireRole } = require("../middleware/auth");
+const { requireAuth, requireRole, requireCsrfHeader } = require("../middleware/auth");
+const { verifyImages } = require("../middleware/verifyImages");
 const { validate } = require("../middleware/validate");
 const { loginLimiter } = require("../middleware/rateLimiters");
 const { imageUpload } = require("../middleware/upload");
@@ -30,9 +31,13 @@ const uploaders = {
 };
 
 // ---- Auth --------------------------------------------------------------------
+// every state-changing admin request (sign-in included) must come from our own frontend
+router.use(requireCsrfHeader);
 router.post("/login", loginLimiter, validate({ body: adminV.login }), auth.login);
 
 router.use(requireAuth);
+
+router.post("/logout", auth.logout);
 
 router.get("/profile", auth.profile);
 router.put("/profile/password", validate({ body: adminV.changePassword }), auth.changePassword);
@@ -48,7 +53,7 @@ router.put("/products/:id", validate({ params: idParams, body: productV.updatePr
 router.patch("/products/:id/stock", validate({ params: idParams, body: productV.stockUpdate }), catalog.updateStock);
 router.delete("/products/:id", validate({ params: idParams }), catalog.deleteProduct);
 
-router.post("/products/:id/images", validate({ params: idParams }), productImages, catalog.addImages);
+router.post("/products/:id/images", validate({ params: idParams }), productImages, verifyImages, catalog.addImages);
 router.put("/products/:id/images/order", validate({ params: idParams, body: productV.imageOrder }), catalog.reorderImages);
 router.patch("/products/:id/images/:imageId", validate({ params: imageParams, body: productV.imageMeta }), catalog.updateImage);
 router.delete("/products/:id/images/:imageId", validate({ params: imageParams }), catalog.deleteImage);
@@ -93,6 +98,7 @@ router.post(
   "/uploads/:folder",
   validate({ params: folderParams }),
   (req, res, next) => uploaders[req.valid.params.folder](req, res, next),
+  verifyImages,
   content.uploadImage,
 );
 

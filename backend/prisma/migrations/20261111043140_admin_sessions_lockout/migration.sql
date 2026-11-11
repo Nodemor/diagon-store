@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE `Admin` ADD COLUMN `failedLogins` INTEGER NOT NULL DEFAULT 0,
+    ADD COLUMN `lockedUntil` DATETIME(3) NULL,
+    ADD COLUMN `tokenVersion` INTEGER NOT NULL DEFAULT 0;

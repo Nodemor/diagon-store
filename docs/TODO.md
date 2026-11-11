@@ -6,10 +6,10 @@ Task checklist grouped by the phases in [ROADMAP.md](ROADMAP.md). Tick `[x]` ite
 
 ## ⚠️ Known issues
 
-- [ ] **Linux deployment:** migration `20260928153143_add_categories` runs `ALTER TABLE \`product\`` (lowercase) while the table was created as `Product`. This works on Windows/XAMPP, where table names are case-insensitive, but **fails on Linux MySQL**. Before the first Linux deploy, either set `lower_case_table_names=1` on the server or squash the migrations into a fresh baseline. *(Phase 7)*
+- [x] ~~Linux deployment: lowercase table name in migration `20260928153143_add_categories`~~. Fixed in Phase 7 (the local checksum was updated to match).
 - [ ] Sorting by price uses the regular price, not the sale price. *(Small; revisit if the client notices.)*
 - [ ] Orders don't change stock automatically. The owner adjusts stock in Admin → Products (inline stock field). Decide with the client whether confirming an order should deduct stock.
-- [ ] The admin token is stored in `localStorage`. Consider an httpOnly cookie before launch. *(Phase 7)*
+- [x] ~~The admin token is stored in `localStorage`~~. Now an httpOnly cookie (Phase 7).
 - [ ] The old demo password `Admin@12345` is in the git history. Never use it. Create admins with `npm run create-admin`.
 
 ---
@@ -113,10 +113,29 @@ Task checklist grouped by the phases in [ROADMAP.md](ROADMAP.md). Tick `[x]` ite
 - [x] Removed the duplicated title heading from seeded pages
 - [ ] Link previews on WhatsApp / Facebook only see the defaults in `index.html` (crawlers there don't run JavaScript). Pre-render or inject meta tags on the server for product pages. *(Phase 7)*
 
-## Phase 7 — Launch
+## Phase 7 — QA, security & launch
 
-- [ ] API + E2E tests
-- [ ] Fix migration table-name case for Linux
-- [ ] Security & accessibility review
-- [ ] Deploy (API + MySQL + uploads volume + static frontend + HTTPS)
-- [ ] Backups + monitoring
+### Security hardening ✅
+- [x] Secret back-office address: only a SHA-256 hash in the code (`VITE_ADMIN_PATH_HASH`, `npm run admin-path`); `/admin` and guesses show "page not found"; robots.txt no longer mentions the back office
+- [x] Admin session in an httpOnly, SameSite=Strict, Secure cookie (no token in localStorage or in JavaScript); shop and API share one address (`/api` proxy)
+- [x] Session versions: sign-out, password change, role change and blocking end every older session immediately; `POST /api/admin/logout`
+- [x] CSRF guard: `X-Requested-With: DiagonStore` required on every state-changing admin request
+- [x] Account lockout (5 wrong passwords → 15 min), same response for unknown email and wrong password, `[security]` log line
+- [x] Password rules (12+ characters, letters and numbers, not the email or name, not common); bcrypt cost 12
+- [x] No credentials in files: `npm run create-admin` asks at the terminal (hidden typing), `--reset` to recover; `ADMIN_*` removed from `.env.example`
+- [x] Server refuses a weak or placeholder `JWT_SECRET` in production; sessions shortened to 8 h
+- [x] Uploads checked by content (sharp); fake images rejected and deleted; decompression-bomb limit
+- [x] Product descriptions and pages cleaned on the server (sanitize-html) as well as in the browser
+- [x] General API rate limit (600 / 5 min per IP)
+- [x] `npm audit`: 0 vulnerabilities in both apps (fixed mysql2 / mariadb password-leak issues, body-parser, vite)
+- [x] Migrations use exact table names (`Product`, `Admin`), so they also work on Linux MySQL
+- [x] `backend/tests/security.test.js`: 16 automated security tests (`npm test`)
+- [x] `docs/SECURITY.md`: protections, admin address, accounts, go-live checklist, nginx example
+
+### Still to do
+- [ ] Link previews on WhatsApp / Facebook for product pages (server-side meta tags or pre-rendering)
+- [ ] More automated tests: orders, stock, products API; end-to-end checkout (Playwright)
+- [ ] Accessibility pass (keyboard, contrast, screen reader) across all pages
+- [ ] Hosting: server or VPS setup, nginx config from SECURITY.md, HTTPS, `prisma migrate deploy`, process manager (pm2 / systemd)
+- [ ] Daily backups (database + `backend/uploads`), uptime monitoring, error tracking
+- [ ] Final privacy / terms / returns text from the client

@@ -8,6 +8,7 @@ import { ImageManager } from "../components/ImageManager";
 import { RelatedPicker, SpecsEditor, TagInput } from "../components/FormParts";
 import { RichTextEditor } from "../components/RichTextEditor";
 import { Button, ErrorBox, Input, LoadingRows, PRODUCT_STATUSES, PageHeader, Panel, Select, StatusBadge, Textarea, Toggle, useAdminData } from "../ui";
+import { adminPath } from "../../lib/adminPath";
 
 // Add / edit product (proposal §4, §5, §16–§20, §29 "Product Addition Workflow").
 
@@ -168,7 +169,7 @@ export default function ProductForm() {
         }
         setDirty(false);
         toast.success(payload.status === "ACTIVE" ? "Product published. It's live in the shop." : "Draft saved");
-        navigate(`/admin/products/${created.id}`, { replace: true });
+        navigate(adminPath(`/products/${created.id}`), { replace: true });
       } else {
         const updated = await adminApi.products.update(id, payload);
         setForm(fromProduct(updated));
@@ -188,7 +189,7 @@ export default function ProductForm() {
     try {
       await adminApi.products.remove(id);
       toast.success("Product deleted");
-      navigate("/admin/products");
+      navigate(adminPath("/products"));
     } catch (err) {
       toast.error(err.message);
     }
@@ -241,7 +242,7 @@ export default function ProductForm() {
   return (
     <>
       <PageHeader
-        back={<Link to="/admin/products" className="mb-2 inline-block text-sm text-ink-soft hover:text-ink">← All products</Link>}
+        back={<Link to={adminPath("/products")} className="mb-2 inline-block text-sm text-ink-soft hover:text-ink">← All products</Link>}
         title={isNew ? "Add product" : form.name || "Edit product"}
         description={isNew ? "Fill in the details, add photos, then publish. It appears in the shop straight away." : undefined}
         actions={

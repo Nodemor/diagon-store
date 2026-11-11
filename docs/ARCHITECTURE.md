@@ -20,7 +20,7 @@ This doc covers how the system fits together, what is stored in the database, an
 
 - **Customers check out as guests.** The phone number identifies a customer (`Customer.phone` is unique and normalised to `94XXXXXXXXX`).
 - **Orders are "inquiries" (proposal §9–§12).** An order is saved, then sent to the shop by WhatsApp (a pre-filled `wa.me` link) or email. Payment is cash on delivery, and the admin moves the order through its statuses.
-- **Admins** log in with a JWT. Every admin request re-checks in the database that the admin exists and is active.
+- **Admins** sign in at a hidden back-office address and get an httpOnly session cookie. Every admin request re-checks in the database that the admin exists, is active, and that the session hasn't been ended (session version).
 
 ---
 
@@ -100,7 +100,7 @@ Admins can set any status. Every change is recorded in `InquiryStatusHistory`.
 
 ## API
 
-Base URL: `http://127.0.0.1:5000/api`. 🔒 = `Authorization: Bearer <admin JWT>`. 👑 = SUPER_ADMIN only.
+Base URL: `/api` (the shop's own address; the API itself runs on `127.0.0.1:5000`). 🔒 = admin session cookie `ds_admin`; changes also need the `X-Requested-With: DiagonStore` header. 👑 = SUPER_ADMIN only.
 
 Errors look like `{ "message": "...", "errors": [{ "path": "price", "message": "..." }] }`.
 
@@ -136,7 +136,8 @@ Public `GET /api/*` responses carry `Cache-Control: public, max-age=60, stale-wh
 
 | Method | Endpoint | |
 |---|---|---|
-| POST | `/login` | `{ email, password }` → `{ token, admin }` (rate-limited) |
+| POST | `/login` | `{ email, password }` → `{ admin }` + httpOnly session cookie (rate-limited, account lockout) |
+| POST | `/logout` | 🔒 ends every session of this admin |
 | GET | `/profile` · PUT `/profile/password` | 🔒 |
 | GET | `/dashboard` | 🔒 product counts (total, active, out-of-stock, low-stock, draft), categories, customers, orders by status, recent orders, stock alerts |
 | GET · POST | `/products` | 🔒 list (`search`, `status`, `categoryId`, `stock=low\|out`, `featured`, `newArrival`, `sort`, `page`) · create |
@@ -192,11 +193,17 @@ Order rules:
 
 ## Security
 
+Full details, the go-live checklist and the nginx example: **[SECURITY.md](SECURITY.md)**.
+
 | Area | Measure |
 |---|---|
-| Transport / headers | `helmet`; CORS limited to `CLIENT_URL`; JSON body ≤ 1 MB |
-| Auth | bcrypt passwords; JWT (`JWT_EXPIRES_IN`); admin re-checked on every request; roles |
-| Abuse | Rate limits on login (failures only), order placement, tracking; honeypot field on orders |
-| Input | Zod on params, query and body; Prisma (parameterised queries) |
-| Uploads | Allow-listed image types, size limit, random file names, path-traversal guard on delete |
-| Data exposure | Tracking returns only the first name and order details; admin notes are never public |
+| Transport / headers | `helmet`; CORS limited to `CLIENT_URL` with credentials; JSON body ≤ 1 MB; HTTPS + HSTS/CSP at nginx |
+| Admin address | Secret path; only its SHA-256 hash ships in the frontend (`VITE_ADMIN_PATH_HASH`); robots.txt doesn't mention it |
+| Sessions | JWT `{ id, tv }` in an httpOnly, SameSite=Strict, Secure cookie on `/api/admin`, 8 h. `Admin.tokenVersion` is bumped on sign-out, password/role change or block, which ends every older session |
+| CSRF | SameSite=Strict + required `X-Requested-With: DiagonStore` header on every non-GET admin request |
+| Passwords | bcrypt cost 12; 12+ characters, letters and numbers, not the email/name, not common; admins created at the terminal, never in files |
+| Abuse | Account lockout (5 wrong → 15 min); IP limits on failed sign-ins, orders, tracking, contact; general API limit; honeypots; same answer for unknown email and wrong password |
+| Input | Zod on params, query and body; Prisma (parameterised queries); rich text sanitised on the server and in the browser |
+| Uploads | Allow-listed types, size limit, random names, content verified with sharp, path-traversal guards |
+| Data exposure | Tracking needs number + phone and returns only the first name and order details; admin notes are never public |
+| Tests | `backend/tests/security.test.js` (`npm test`) |

@@ -4,6 +4,7 @@ import { motion } from "motion/react";
 import { useAdminAuth } from "../context";
 import { LampMark } from "../../components/ui/icons";
 import { Button } from "../ui";
+import { adminPath } from "../../lib/adminPath";
 
 export default function Login() {
   const { admin, login, notice } = useAdminAuth();
@@ -14,7 +15,7 @@ export default function Login() {
   const [error, setError] = useState(null);
   const [busy, setBusy] = useState(false);
 
-  if (admin) return <Navigate to={location.state?.from || "/admin"} replace />;
+  if (admin) return <Navigate to={location.state?.from || adminPath("")} replace />;
 
   const submit = async (e) => {
     e.preventDefault();
@@ -22,7 +23,7 @@ export default function Login() {
     setError(null);
     try {
       await login(email.trim(), password);
-      navigate(location.state?.from || "/admin", { replace: true });
+      navigate(location.state?.from || adminPath(""), { replace: true });
     } catch (err) {
       setError(err.message || "Couldn't sign in.");
     } finally {

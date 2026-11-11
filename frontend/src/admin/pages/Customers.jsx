@@ -3,6 +3,7 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { adminApi } from "../api";
 import { usePageTitle } from "../../hooks/usePageTitle";
 import { EmptyState, ErrorBox, LoadingRows, PageHeader, Pagination, StatusBadge, formatDate, useAdminData } from "../ui";
+import { adminPath } from "../../lib/adminPath";
 
 // Customers (proposal §28 "Customer / Inquiry Management"): built from orders, keyed by mobile number.
 export default function Customers() {
@@ -51,9 +52,9 @@ export default function Customers() {
                 </thead>
                 <tbody>
                   {data.items.map((c) => (
-                    <tr key={c.id} onClick={() => navigate(`/admin/customers/${c.id}`)} className="cursor-pointer border-b border-ink/5 last:border-0 hover:bg-fog/60">
+                    <tr key={c.id} onClick={() => navigate(adminPath(`/customers/${c.id}`))} className="cursor-pointer border-b border-ink/5 last:border-0 hover:bg-fog/60">
                       <td className="px-4 py-3">
-                        <Link to={`/admin/customers/${c.id}`} onClick={(e) => e.stopPropagation()} className="font-semibold hover:underline">{c.name}</Link>
+                        <Link to={adminPath(`/customers/${c.id}`)} onClick={(e) => e.stopPropagation()} className="font-semibold hover:underline">{c.name}</Link>
                       </td>
                       <td className="px-4 py-3 tabular-nums">+{c.phone}</td>
                       <td className="px-4 py-3 text-ink-soft">{c.email || "—"}</td>

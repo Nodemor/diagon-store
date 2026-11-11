@@ -1,26 +1,7 @@
-// Admin API client (see docs/ARCHITECTURE.md#admin-apiadmin). Every call sends the admin token;
-// a 401 response signs the admin out (expired or revoked session).
+// Admin API client (see docs/ARCHITECTURE.md#admin-apiadmin).
+// The session lives in an httpOnly cookie set by the API: this code never sees or stores a token.
+// A 401 response means the session expired or was revoked, and signs the admin out.
 import { request } from "../lib/api";
-
-const TOKEN_KEY = "diagon-admin-token";
-
-export const tokenStore = {
-  get: () => {
-    try {
-      return localStorage.getItem(TOKEN_KEY);
-    } catch {
-      return null;
-    }
-  },
-  set: (token) => {
-    try {
-      if (token) localStorage.setItem(TOKEN_KEY, token);
-      else localStorage.removeItem(TOKEN_KEY);
-    } catch {
-      /* storage unavailable */
-    }
-  },
-};
 
 let onUnauthorized = () => {};
 export const setUnauthorizedHandler = (fn) => {
@@ -29,7 +10,7 @@ export const setUnauthorizedHandler = (fn) => {
 
 async function call(path, options = {}) {
   try {
-    return await request(`/admin${path}`, { ...options, token: tokenStore.get() });
+    return await request(`/admin${path}`, options);
   } catch (error) {
     if (error.status === 401) onUnauthorized();
     throw error;
@@ -50,6 +31,9 @@ const form = (field, files) => {
 
 export const adminApi = {
   login: (email, password) => request("/admin/login", { method: "POST", body: { email, password } }),
+  logout: () => request("/admin/logout", { method: "POST" }),
+  /** null when nobody is signed in (no error toast) */
+  currentAdmin: () => request("/admin/profile").then((r) => r.admin).catch(() => null),
   profile: () => call("/profile"),
   changePassword: (body) => put("/profile/password", body),
   dashboard: () => call("/dashboard"),

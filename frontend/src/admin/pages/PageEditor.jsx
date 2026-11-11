@@ -5,6 +5,7 @@ import { useConfirm, useToast } from "../context";
 import { usePageTitle } from "../../hooks/usePageTitle";
 import { RichTextEditor } from "../components/RichTextEditor";
 import { Button, ErrorBox, Input, LoadingRows, PageHeader, Panel, Textarea, Toggle, useAdminData } from "../ui";
+import { adminPath } from "../../lib/adminPath";
 
 export default function PageEditor() {
   const { slug } = useParams();
@@ -40,7 +41,7 @@ export default function PageEditor() {
         isPublished: form.isPublished,
       });
       toast.success("Page saved");
-      if (isNew) navigate(`/admin/pages/${slug}`, { replace: true });
+      if (isNew) navigate(adminPath(`/pages/${slug}`), { replace: true });
     } catch (err) {
       toast.error(err.message);
     } finally {
@@ -53,7 +54,7 @@ export default function PageEditor() {
     try {
       await adminApi.pages.remove(slug);
       toast.success("Page deleted");
-      navigate("/admin/pages");
+      navigate(adminPath("/pages"));
     } catch (err) {
       toast.error(err.message);
     }
@@ -65,7 +66,7 @@ export default function PageEditor() {
   return (
     <>
       <PageHeader
-        back={<Link to="/admin/pages" className="mb-2 inline-block text-sm text-ink-soft hover:text-ink">← All pages</Link>}
+        back={<Link to={adminPath("/pages")} className="mb-2 inline-block text-sm text-ink-soft hover:text-ink">← All pages</Link>}
         title={form.title || "New page"}
         description={`Address: /pages/${slug}`}
         actions={!isNew && <a href={`/pages/${slug}`} target="_blank" rel="noreferrer" className="text-sm font-semibold underline underline-offset-4">View page</a>}

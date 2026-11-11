@@ -7,6 +7,7 @@ import { formatPrice, imageAt } from "../../lib/format";
 import { Img } from "../../components/ui/Img";
 import { ButtonLink, EmptyState, ErrorBox, LoadingRows, PRODUCT_STATUSES, PageHeader, Pagination, StatusBadge, useAdminData } from "../ui";
 import { EditIcon, StarIcon } from "../icons";
+import { adminPath } from "../../lib/adminPath";
 
 /** Stock cell: type a number and press Enter (or leave the field) to save. */
 function StockCell({ product, onSaved }) {
@@ -103,7 +104,7 @@ export default function Products() {
 
   return (
     <>
-      <PageHeader title="Products" description="Everything in the shop. Draft and inactive products are hidden from customers." actions={<ButtonLink to="/admin/products/new">Add product</ButtonLink>} />
+      <PageHeader title="Products" description="Everything in the shop. Draft and inactive products are hidden from customers." actions={<ButtonLink to={adminPath("/products/new")}>Add product</ButtonLink>} />
 
       <div className="mb-5 flex flex-wrap gap-3">
         <label className="min-w-60 flex-1">
@@ -137,7 +138,7 @@ export default function Products() {
       {loading && !data ? (
         <LoadingRows />
       ) : data?.items.length === 0 ? (
-        <EmptyState title="No products found" text={Object.keys(query).length ? "Try clearing a filter." : "Add your first product to open the shop."} action={<ButtonLink to="/admin/products/new">Add product</ButtonLink>} />
+        <EmptyState title="No products found" text={Object.keys(query).length ? "Try clearing a filter." : "Add your first product to open the shop."} action={<ButtonLink to={adminPath("/products/new")}>Add product</ButtonLink>} />
       ) : (
         data && (
           <>
@@ -158,7 +159,7 @@ export default function Products() {
                   {data.items.map((p) => (
                     <tr key={p.id} className="border-b border-ink/5 last:border-0 hover:bg-fog/60">
                       <td className="px-4 py-2.5">
-                        <Link to={`/admin/products/${p.id}`} className="flex items-center gap-3">
+                        <Link to={adminPath(`/products/${p.id}`)} className="flex items-center gap-3">
                           <Img src={imageAt(p.images?.[0]?.url, 120)} alt="" className="h-12 w-10 shrink-0 rounded-lg object-cover" />
                           <span className="min-w-0">
                             <span className="block max-w-[18rem] truncate font-semibold hover:underline">{p.name}</span>
@@ -186,7 +187,7 @@ export default function Products() {
                       </td>
                       <td className="px-4 py-2.5">
                         <div className="flex justify-end gap-1">
-                          <Link to={`/admin/products/${p.id}`} className="grid h-9 w-9 place-items-center rounded-full text-ink-soft hover:bg-fog hover:text-ink" aria-label={`Edit ${p.name}`}><EditIcon width={17} height={17} /></Link>
+                          <Link to={adminPath(`/products/${p.id}`)} className="grid h-9 w-9 place-items-center rounded-full text-ink-soft hover:bg-fog hover:text-ink" aria-label={`Edit ${p.name}`}><EditIcon width={17} height={17} /></Link>
                           <button type="button" onClick={() => remove(p)} className="h-9 rounded-full px-3 text-xs font-semibold text-ink-soft hover:bg-oxblood/10 hover:text-oxblood">Delete</button>
                         </div>
                       </td>

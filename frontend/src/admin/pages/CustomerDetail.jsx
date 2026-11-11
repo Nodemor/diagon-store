@@ -4,6 +4,7 @@ import { usePageTitle } from "../../hooks/usePageTitle";
 import { formatPrice, whatsappLink } from "../../lib/format";
 import { MailIcon, PhoneIcon, PinIcon, WhatsAppIcon } from "../../components/ui/icons";
 import { ErrorBox, LoadingRows, PageHeader, Panel, StatusBadge, formatDateTime, useAdminData } from "../ui";
+import { adminPath } from "../../lib/adminPath";
 
 export default function CustomerDetail() {
   const { id } = useParams();
@@ -21,7 +22,7 @@ export default function CustomerDetail() {
   return (
     <>
       <PageHeader
-        back={<Link to="/admin/customers" className="mb-2 inline-block text-sm text-ink-soft hover:text-ink">← All customers</Link>}
+        back={<Link to={adminPath("/customers")} className="mb-2 inline-block text-sm text-ink-soft hover:text-ink">← All customers</Link>}
         title={c.name}
         description={`Customer since ${formatDateTime(c.createdAt)}`}
       />
@@ -47,7 +48,7 @@ export default function CustomerDetail() {
           <ul className="divide-y divide-ink/10">
             {c.inquiries.map((o) => (
               <li key={o.id}>
-                <Link to={`/admin/orders/${o.id}`} className="flex flex-wrap items-center gap-x-4 gap-y-1 py-3 hover:bg-fog/60">
+                <Link to={adminPath(`/orders/${o.id}`)} className="flex flex-wrap items-center gap-x-4 gap-y-1 py-3 hover:bg-fog/60">
                   <span className="font-semibold tabular-nums">{o.inquiryNumber}</span>
                   <span className="min-w-0 flex-1 truncate text-sm text-ink-soft">{o.items.map((i) => `${i.productName} × ${i.quantity}`).join(", ")}</span>
                   <span className="text-sm font-semibold tabular-nums">{formatPrice(o.estimatedTotal)}</span>

@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useSettings } from "../context/SettingsContext";
+import { isAdminPathname } from "../lib/adminPath";
 
 // Per-page SEO (proposal §23): <title>, meta description, canonical link,
 // Open Graph / Twitter tags for link previews (WhatsApp, Facebook) and optional JSON-LD.
@@ -61,7 +62,7 @@ export function useSeo({ title, description, image, type = "website", jsonLd, no
     document.title = fullTitle;
     setMeta("name", "description", desc);
     // the back office is never indexed
-    setMeta("name", "robots", noindex || window.location.pathname.startsWith("/admin") ? "noindex, nofollow" : null);
+    setMeta("name", "robots", noindex || isAdminPathname(window.location.pathname) ? "noindex, nofollow" : null);
     setLink("canonical", url);
     setMeta("property", "og:site_name", storeName);
     setMeta("property", "og:title", fullTitle);
