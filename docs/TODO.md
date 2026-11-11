@@ -99,12 +99,19 @@ Task checklist grouped by the phases in [ROADMAP.md](ROADMAP.md). Tick `[x]` ite
 - [x] End-to-end tested in the browser (sign-in, publish product with photos, stock, categories, banners, settings, orders → customer tracking, pages, admins, mobile)
 - [ ] Decide with the client whether confirming an order should deduct stock automatically
 
-## Phase 6 — Content & SEO
+## Phase 6 — Content, contact, SEO & performance ✅
 
-- [ ] About, Contact (map, hours, social), policy pages
-- [ ] Per-route meta + Open Graph
-- [ ] `sitemap.xml`, `robots.txt`, product JSON-LD
-- [ ] Image sizes / lazy loading, code-splitting, API cache headers
+- [x] `/pages/:slug` content pages (About, Privacy, Terms, Delivery, Returns) from Admin → Pages, sanitised, with "More information" links
+- [x] `/contact`: phone, WhatsApp, email, address, opening hours, social links, Google Map (only Google embed links allowed), message form
+- [x] `POST /api/contact` (validation, honeypot, 5 per hour per IP): saved as `ContactMessage` and emailed to the business
+- [x] Admin → Messages: unread filter, open marks as read, reply by email / WhatsApp, delete; unread badge + dashboard shortcut
+- [x] `useSeo`: title, description, canonical, Open Graph / Twitter tags; product JSON-LD (price in LKR, availability); category descriptions; noindex on cart, checkout, order, tracking, 404 and admin
+- [x] `/sitemap.xml` (home, shop, contact, categories, products, pages) and `/robots.txt` from the API (`SITE_URL`); Vite proxies both in development
+- [x] Image resizing: `/uploads/...?w=400` → cached WebP (e.g. 82 kB → 5 kB); all storefront images request the size they need
+- [x] Route-level code splitting: main bundle 230 kB → 139 kB gzip
+- [x] Cache-Control on public API GETs (60 s + stale-while-revalidate); tracking is no-store
+- [x] Removed the duplicated title heading from seeded pages
+- [ ] Link previews on WhatsApp / Facebook only see the defaults in `index.html` (crawlers there don't run JavaScript). Pre-render or inject meta tags on the server for product pages. *(Phase 7)*
 
 ## Phase 7 — Launch
 

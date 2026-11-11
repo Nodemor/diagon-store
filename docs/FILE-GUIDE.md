@@ -63,6 +63,8 @@ When you add a file, add a line here in the same commit.
 | `admin/auth.controller.js` | Login (updates `lastLoginAt`), profile, change password |
 | `admin/catalog.controller.js` | Products CRUD, stock, product images (upload / URL / reorder / alt text / delete), categories, subcategories |
 | `admin/sales.controller.js` | Dashboard, orders (list / detail / status / notes / delete), customers |
+| `contact.controller.js` | Contact form: save + email (public), list / mark read / delete (admin) |
+| `seo.controller.js` | `/sitemap.xml` and `/robots.txt` |
 | `admin/content.controller.js` | Generic image upload, banners, settings, content pages, admin users |
 
 ### backend/services/
@@ -87,6 +89,7 @@ When you add a file, add a line here in the same commit.
 | `inquiry.js` | Order form (with a honeypot field), tracking query, admin list query, status and notes updates |
 | `admin.js` | Login, create/update admin, change password |
 | `content.js` | Banners, settings, pages |
+| `contact.js` | Contact form, admin message list / update |
 
 ### backend/middleware/
 
@@ -95,8 +98,9 @@ When you add a file, add a line here in the same commit.
 | `auth.js` | `requireAuth` (JWT + active admin check, sets `req.admin`), `requireRole(...roles)` |
 | `validate.js` | `validate({ params, query, body })`: runs Zod schemas and puts the results in `req.valid` |
 | `errorHandler.js` | 404 handler and the central error → JSON converter |
-| `rateLimiters.js` | `loginLimiter`, `inquiryLimiter`, `trackLimiter` |
+| `rateLimiters.js` | `loginLimiter`, `inquiryLimiter`, `trackLimiter`, `contactLimiter` |
 | `upload.js` | Multer image upload to `uploads/<folder>/` with type and size checks and random names |
+| `imageResize.js` | `/uploads/...?w=` → resized WebP via sharp, cached in `uploads/.cache` (fixed widths, path-traversal guard) |
 
 ### backend/utils/
 
@@ -133,7 +137,7 @@ React 19 + Vite 8 + Tailwind CSS 4. Motion: GSAP + ScrollTrigger, Lenis, Motion 
 | `package.json` | Dependencies and scripts (`dev`, `build`, `preview`, `lint`) |
 | `.env.example` | `VITE_API_URL`. Copy it to `.env`. |
 | `index.html` | HTML shell, meta, Google Fonts (IM Fell English + Figtree) |
-| `vite.config.js` | Vite with the React and Tailwind plugins |
+| `vite.config.js` | Vite with the React and Tailwind plugins; dev proxy for `/sitemap.xml` and `/robots.txt` |
 | `.oxlintrc.json` | oxlint rules |
 | `public/favicon.svg` | Tab icon |
 
@@ -142,7 +146,7 @@ React 19 + Vite 8 + Tailwind CSS 4. Motion: GSAP + ScrollTrigger, Lenis, Motion 
 | File | Purpose |
 |---|---|
 | `main.jsx` | Entry: `MotionConfig` (respects reduced motion) → `SettingsProvider` → `CartProvider` → `SmoothScroll` → `App` |
-| `App.jsx` | Routes. Storefront pages sit inside `StoreLayout`; placeholders for Phase 3–6 pages; admin pages are lazy-loaded. |
+| `App.jsx` | Routes. Storefront pages sit inside `StoreLayout`; every page except Home and the back office is lazy-loaded. |
 | `index.css` | Tailwind import, **design tokens** (`@theme`), base styles, fog and flicker keyframes, reduced-motion rules |
 
 ### src/lib/ · src/hooks/ · src/context/ · src/services/
@@ -154,7 +158,8 @@ React 19 + Vite 8 + Tailwind CSS 4. Motion: GSAP + ScrollTrigger, Lenis, Motion 
 | `lib/motion.js` | Registers GSAP plugins (ScrollTrigger, RoughEase, useGSAP); reduced-motion helpers |
 | `lib/recentOrders.js` | Orders placed on this device (for one-tap tracking) and opt-in saved customer details |
 | `hooks/useAsync.js` | Loads data with abort handling → `{ data, error, loading }` |
-| `hooks/usePageTitle.js` | Sets `document.title` per page |
+| `hooks/useSeo.js` | Per-page title, description, canonical, Open Graph / Twitter tags, JSON-LD, noindex |
+| `hooks/usePageTitle.js` | Shortcut for `useSeo({ title })` |
 | `context/SettingsContext.jsx` | Store settings from `/api/settings` (name, WhatsApp, contact details, social links) with fallbacks |
 | `context/CartContext.jsx` | Cart saved in `localStorage`: `add`, `setQuantity`, `remove`, `clear`, `refresh` (re-reads prices and stock from the API), `count`, `subtotal`, `savings`, drawer `isOpen` / `openCart` / `closeCart` |
 | `services/store.js` | Public API calls (home, settings, categories, products, product, related, page, place order, track) |
@@ -205,7 +210,8 @@ React 19 + Vite 8 + Tailwind CSS 4. Motion: GSAP + ScrollTrigger, Lenis, Motion 
 | `Checkout.jsx` | `/checkout`: order form, WhatsApp / email choice, summary; cart or single product (`?buy=`) |
 | `OrderSuccess.jsx` | `/order/success/:number`: confirmation, order number, WhatsApp fallback button, summary |
 | `Track.jsx` | `/track`: look up by order number + mobile, status timeline, items |
-| `ComingSoon.jsx` | Placeholder for pages scheduled in later phases |
+| `ContentPage.jsx` | `/pages/:slug`: About and policy pages from Admin → Pages |
+| `Contact.jsx` | `/contact`: details, map, social links, message form |
 
 ### src/admin/ (back office, lazy-loaded at `/admin`)
 
@@ -230,6 +236,7 @@ React 19 + Vite 8 + Tailwind CSS 4. Motion: GSAP + ScrollTrigger, Lenis, Motion 
 | `pages/Categories.jsx` | Categories (modal form, image, visibility) + inline subcategories |
 | `pages/Banners.jsx` | Hero and promo banners with schedules |
 | `pages/Customers.jsx` / `CustomerDetail.jsx` | Customer list and order history |
+| `pages/Messages.jsx` | Contact form messages: unread filter, read / unread, reply, delete |
 | `pages/Pages.jsx` / `PageEditor.jsx` | Content pages list and editor |
 | `pages/Settings.jsx` | Store, contact & ordering, social, SEO settings |
 | `pages/Admins.jsx` | Admin users and roles (super admins only) |

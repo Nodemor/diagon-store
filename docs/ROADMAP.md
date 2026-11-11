@@ -13,8 +13,8 @@ Phase 2  Design system + animated landing page                   ✅ done
 Phase 3  Shop, categories, product page, search, filters, cart   ✅ done
 Phase 4  Order / inquiry flow: WhatsApp, email, tracking          ✅ done
 Phase 5  Admin panel UI                                           ✅ done
-Phase 6  Content pages, contact, SEO & performance               ← next
-Phase 7  QA, security review & launch
+Phase 6  Content pages, contact, SEO & performance               ✅ done
+Phase 7  QA, security review & launch                             ← next
 Future   Proposal §30 upgrades (payments, accounts, reviews, ...)
 ```
 
@@ -51,13 +51,13 @@ Future   Proposal §30 upgrades (payments, accounts, reviews, ...)
 | §16–18 Featured, new arrivals, sale price / discount % | 1 | ✅ |
 | §19 Stock management | API 1 · UI 5 | ✅ |
 | §20 Related products (same category / subcategory / hand-picked) | 1 | ✅ |
-| §21–22 Responsive, mobile-friendly | 2–6 | — |
-| §23 SEO (URLs, titles, meta, alt text, sitemap) | slugs + meta fields 1 · rest 6 | partly |
-| §24–25 Contact info, Google Map, social links, hours | settings 1 · UI 6 | API ✅ |
+| §21–22 Responsive, mobile-friendly | 2–6 | ✅ |
+| §23 SEO (URLs, titles, meta, alt text, sitemap) | slugs + meta fields 1 · rest 6 | ✅ |
+| §24–25 Contact info, Google Map, social links, hours | settings 1 · UI 6 | ✅ |
 | §26 Website content management (pages, banners, settings) | API 1 · UI 5 | ✅ |
-| §27 Pages: About, Contact, Privacy, Terms, Delivery, Returns | API 1 · UI 6 | API ✅ |
+| §27 Pages: About, Contact, Privacy, Terms, Delivery, Returns | API 1 · UI 6 | ✅ |
 | §31 Security | 1 + 7 | partly |
-| §32 Performance (optimised images, pagination, caching) | 1 + 6 | partly |
+| §32 Performance (optimised images, pagination, caching) | 1 + 6 | ✅ |
 | Extra (not in proposal): COD order tracking page | API 1 · UI 4 | ✅ |
 | §30 Future upgrades | Future | — |
 
@@ -170,7 +170,7 @@ Settings moved into environment variables, `.env.example` files, repo cleanup, R
 
 **Done when:** the owner can complete the proposal §29 workflow (log in → add product → upload images → mark featured / new / sale → publish → it appears on the site) without a developer.
 
-## Phase 6 — Content, contact, SEO & performance
+## Phase 6 — Content, contact, SEO & performance ✅
 
 - Pages: About, Contact (form, map, hours, social links), Privacy, Terms, Delivery Information, Return / Refund (`/pages/:slug`).
 - SEO:

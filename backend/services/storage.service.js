@@ -20,6 +20,12 @@ async function removeUploadedFile(url) {
   } catch (error) {
     if (error.code !== "ENOENT") console.warn("Could not delete file", absolute, error.message);
   }
+
+  // also remove resized copies made by middleware/imageResize.js
+  const cacheDir = path.join(env.upload.dir, ".cache");
+  const variant = relative.replace(/\.[a-z0-9]+$/i, ".webp");
+  const widths = await fs.readdir(cacheDir).catch(() => []);
+  await Promise.all(widths.map((w) => fs.unlink(path.join(cacheDir, w, variant)).catch(() => {})));
 }
 
 module.exports = { removeUploadedFile };

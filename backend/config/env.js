@@ -30,6 +30,8 @@ const env = {
     .map((url) => url.trim())
     .filter(Boolean),
   apiPublicUrl: process.env.API_PUBLIC_URL || `http://127.0.0.1:${toInt(process.env.PORT, 5000)}`,
+  // Public address of the storefront (sitemap.xml, robots.txt, links in emails)
+  siteUrl: (process.env.SITE_URL || (process.env.CLIENT_URL || "http://localhost:5173").split(",")[0]).trim().replace(/\/$/, ""),
 
   jwtSecret: process.env.JWT_SECRET,
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || "1d",

@@ -41,6 +41,11 @@ export default function Dashboard() {
           <>
             <ButtonLink to="/admin/products/new" size="sm">Add product</ButtonLink>
             <ButtonLink to="/admin/orders?status=NEW" size="sm" variant="outline">New orders</ButtonLink>
+            {data?.unreadMessages > 0 && (
+              <ButtonLink to="/admin/messages?unread=true" size="sm" variant="outline">
+                {data.unreadMessages} unread message{data.unreadMessages === 1 ? "" : "s"}
+              </ButtonLink>
+            )}
           </>
         }
       />

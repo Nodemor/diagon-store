@@ -86,6 +86,12 @@ export const adminApi = {
     remove: (id) => del(`/inquiries/${id}`),
   },
 
+  messages: {
+    list: (query) => call("/messages", { query }),
+    update: (id, body) => patch(`/messages/${id}`, body),
+    remove: (id) => del(`/messages/${id}`),
+  },
+
   customers: {
     list: (query) => call("/customers", { query }),
     get: (id) => call(`/customers/${id}`),

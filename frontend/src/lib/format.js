@@ -14,9 +14,16 @@ export function assetUrl(url) {
 }
 
 /** Unsplash images can be resized through the URL; local uploads are returned as-is. */
+/**
+ * Image URL at a given display width.
+ * Uploaded photos are resized by the API (/uploads/...?w=400 → cached WebP);
+ * Unsplash photos are resized by Unsplash. Anything else is returned as-is.
+ */
 export function imageAt(url, width) {
   const full = assetUrl(url);
-  if (!full || !full.includes("images.unsplash.com")) return full;
+  if (!full || !width) return full;
+  if (url.startsWith("/uploads/") && /\.(jpe?g|png|webp|avif)$/i.test(url)) return `${full}?w=${width}`;
+  if (!full.includes("images.unsplash.com")) return full;
   const u = new URL(full);
   u.searchParams.set("w", String(width));
   return u.toString();

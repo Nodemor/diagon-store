@@ -12,6 +12,7 @@ import ProductForm from "./pages/ProductForm";
 import Categories from "./pages/Categories";
 import Banners from "./pages/Banners";
 import Customers from "./pages/Customers";
+import Messages from "./pages/Messages";
 import CustomerDetail from "./pages/CustomerDetail";
 import Pages from "./pages/Pages";
 import PageEditor from "./pages/PageEditor";
@@ -47,6 +48,7 @@ export default function AdminApp() {
               <Route path="products/:id" element={<ProductForm />} />
               <Route path="categories" element={<Categories />} />
               <Route path="banners" element={<Banners />} />
+              <Route path="messages" element={<Messages />} />
               <Route path="customers" element={<Customers />} />
               <Route path="customers/:id" element={<CustomerDetail />} />
               <Route path="pages" element={<Pages />} />

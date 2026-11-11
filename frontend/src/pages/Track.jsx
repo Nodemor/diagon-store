@@ -22,7 +22,7 @@ export default function Track() {
   const [number, setNumber] = useState(params.get("number") || "");
   const [phone, setPhone] = useState(params.get("phone") || "");
   const [state, setState] = useState({ loading: false, order: null, error: null });
-  usePageTitle("Track an order");
+  usePageTitle("Track an order", { noindex: true });
 
   const lookup = async (n, p) => {
     if (!n.trim() || p.replace(/\D/g, "").length < 9) {

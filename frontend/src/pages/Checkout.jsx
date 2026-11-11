@@ -67,7 +67,7 @@ export default function Checkout() {
   const cart = useCart();
   const buySlug = params.get("buy");
   const buyQty = Math.max(1, Math.min(99, Number(params.get("qty")) || 1));
-  usePageTitle("Send your order");
+  usePageTitle("Send your order", { noindex: true });
 
   const saved = useMemo(getSavedDetails, []);
   const [form, setForm] = useState(() => ({ ...EMPTY, ...(saved || {}) }));
