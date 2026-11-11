@@ -32,8 +32,19 @@ export function imageAt(url, width) {
 export const mainImage = (product) => product?.images?.[0]?.url || null;
 
 /** wa.me link with a pre-filled message, or null when no number is set. */
-export function whatsappLink(number, message) {
+/** WhatsApp needs international digits: Sri Lankan 0771234567 / 771234567 become 94771234567. */
+export function whatsappDigits(number) {
   const digits = String(number || "").replace(/\D/g, "");
+  if (/^0\d{9}$/.test(digits)) return `94${digits.slice(1)}`;
+  if (/^7\d{8}$/.test(digits)) return `94${digits}`;
+  return digits;
+}
+
+/** Short product link that shows a photo + price preview in WhatsApp and Facebook. */
+export const productShareUrl = (slug) => `${window.location.origin}/s/p/${encodeURIComponent(slug)}`;
+
+export function whatsappLink(number, message) {
+  const digits = whatsappDigits(number);
   if (!digits) return null;
   return `https://wa.me/${digits}${message ? `?text=${encodeURIComponent(message)}` : ""}`;
 }
@@ -42,7 +53,7 @@ export function whatsappLink(number, message) {
  * WhatsApp message for one product, in the format from the proposal (§9):
  * "Hello Diagon Store, I would like to order the following product: ..."
  */
-export function productWhatsAppMessage(product, quantity, storeName = "Diagon Store") {
+export function productWhatsAppMessage(product, quantity, storeName = "Diagon Store", link) {
   const lines = [
     `Hello ${storeName},`,
     "I would like to order the following product:",
@@ -53,6 +64,8 @@ export function productWhatsAppMessage(product, quantity, storeName = "Diagon St
   lines.push(`Quantity: ${quantity}`);
   lines.push(`Price: LKR ${lkr.format(product.finalPrice)}`);
   if (quantity > 1) lines.push(`Total: LKR ${lkr.format(product.finalPrice * quantity)}`);
+  // WhatsApp turns the first link into a preview with the product photo and price
+  if (link) lines.push(`Product link: ${link}`);
   lines.push("", "Please confirm availability and delivery details.");
   return lines.join("\n");
 }

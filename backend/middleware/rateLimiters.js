@@ -49,4 +49,13 @@ const apiLimiter = rateLimit({
   message: json("Too many requests. Please wait a moment and try again."),
 });
 
-module.exports = { apiLimiter, loginLimiter, inquiryLimiter, trackLimiter, contactLimiter };
+// Share links and their preview images (/s/...): 300 per IP per 5 minutes — cards are generated on first view
+const shareLimiter = rateLimit({
+  windowMs: 5 * 60 * 1000,
+  limit: 300,
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+  message: "Too many requests. Please wait a moment and try again.",
+});
+
+module.exports = { apiLimiter, loginLimiter, inquiryLimiter, trackLimiter, contactLimiter, shareLimiter };

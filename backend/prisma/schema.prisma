@@ -149,6 +149,8 @@ model Inquiry {
   itemCount     Int
   estimatedTotal Decimal       @db.Decimal(10, 2)
   adminNotes    String?        @db.Text // internal, never shown to the customer
+  // random code for the order link in WhatsApp messages (/s/o/<code>) — order numbers are guessable, this is not
+  shareToken    String?        @unique @db.VarChar(32)
   items         InquiryItem[]
   history       InquiryStatusHistory[]
   createdAt     DateTime       @default(now())

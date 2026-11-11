@@ -58,7 +58,7 @@ function itemsTable(inquiry, currency) {
 }
 
 /** New order/inquiry: notify the business (proposal §10) and confirm to the customer. */
-async function sendInquiryEmails(inquiry, settings) {
+async function sendInquiryEmails(inquiry, settings, orderUrl) {
   const currency = settings.currency;
   const businessEmail = env.email.adminNotify || settings.email;
 
@@ -96,7 +96,9 @@ async function sendInquiryEmails(inquiry, settings) {
           has reached ${escapeHtml(settings.storeName)}. We will contact you shortly to confirm availability and delivery.
           Payment is cash on delivery.</p>
           ${itemsTable(inquiry, currency)}
-          <p style="font-family:Arial,sans-serif;font-size:13px;color:#666">Track your order any time with your order number and mobile number.</p>`,
+          <p style="font-family:Arial,sans-serif;font-size:13px;color:#666">Track your order any time with your order number and mobile number${
+            orderUrl ? `: <a href="${escapeHtml(orderUrl)}">open your order</a>` : "."
+          }</p>`,
       }),
     );
   }

@@ -7,7 +7,7 @@ import { useAsync } from "../hooks/useAsync";
 import { useSeo } from "../hooks/useSeo";
 import { useCart } from "../context/CartContext";
 import { useSettings } from "../context/SettingsContext";
-import { formatPrice, imageAt, productWhatsAppMessage, whatsappLink } from "../lib/format";
+import { formatPrice, imageAt, productShareUrl, productWhatsAppMessage, whatsappLink } from "../lib/format";
 import { ProductGallery } from "../components/product/ProductGallery";
 import { ShareButton } from "../components/product/ShareButton";
 import { ProductSection } from "../components/product/ProductRail";
@@ -116,7 +116,8 @@ export default function Product() {
   };
   const buyNow = () => navigate(`/checkout?buy=${encodeURIComponent(product.slug)}&qty=${quantity}`);
 
-  const waUrl = whatsappLink(settings.whatsappNumber, productWhatsAppMessage(product, quantity, settings.storeName));
+  const shareUrl = productShareUrl(product.slug);
+  const waUrl = whatsappLink(settings.whatsappNumber, productWhatsAppMessage(product, quantity, settings.storeName, shareUrl));
   const mailUrl = settings.email
     ? `mailto:${settings.email}?subject=${encodeURIComponent(`Inquiry: ${product.name}${product.sku ? ` (${product.sku})` : ""}`)}&body=${encodeURIComponent(
         `${productWhatsAppMessage(product, quantity, settings.storeName)}\n\nName:\nMobile number:\nDelivery address:\n\nProduct link: ${window.location.href}`,
@@ -218,7 +219,7 @@ export default function Product() {
                       <MailIcon width={18} height={18} /> Send inquiry by email
                     </a>
                   )}
-                  <ShareButton title={product.name} text={product.shortDescription || product.name} />
+                  <ShareButton title={product.name} text={product.shortDescription || product.name} url={shareUrl} />
                 </div>
               </div>
 

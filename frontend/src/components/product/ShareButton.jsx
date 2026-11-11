@@ -2,12 +2,15 @@ import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { CheckIcon, FacebookIcon, LinkIcon, ShareIcon, WhatsAppIcon } from "../ui/icons";
 
-/** Share a product (proposal §3 "Share product option"). Uses the phone's share sheet when available. */
-export function ShareButton({ title, text }) {
+/**
+ * Share a product (proposal §3 "Share product option"). Uses the phone's share sheet when available.
+ * `url` should be the product's share link (/s/p/...), which shows a photo + price preview in chat apps.
+ */
+export function ShareButton({ title, text, url: shareUrl }) {
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const box = useRef(null);
-  const url = typeof window !== "undefined" ? window.location.href : "";
+  const url = shareUrl || (typeof window !== "undefined" ? window.location.href : "");
 
   useEffect(() => {
     if (!open) return undefined;

@@ -111,7 +111,7 @@ Task checklist grouped by the phases in [ROADMAP.md](ROADMAP.md). Tick `[x]` ite
 - [x] Route-level code splitting: main bundle 230 kB → 139 kB gzip
 - [x] Cache-Control on public API GETs (60 s + stale-while-revalidate); tracking is no-store
 - [x] Removed the duplicated title heading from seeded pages
-- [ ] Link previews on WhatsApp / Facebook only see the defaults in `index.html` (crawlers there don't run JavaScript). Pre-render or inject meta tags on the server for product pages. *(Phase 7)*
+- [x] ~~Link previews on WhatsApp / Facebook only see the defaults in `index.html`~~. Fixed in Phase 7 with share links (`/s/o/…`, `/s/p/…`) and the nginx preview-bot rule.
 
 ## Phase 7 — QA, security & launch
 
@@ -132,8 +132,19 @@ Task checklist grouped by the phases in [ROADMAP.md](ROADMAP.md). Tick `[x]` ite
 - [x] `backend/tests/security.test.js`: 16 automated security tests (`npm test`)
 - [x] `docs/SECURITY.md`: protections, admin address, accounts, go-live checklist, nginx example
 
+### WhatsApp link previews ✅
+- [x] Order link in every WhatsApp order message (`/s/o/<random code>`): preview card with order number, item, total and product photo; opens order tracking with the number filled in
+- [x] Product links (`/s/p/<slug>`) in product WhatsApp messages and the Share button: photo + price preview card
+- [x] 1200×630 JPEG preview cards generated with sharp, cached in `uploads/.cache/og`
+- [x] Order links use a random 128-bit code (`Inquiry.shareToken`), never the order number; previews never show customer details
+- [x] Back office order page: *Message on WhatsApp* includes the order status + order link; *Copy order link*
+- [x] WhatsApp number in Settings accepts `0771234567` and saves `94771234567`; wrong numbers are refused; warning when no number is set; *Send a test message*
+- [x] Customer confirmation email links to the order
+- [x] nginx: `/s/` proxied; chat-app crawlers on `/product/…` get the preview page
+- [x] `backend/tests/share.test.js`: 9 tests
+
 ### Still to do
-- [ ] Link previews on WhatsApp / Facebook for product pages (server-side meta tags or pre-rendering)
+- [ ] Test a real WhatsApp preview on a phone once the shop has a public https address
 - [ ] More automated tests: orders, stock, products API; end-to-end checkout (Playwright)
 - [ ] Accessibility pass (keyboard, contrast, screen reader) across all pages
 - [ ] Hosting: server or VPS setup, nginx config from SECURITY.md, HTTPS, `prisma migrate deploy`, process manager (pm2 / systemd)

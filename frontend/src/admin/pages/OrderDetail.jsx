@@ -166,6 +166,7 @@ export default function OrderDetail() {
                   <WhatsAppIcon width={18} height={18} /> Message on WhatsApp
                 </a>
               )}
+              {order.shareUrl && <CopyOrderLink url={order.shareUrl} />}
               {order.customer && (
                 <Link to={adminPath(`/customers/${order.customer.id}`)} className="inline-flex h-10 items-center rounded-full border border-ink/20 px-4 text-sm font-semibold hover:border-ink">
                   {order.customer._count.inquiries} order{order.customer._count.inquiries === 1 ? "" : "s"} from this customer
@@ -201,5 +202,24 @@ export default function OrderDetail() {
         </div>
       </div>
     </>
+  );
+}
+
+/** Copies the order's share link (it shows the order number, total and product photo in WhatsApp). */
+function CopyOrderLink({ url }) {
+  const [copied, setCopied] = useState(false);
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1800);
+    } catch {
+      window.prompt("Copy the order link", url);
+    }
+  };
+  return (
+    <button type="button" onClick={copy} className="inline-flex h-10 items-center rounded-full border border-ink/20 px-4 text-sm font-semibold hover:border-ink">
+      {copied ? "Order link copied" : "Copy order link"}
+    </button>
   );
 }

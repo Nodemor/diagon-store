@@ -8,6 +8,7 @@ const { apiLimiter } = require("./middleware/rateLimiters");
 const env = require("./config/env");
 const storeRoutes = require("./routes/store.routes");
 const adminRoutes = require("./routes/admin.routes");
+const shareRoutes = require("./routes/share.routes");
 const { notFoundHandler, errorHandler } = require("./middleware/errorHandler");
 const { imageResize } = require("./middleware/imageResize");
 const seo = require("./controllers/seo.controller");
@@ -34,6 +35,8 @@ app.use("/uploads", imageResize, express.static(env.upload.dir, { maxAge: "30d",
 // Search engines
 app.get("/sitemap.xml", seo.sitemap);
 app.get("/robots.txt", seo.robots);
+// short share links with WhatsApp / Facebook link previews (orders and products)
+app.use("/s", shareRoutes);
 
 app.get("/", (req, res) => res.send("Diagon Store API is running ✨"));
 app.get("/api/health", (req, res) => res.json({ status: "ok", time: new Date().toISOString() }));

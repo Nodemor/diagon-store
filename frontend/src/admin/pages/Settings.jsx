@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { adminApi } from "../api";
 import { useToast } from "../context";
 import { usePageTitle } from "../../hooks/usePageTitle";
-import { whatsappLink } from "../../lib/format";
+import { whatsappDigits, whatsappLink } from "../../lib/format";
 import { Button, ErrorBox, Input, LoadingRows, PageHeader, Panel, Textarea, useAdminData } from "../ui";
 
 // Website settings (proposal §24–§26, §28 "Website Settings").
@@ -20,7 +20,7 @@ const GROUPS = [
     title: "Contact & ordering",
     description: "Orders are sent to this WhatsApp number and email.",
     fields: [
-      ["whatsappNumber", "WhatsApp number", { hint: "International format, digits only. Sri Lanka: 94 then the number without the 0, e.g. 94771234567.", inputMode: "tel" }],
+      ["whatsappNumber", "WhatsApp number", { hint: "Customers' orders open a WhatsApp chat with this number. Type it as usual (0771234567) or with the country code (94771234567).", inputMode: "tel" }],
       ["phone", "Phone number", { hint: "Shown in the footer, e.g. 077 123 4567.", inputMode: "tel" }],
       ["email", "Business email", { hint: "Shown in the footer and used for email inquiries.", type: "email" }],
       ["address", "Address", { textarea: true }],
@@ -106,11 +106,19 @@ export default function Settings() {
                   <Input key={key} type={opts.type || "text"} inputMode={opts.inputMode} {...props} />
                 );
               })}
-              {group.title === "Contact & ordering" && wa && (
-                <a href={wa} target="_blank" rel="noreferrer" className="inline-block text-sm font-semibold underline underline-offset-4">
-                  Test the WhatsApp number
-                </a>
-              )}
+              {group.title === "Contact & ordering" &&
+                (wa ? (
+                  <p className="text-sm text-ink-soft">
+                    Orders go to <span className="font-semibold text-ink">+{whatsappDigits(form.whatsappNumber)}</span>.{" "}
+                    <a href={wa} target="_blank" rel="noreferrer" className="font-semibold text-ink underline underline-offset-4">
+                      Send a test message
+                    </a>
+                  </p>
+                ) : (
+                  <p role="alert" className="rounded-xl bg-oxblood/10 p-3 text-sm text-oxblood">
+                    No WhatsApp number yet. Customers can't send orders on WhatsApp until you add one.
+                  </p>
+                ))}
             </div>
           </Panel>
         ))}

@@ -21,7 +21,7 @@ The protections are checked by automated tests: `cd backend && npm test`, 16 tes
 | **Input** | Every request body, query and URL parameter is validated (Zod), and the database is accessed only through Prisma, with no hand-built SQL from user input. |
 | **Rich text** | Product descriptions and pages are cleaned **on the server** before saving (sanitize-html: no scripts, event handlers or `javascript:` links). They're cleaned **again in the browser** before display (DOMPurify). |
 | **Uploads** | Allowed types and a size limit; random file names. **The file contents are checked** with sharp, so a renamed script or HTML file is rejected and deleted. Very large "decompression bomb" images are refused. Uploads can't be used to read files outside the upload folder. |
-| **Customer data** | Order tracking needs the order number **and** the phone number used for the order (rate-limited, never cached). Internal admin notes are never sent to customers. |
+| **Customer data** | Order tracking needs the order number **and** the phone number used for the order (rate-limited, never cached). Internal admin notes are never sent to customers. Order links in WhatsApp messages (`/s/o/…`) use a random 128-bit code, not the order number, and their preview shows only the order number, item count, total and product photo — never the customer's name, phone or address. |
 | **Spam** | Honeypot fields and per-IP limits on orders (10/hour) and contact messages (5/hour). |
 | **HTTP headers** | helmet on the API (CSP, nosniff, frame and referrer rules, no `X-Powered-By`). The web server adds the site's headers; see the nginx example below. |
 | **Dependencies** | `npm audit` shows 0 known vulnerabilities in both apps (Nov 2026). Re-run monthly. |
@@ -81,6 +81,12 @@ Without a hash (local development) the back office is at `/admin`.
 The shop and the API share one address. The API is never exposed directly.
 
 ```nginx
+# chat apps (WhatsApp, Facebook, …) don't run JavaScript: send them the product preview page
+map $http_user_agent $preview_bot {
+    default 0;
+    ~*(whatsapp|facebookexternalhit|facebot|twitterbot|telegrambot|slackbot|discordbot|linkedinbot|skypeuripreview|viber|pinterest) 1;
+}
+
 server {
     listen 443 ssl http2;
     server_name diagonstore.lk;
@@ -99,6 +105,13 @@ server {
     location /uploads/      { proxy_pass http://127.0.0.1:5000; }
     location = /sitemap.xml { proxy_pass http://127.0.0.1:5000; }
     location = /robots.txt  { proxy_pass http://127.0.0.1:5000; }
+    location /s/            { proxy_pass http://127.0.0.1:5000; include /etc/nginx/proxy_params; }   # share links + preview cards
+
+    # product addresses shared by copy-paste still get a preview
+    location /product/ {
+        if ($preview_bot) { rewrite ^/product/(.*)$ /s/p/$1 last; }
+        try_files $uri /index.html;
+    }
 
     # the single-page app: every other address is handled by the shop (including the secret admin address)
     location / { try_files $uri /index.html; }

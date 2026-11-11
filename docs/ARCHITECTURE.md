@@ -70,7 +70,7 @@ Banner · Setting (key/value) · Page · Admin
 | `Category` | `name`, `slug`, `description`, `imageUrl`, `isActive`, `sortOrder`, SEO meta |
 | `Subcategory` | `name`, `slug` (unique within its category), `isActive`, `sortOrder` |
 | `Customer` | `name`, `phone` (unique), `email`, `address` — created or updated whenever an order is placed |
-| `Inquiry` | An order. `inquiryNumber` (`DS-YYYY-NNNNNN`), a snapshot of the customer's details, `channel` (WHATSAPP · EMAIL · WEB), `status`, `itemCount`, `estimatedTotal`, `adminNotes` (internal) |
+| `Inquiry` | An order. `inquiryNumber` (`DS-YYYY-NNNNNN`), a snapshot of the customer's details, `channel` (WHATSAPP · EMAIL · WEB), `status`, `itemCount`, `estimatedTotal`, `adminNotes` (internal), `shareToken` (random code for the order link `/s/o/<code>`) |
 | `InquiryItem` | A snapshot of `productName`, `sku`, `unitPrice`, `quantity`, `lineTotal`. It survives product edits and deletion. |
 | `InquiryStatusHistory` | Each status change, with an optional note and the admin who made it. Used for the tracking timeline. |
 | `Banner` | `title`, `subtitle`, `imageUrl`, `buttonText`, `buttonLink`, `placement` (HERO · PROMO), `isActive`, `sortOrder`, `startsAt` / `endsAt` |
@@ -163,6 +163,19 @@ Public `GET /api/*` responses carry `Cache-Control: public, max-age=60, stale-wh
 | GET | `/pages` · GET · PUT · DELETE `/pages/:slug` | 🔒 PUT creates or updates |
 | GET · POST | `/admins` · PUT · DELETE `/admins/:id` | 🔒👑 you can't delete, deactivate or demote yourself |
 
+### Share links (`/s`, outside `/api`)
+
+Short links used in WhatsApp messages and the Share button. Chat apps don't run JavaScript, so these pages carry the link-preview tags (Open Graph) and send people on with a meta refresh. Rate-limited (300 / 5 min per IP).
+
+| Method | Endpoint | Notes |
+|---|---|---|
+| GET | `/s/o/:code` | Order preview: "Order DS-…", item count, total → redirects to `/track?number=…`. `noindex`, private cache. Unknown code → 404 page. |
+| GET | `/s/o/:code/image.jpg` | 1200×630 card: first product photo, order number, first item, total |
+| GET | `/s/p/:slug` | Product preview: name, price, short description → redirects to `/product/:slug`. Hidden products → 404. |
+| GET | `/s/p/:slug/image.jpg` | 1200×630 card: photo, name, price (and old price), stock. `?v=` changes when the product changes. |
+
+Cards are generated once with sharp and cached in `uploads/.cache/og`. Only photos in `uploads/` are used; external image URLs get a lamp-lit placeholder (the server never fetches outside URLs).
+
 ### Image URLs
 
 Uploaded images are stored as paths such as `/uploads/products/<random>.jpg`. The frontend adds the API origin in front. External URLs (`https://...`) are stored and returned as-is.
@@ -176,7 +189,7 @@ Customer: cart → /checkout form → POST /api/inquiries
   server: validate → normalise phone → load products (visible only)
           → reject out-of-stock / qty > stock → price from DB (sale price if on sale)
           → transaction: upsert Customer, create Inquiry + items + history(NEW), set DS-YYYY-NNNNNN
-          → build WhatsApp message + wa.me link (number from Settings)
+          → build WhatsApp message (with the order link /s/o/<code>) + wa.me link (number from Settings)
           → send emails in the background (business + customer)
   ← 201 { inquiryNumber, whatsappUrl, ... }
 Frontend: channel WHATSAPP → open whatsappUrl · EMAIL → show confirmation

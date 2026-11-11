@@ -1,5 +1,7 @@
 const prisma = require("../prisma");
 const env = require("../config/env");
+const { normalizePhone } = require("../utils/phone");
+const { badRequest } = require("../utils/httpError");
 
 // Every editable store setting and its default. Only these keys can be saved.
 // All settings are public (shown on the website) — never store secrets here.
@@ -34,14 +36,31 @@ async function getSettings() {
   return cache;
 }
 
+/**
+ * Orders go to this number, so a mistake means lost orders: accept the usual ways people write it
+ * (0771234567, +94 77 123 4567, 94771234567) and store international digits; refuse anything else.
+ */
+function cleanWhatsappNumber(value) {
+  const raw = value === null ? "" : String(value).trim();
+  if (!raw) return "";
+  const digits = normalizePhone(raw);
+  if (!digits) {
+    throw badRequest("That WhatsApp number doesn't look right. Use the full number, e.g. 0771234567 or 94771234567.", [
+      { path: "whatsappNumber", message: "Invalid WhatsApp number" },
+    ]);
+  }
+  return digits;
+}
+
 async function updateSettings(input) {
-  const entries = Object.entries(input).filter(([key]) => key in DEFAULTS);
+  const entries = Object.entries(input)
+    .filter(([key]) => key in DEFAULTS)
+    .map(([key, value]) => [key, key === "whatsappNumber" ? cleanWhatsappNumber(value) : value]);
 
   if (entries.length) {
     await prisma.$transaction(
       entries.map(([key, value]) => {
-        let clean = value === null ? "" : String(value).trim();
-        if (key === "whatsappNumber") clean = clean.replace(/\D/g, "");
+        const clean = value === null ? "" : String(value).trim();
         return prisma.setting.upsert({ where: { key }, create: { key, value: clean }, update: { value: clean } });
       }),
     );

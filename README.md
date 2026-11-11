@@ -4,7 +4,7 @@
 
 Customers browse electronics, fashion, beauty, home goods and more, then fill a cart and **send their order through WhatsApp or email**. Payment is **cash on delivery**, and customers **track the order** on the website using its order number. The shop team runs everything from a secure **admin panel**: products, images, prices, stock, categories, banners, featured products, offers, orders, customers, pages and settings.
 
-> **Status:** Phases 1–6 are complete, and Phase 7 security hardening is done: hidden admin address, cookie sessions, account lockout, upload checks and automated security tests. Remaining Phase 7 work covers link previews, deployment and backups. See [docs/ROADMAP.md](docs/ROADMAP.md).
+> **Status:** Phases 1–6 are complete. Phase 7 so far: security hardening (hidden admin address, cookie sessions, account lockout, upload checks, automated tests) and WhatsApp link previews for orders and products. Remaining: more tests, accessibility, deployment and backups. See [docs/ROADMAP.md](docs/ROADMAP.md).
 
 ---
 
@@ -24,7 +24,8 @@ Customers browse electronics, fashion, beauty, home goods and more, then fill a 
 | Admin users with Super Admin / Admin roles | ✅ | ✅ |
 | Wizarding theme, smooth animations, responsive design | — | ✅ |
 | Contact page (map, hours, social, message form → Admin → Messages) | ✅ | ✅ |
-| SEO: page titles, descriptions, link previews, product structured data, sitemap.xml, robots.txt | ✅ | ✅ |
+| SEO: page titles, descriptions, product structured data, sitemap.xml, robots.txt | ✅ | ✅ |
+| WhatsApp / Facebook link previews: order links (order number, total, product photo) and product links (photo, price) | ✅ | ✅ |
 | Fast images: automatic resized WebP copies of uploaded photos | ✅ | ✅ |
 
 ---
@@ -93,7 +94,7 @@ npm run dev             # http://localhost:5173
 |---|---|
 | http://localhost:5173 | Storefront |
 | http://localhost:5173/admin | Back office in development (sign in with the admin from `npm run create-admin`). In production it moves to a secret address; see [docs/SECURITY.md](docs/SECURITY.md). |
-| http://localhost:5173/api/health | API health check (Vite forwards `/api`, `/uploads`, `/sitemap.xml` and `/robots.txt` to the backend, so the shop and the API share one address) |
+| http://localhost:5173/api/health | API health check (Vite forwards `/api`, `/uploads`, `/s/`, `/sitemap.xml` and `/robots.txt` to the backend, so the shop and the API share one address) |
 
 ---
 
@@ -122,16 +123,26 @@ npm run dev             # http://localhost:5173
 
 ## Going live
 
-The shop and the API share **one address**. The web server serves the built shop and forwards `/api`, `/uploads`, `/sitemap.xml` and `/robots.txt` to the API, which only listens on `127.0.0.1`. That's required for the secure admin session cookie.
+The shop and the API share **one address**. The web server serves the built shop and forwards `/api`, `/uploads`, `/s/` (share links), `/sitemap.xml` and `/robots.txt` to the API, which only listens on `127.0.0.1`. That's required for the secure admin session cookie.
 
 Before launch, work through the checklist and the full nginx example (HTTPS, security headers) in **[docs/SECURITY.md](docs/SECURITY.md)**. In short:
 
 - `NODE_ENV=production`, a new `JWT_SECRET`, and a dedicated database user (not root)
-- `CLIENT_URL` and `SITE_URL` set to the `https://` shop address
+- `CLIENT_URL` and `SITE_URL` set to the `https://` shop address (`SITE_URL` is used in the order links inside WhatsApp messages)
+- the WhatsApp number set in Back office → Settings
 - `VITE_ADMIN_PATH_HASH` from `npm run admin-path`, then rebuild the frontend
 - admins created with `npm run create-admin`, and daily backups of the database and `backend/uploads`
 
 Uploaded photos are resized on request (`/uploads/...?w=400`) and cached in `backend/uploads/.cache`. Keep `backend/uploads` on persistent storage and include it in backups.
+
+## WhatsApp orders and link previews
+
+- **Shop WhatsApp number:** Back office → Settings → WhatsApp number. Type it as usual (`0771234567`) or with the country code; it's saved as `94771234567`. Use **Send a test message** to check it opens the right chat. Change it any time; new orders go to the new number straight away.
+- **Order messages** include an order link (`/s/o/<random code>`). WhatsApp shows it as a preview card with the order number, total and product photo, and opening it goes to order tracking.
+- **Product messages and the Share button** use product links (`/s/p/<slug>`) with a photo + price preview.
+- **Back office → Orders → an order:** *Message on WhatsApp* opens a chat with the customer with the order status and the order link; *Copy order link* copies it.
+
+WhatsApp builds the preview on the phone, so the phone must be able to open the link. With `localhost` addresses (development) the message and link work, but no preview appears; previews show once the shop is on its public `https://` address.
 
 ## Environment variables
 
