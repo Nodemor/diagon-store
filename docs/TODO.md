@@ -144,7 +144,8 @@ Task checklist grouped by the phases in [ROADMAP.md](ROADMAP.md). Tick `[x]` ite
 - [x] `backend/tests/share.test.js`: 9 tests
 
 ### Still to do
-- [ ] Test a real WhatsApp preview on a phone once the shop has a public https address
+- [x] WhatsApp test environment: `npm run whatsapp:test -- --number <phone>` (public test address, sample order, QR codes, clean-up)
+- [ ] Test a real WhatsApp preview on a phone (run the test environment, or after going live)
 - [ ] More automated tests: orders, stock, products API; end-to-end checkout (Playwright)
 - [ ] Accessibility pass (keyboard, contrast, screen reader) across all pages
 - [ ] Hosting: server or VPS setup, nginx config from SECURITY.md, HTTPS, `prisma migrate deploy`, process manager (pm2 / systemd)

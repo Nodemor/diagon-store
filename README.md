@@ -115,6 +115,7 @@ npm run dev             # http://localhost:5173
 | `npm run create-admin` | Create a SUPER_ADMIN (asks for the details; password typing hidden) |
 | `npm run create-admin -- --reset` | New password for an existing admin; also unlocks it and signs it out everywhere |
 | `npm test` | Security tests against the database in `.env` (use a development database) |
+| `npm run whatsapp:test -- --number 0771234567` | WhatsApp test environment: the shop on a temporary public https address, a sample order and QR codes to try ordering and link previews on a phone (see below) |
 | `npm run images:localize` | Copy external demo photos into `backend/uploads` so the shop doesn't depend on an image host (`-- --dry` to preview) |
 
 **Frontend** (`frontend/`): `npm run dev`, `npm run build`, `npm run preview`, `npm run lint`, and `npm run admin-path` (creates the secret back-office address and its hash).
@@ -143,6 +144,22 @@ Uploaded photos are resized on request (`/uploads/...?w=400`) and cached in `bac
 - **Back office → Orders → an order:** *Message on WhatsApp* opens a chat with the customer with the order status and the order link; *Copy order link* copies it.
 
 WhatsApp builds the preview on the phone, so the phone must be able to open the link. With `localhost` addresses (development) the message and link work, but no preview appears; previews show once the shop is on its public `https://` address.
+
+### Test WhatsApp on your phone (before going live)
+
+```bash
+cd frontend && npm run build          # the test serves the built shop
+cd ../backend
+npm run whatsapp:test -- --number 0771234567
+```
+
+The script serves the shop and the API on one address (like the VPS), opens a **temporary public https address** (Cloudflare quick tunnel, no account), uses the number as the shop's WhatsApp number, places a sample order and prints QR codes:
+
+- **A:** opens WhatsApp with the sample order message. The order link turns into a preview card (order number, total, product photo). The terminal prints `✓ WhatsApp fetched the link preview` when that happens.
+- **B:** opens the shop on the phone, so you can order like a customer.
+- **C:** in the back office on the computer (`http://localhost:5050/admin`), open the sample order and click *Message on WhatsApp* for the shop → customer message.
+
+Press **Ctrl+C** to stop: the test orders are removed, the old WhatsApp number is put back and the public address closes. Options: `--save` keeps the number, `--keep` keeps the orders, `--local` skips the public address. While it runs, anyone with the random address can open the shop; the back office only works on the computer itself.
 
 ## Environment variables
 

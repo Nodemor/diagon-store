@@ -42,6 +42,7 @@ When you add a file, add a line here in the same commit.
 | `tests/security.test.js` | `npm test`: 16 security tests (sessions, CSRF, lockout, passwords, uploads, HTML cleaning, public surface) |
 | `create-admin.js` | `npm run create-admin`: creates a SUPER_ADMIN, asking for the details at the terminal (password typing hidden). `-- --reset` sets a new password, unlocks the account and ends its sessions |
 | `test-db.js` | `npm run db:test`: runs a real query to check the database connection |
+| `scripts/whatsapp-test.js` | `npm run whatsapp:test -- --number <phone>`: WhatsApp test environment. Serves the built shop + API on one port, opens a temporary public https address (Cloudflare quick tunnel), places a sample order, prints QR codes, and cleans up on Ctrl+C |
 | `scripts/localize-images.js` | `npm run images:localize` (`-- --dry` to preview): copies external product, category and banner images into `uploads/` and points the database at the local copies |
 
 ### backend/config/
