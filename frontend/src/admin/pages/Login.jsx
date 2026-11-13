@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { motion } from "motion/react";
 import { useAdminAuth } from "../context";
-import { LampMark } from "../../components/ui/icons";
+import { LogoFull } from "../../components/ui/Logo";
 import { Button } from "../ui";
 import { adminPath } from "../../lib/adminPath";
 
@@ -43,10 +43,7 @@ export default function Login() {
         transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
         className="relative w-full max-w-sm rounded-3xl border border-cobble-line/70 bg-night-deep/80 p-8 shadow-2xl backdrop-blur"
       >
-        <div className="flex items-center gap-2">
-          <LampMark />
-          <span className="font-sign text-2xl">Diagon Store</span>
-        </div>
+        <LogoFull width={150} loading="eager" className="mx-auto h-auto w-[150px]" />
         <h1 className="mt-6 text-4xl">Back office</h1>
         <p className="mt-1 text-sm text-moon-soft">Sign in to manage products, orders and the website.</p>
 

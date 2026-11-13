@@ -4,7 +4,8 @@ import { AnimatePresence, motion } from "motion/react";
 import PillNav from "../reactbits/PillNav";
 import { useCart } from "../../context/CartContext";
 import { useSettings } from "../../context/SettingsContext";
-import { BagIcon, LampMark } from "../ui/icons";
+import { BagIcon } from "../ui/icons";
+import { LogoMark } from "../ui/Logo";
 import { MobileMenu } from "./MobileMenu";
 import { SearchForm } from "./SearchForm";
 
@@ -72,7 +73,7 @@ export function Header() {
       >
         <div className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4 sm:px-6 md:h-[4.5rem] lg:px-8">
           <Link to="/" className="group flex shrink-0 items-center gap-2" aria-label={`${storeName} home`} onClick={close}>
-            <LampMark className="transition-transform duration-700 ease-alley group-hover:-rotate-6" />
+            <LogoMark height={44} className="-my-1 h-10 w-auto transition-transform duration-700 ease-alley group-hover:-rotate-3 md:h-11" />
             <span className="font-sign text-[1.6rem] leading-none tracking-tight">{storeName}</span>
           </Link>
 

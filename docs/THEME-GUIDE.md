@@ -17,6 +17,19 @@ Demo product names in the seed data are original. Some demo **photos** show real
 
 ---
 
+## Logo
+
+The client's logo (a smiling shopping cart in a wizard hat, with a wand, the alley and "Diagon Store" lettering) is recoloured for the night-slate street: the black ink becomes **moonlight** (`moon`), the gold stays **lamp** gold, the wand is warm wood. Files: `frontend/src/assets/brand/` (site), `frontend/public/brand/` (originals for light and dark backgrounds).
+
+| Where | Version |
+|---|---|
+| Navbar, back-office sidebar | Mark only (cart, hat, wand), next to the store name in `font-sign` |
+| Footer, back-office sign-in | Full logo with lettering |
+| Tab icon, phone icons | Simplified vector mark on a night rounded square (`public/favicon.svg`): detail disappears below 48 px |
+| Link previews | `public/og-image.jpg`; order and product cards carry the mark (`backend/assets/logo-mark.png`) |
+
+Don't put the logo on light backgrounds without switching to `public/brand/logo-light-background.png`.
+
 ## Colour tokens
 
 Tokens are defined in `frontend/src/index.css` (`@theme`) and used as Tailwind classes (`bg-night`, `text-lamp`, ...).

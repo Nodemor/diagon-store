@@ -127,6 +127,12 @@ When you add a file, add a line here in the same commit.
 | `upload.js` | Multer image upload to `uploads/<folder>/` with type and size checks and random names |
 | `imageResize.js` | `/uploads/...?w=` → resized WebP via sharp, cached in `uploads/.cache` (fixed widths, path-traversal guard) |
 
+### backend/assets/
+
+| File | Purpose |
+|---|---|
+| `logo-mark.png` | Logo on the WhatsApp / Facebook preview cards for orders and products (and the picture for products without a photo) |
+
 ### backend/utils/
 
 | File | Purpose |
@@ -167,7 +173,11 @@ React 19 + Vite 8 + Tailwind CSS 4. Motion: GSAP + ScrollTrigger, Lenis, Motion 
 | `index.html` | HTML shell, meta, Google Fonts (IM Fell English + Figtree) |
 | `vite.config.js` | Vite with the React and Tailwind plugins; dev proxy for `/sitemap.xml` and `/robots.txt` |
 | `.oxlintrc.json` | oxlint rules |
-| `public/favicon.svg` | Tab icon |
+| `public/favicon.svg`, `favicon.ico` | Tab icon: the cart-and-wizard-hat mark, redrawn as a simple vector so it stays sharp at 16 px |
+| `public/apple-touch-icon.png`, `icon-192.png`, `icon-512.png`, `icon-maskable-512.png`, `site.webmanifest` | Phone home-screen and app icons |
+| `public/og-image.jpg` | Default link preview (WhatsApp, Facebook, Messenger, Discord) for pages without their own picture; `index.html` gets the full address from `VITE_SITE_URL` at build time |
+| `public/brand/` | Full-size logo files for print, email and social profiles (light- and dark-background versions) |
+| `src/assets/brand/` | Logo images used in the site (`logo-mark.webp`, `logo-full.webp`), recoloured for the night theme |
 
 ### frontend/src/
 
@@ -223,7 +233,8 @@ React 19 + Vite 8 + Tailwind CSS 4. Motion: GSAP + ScrollTrigger, Lenis, Motion 
 | `ui/Button.jsx` | `Button`, `ButtonLink`, `buttonClass` variants |
 | `ui/PriceTag.jsx` | Sale and regular price |
 | `ui/Skeleton.jsx` | Product card loading placeholder |
-| `ui/icons.jsx` | Inline SVG icons + the lamp logo mark |
+| `ui/icons.jsx` | Inline SVG icons (+ the old lamp mark, still used as a small decoration) |
+| `ui/Logo.jsx` | `LogoMark` (navbar, back office) and `LogoFull` (footer, sign-in page) |
 | `reactbits/PillNav.jsx` | React Bits Pill Nav (desktop navigation) |
 | `reactbits/PixelSnow.jsx` | React Bits Pixel Snow (WebGL2 hero snow; lazy-loaded) |
 

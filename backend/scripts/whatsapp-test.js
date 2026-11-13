@@ -219,7 +219,7 @@ async function qr(text) {
         const orders = await prisma.inquiry.findMany({ where: { createdAt: { gte: startedAt } }, select: { inquiryNumber: true, shareToken: true } });
         await prisma.inquiry.deleteMany({ where: { createdAt: { gte: startedAt } } });
         await prisma.customer.deleteMany({ where: { createdAt: { gte: startedAt }, inquiries: { none: {} } } });
-        for (const o of orders) if (o.shareToken) fs.rmSync(path.join(require("../config/env").upload.dir, ".cache", "og", `o-${o.shareToken}.jpg`), { force: true });
+        for (const o of orders) if (o.shareToken) fs.rmSync(path.join(require("../config/env").upload.dir, ".cache", "og", `o-v2-${o.shareToken}.jpg`), { force: true });
         if ((await prisma.inquiry.count()) === 0) await prisma.$executeRawUnsafe("ALTER TABLE `Inquiry` AUTO_INCREMENT = 1");
         say(`  removed ${orders.length} test order${orders.length === 1 ? "" : "s"}${orders.length ? `: ${orders.map((o) => o.inquiryNumber).join(", ")}` : ""}`);
       }

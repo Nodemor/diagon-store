@@ -46,7 +46,8 @@ main() {
   local first_deploy=false
   [[ -f "$STATE_DIR/deployed" ]] || first_deploy=true
 
-  if [[ "$target" == "$previous" && "$first_deploy" == false ]]; then
+  # FORCE=1 rebuilds the live commit (e.g. after the shop's address changed in backend/.env)
+  if [[ "$target" == "$previous" && "$first_deploy" == false && "${FORCE:-0}" != 1 ]]; then
     log "${target:0:7} is already live"
     exit 0
   fi
@@ -116,7 +117,10 @@ build() {
 
   log "building the shop"
   rm -rf frontend/dist-next
-  (cd frontend && npx --no-install vite build --outDir dist-next --emptyOutDir --logLevel warn) || return 1
+  # the shop's public address goes into index.html (link-preview image for WhatsApp, Facebook, …)
+  local site_url
+  site_url=$(grep -E '^SITE_URL=' backend/.env 2>/dev/null | tail -n 1 | cut -d= -f2- | tr -d '"[:space:]')
+  (cd frontend && VITE_SITE_URL="$site_url" npx --no-install vite build --outDir dist-next --emptyOutDir --logLevel warn) || return 1
   [[ -f frontend/dist-next/index.html ]] || return 1
 }
 

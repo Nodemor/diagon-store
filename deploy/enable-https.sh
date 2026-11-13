@@ -52,6 +52,9 @@ set_env API_PUBLIC_URL "https://$DOMAIN" "$env_file"
 set_env COOKIE_SECURE true "$env_file"
 systemctl restart diagon-store
 
+echo "▸ rebuilding the shop for the new address (link previews)"
+sudo -u diagon -H env FORCE=1 bash "$APP_DIR/deploy/deploy.sh" || echo "note: rebuild failed; it happens with the next update anyway"
+
 echo -e "\n✔ The shop is live at https://$DOMAIN (certificates renew automatically)."
 [[ -f /root/diagon-store-admin-address.txt ]] &&
   echo "  Back office: https://$DOMAIN/$(grep -oE 'door-[a-z0-9]+' /root/diagon-store-admin-address.txt | head -n 1)"
