@@ -195,7 +195,7 @@ ln -sf /etc/nginx/sites-available/diagon-store /etc/nginx/sites-enabled/diagon-s
 rm -f /etc/nginx/sites-enabled/default
 nginx -t
 systemctl enable nginx >/dev/null
-systemctl reload nginx
+systemctl reload-or-restart nginx
 
 say "Auto-deploy and nightly backups"
 systemctl enable --now diagon-store-deploy.timer diagon-store-backup.timer >/dev/null

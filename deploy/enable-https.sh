@@ -34,7 +34,7 @@ www_ip=$(getent ahostsv4 "www.$DOMAIN" | awk 'NR==1{print $1}' || true)
 echo "▸ nginx: ${names[*]}"
 sed -i "0,/server_name .*;/s//server_name ${names[*]};/" "$SITE_CONF"
 nginx -t
-systemctl reload nginx
+systemctl reload-or-restart nginx
 
 echo "▸ HTTPS certificate"
 cert_args=(--nginx --non-interactive --agree-tos --redirect)
