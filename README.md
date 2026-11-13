@@ -126,7 +126,7 @@ npm run dev             # http://localhost:5173
 
 The shop and the API share **one address**. The web server serves the built shop and forwards `/api`, `/uploads`, `/s/` (share links), `/sitemap.xml` and `/robots.txt` to the API, which only listens on `127.0.0.1`. That's required for the secure admin session cookie.
 
-**On a VPS (Ubuntu 24.04), one command sets everything up**: nginx, MariaDB, Node.js, firewall, HTTPS, auto-deploy after CI passes, and nightly backups. See **[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)**:
+**On a VPS (Ubuntu 24.04 or 26.04), one command sets everything up**: nginx, MariaDB, Node.js, firewall, HTTPS, auto-deploy after CI passes, and nightly backups. See **[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)**:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Nodemor/diagon-store/main/deploy/setup-vps.sh -o setup-vps.sh

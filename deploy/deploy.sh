@@ -122,7 +122,7 @@ build() {
 
 healthy() {
   local port
-  port=$(grep -E '^PORT=' backend/.env 2>/dev/null | tail -1 | cut -d= -f2 | tr -d '"[:space:]')
+  port=$(grep -E '^PORT=' backend/.env 2>/dev/null | tail -n 1 | cut -d= -f2 | tr -d '"[:space:]')
   for _ in $(seq 1 30); do
     if curl -fsS --max-time 2 "http://127.0.0.1:${port:-5000}/api/health" >/dev/null 2>&1; then
       return 0

@@ -54,5 +54,5 @@ systemctl restart diagon-store
 
 echo -e "\n✔ The shop is live at https://$DOMAIN (certificates renew automatically)."
 [[ -f /root/diagon-store-admin-address.txt ]] &&
-  echo "  Back office: https://$DOMAIN/$(grep -oE 'door-[a-z0-9]+' /root/diagon-store-admin-address.txt | head -1)"
+  echo "  Back office: https://$DOMAIN/$(grep -oE 'door-[a-z0-9]+' /root/diagon-store-admin-address.txt | head -n 1)"
 exit 0
