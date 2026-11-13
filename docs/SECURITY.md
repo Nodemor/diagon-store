@@ -60,6 +60,8 @@ Without a hash (local development) the back office is at `/admin`.
 
 ## Before going live (checklist)
 
+On the VPS, `deploy/setup-vps.sh` and `deploy/enable-https.sh` do all of this except the off-server backup copies (see [DEPLOYMENT.md](DEPLOYMENT.md)). On other hosting, tick these off by hand.
+
 - [ ] **HTTPS only.** Install a certificate (e.g. Let's Encrypt) and redirect http → https.
 - [ ] `NODE_ENV=production` in `backend/.env`, which makes the session cookie HTTPS-only.
 - [ ] **New `JWT_SECRET`**: `node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"`.
@@ -77,6 +79,8 @@ Without a hash (local development) the back office is at `/admin`.
 - [ ] `npm audit` clean in both apps, and Node.js on a supported LTS version.
 
 ### Example web server (nginx)
+
+The VPS uses [deploy/nginx/diagon-store.conf](../deploy/nginx/diagon-store.conf) and [deploy/nginx/diagon-security-headers.conf](../deploy/nginx/diagon-security-headers.conf). This example shows the same rules in one block.
 
 The shop and the API share one address. The API is never exposed directly.
 

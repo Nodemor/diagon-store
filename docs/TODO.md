@@ -148,6 +148,14 @@ Task checklist grouped by the phases in [ROADMAP.md](ROADMAP.md). Tick `[x]` ite
 - [ ] Test a real WhatsApp preview on a phone (run the test environment, or after going live)
 - [ ] More automated tests: orders, stock, products API; end-to-end checkout (Playwright)
 - [ ] Accessibility pass (keyboard, contrast, screen reader) across all pages
-- [ ] Hosting: server or VPS setup, nginx config from SECURITY.md, HTTPS, `prisma migrate deploy`, process manager (pm2 / systemd)
-- [ ] Daily backups (database + `backend/uploads`), uptime monitoring, error tracking
+### VPS deployment ✅
+- [x] `deploy/setup-vps.sh`: one-command Ubuntu 24.04 setup (nginx, MariaDB, Node.js 24, ufw, fail2ban, swap, app user, DB + secrets, secret admin address, first admin)
+- [x] systemd API service with sandboxing; uploads outside the code folder
+- [x] Auto-deploy: VPS checks `main` every minute and deploys after GitHub Actions passes; install only when lock files change; health check + rollback
+- [x] HTTPS with `deploy/enable-https.sh` (Let's Encrypt, auto-renew)
+- [x] Nightly backups (database + photos, 14 days)
+- [x] CI: API tests on MariaDB, shop lint + build, npm audit, deploy-script checks; VPS setup tested on a fresh Ubuntu 24.04 runner
+- [x] `docs/DEPLOYMENT.md`
+- [ ] Run the setup on the Hostinger VPS, point the domain, enable HTTPS
+- [ ] Off-server backup copies (download or cloud sync); uptime monitoring (e.g. UptimeRobot on /api/health)
 - [ ] Final privacy / terms / returns text from the client

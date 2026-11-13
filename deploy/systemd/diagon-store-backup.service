@@ -1,0 +1,10 @@
+# Daily backup of the database and uploaded photos — started by diagon-store-backup.timer
+[Unit]
+Description=Diagon Store backup (database + uploads)
+After=mariadb.service
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash /var/www/diagon-store/deploy/backup.sh
+Nice=10
+IOSchedulingClass=idle

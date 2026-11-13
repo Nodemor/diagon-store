@@ -1,0 +1,99 @@
+# CI: runs on every pull request and every push to main.
+# The VPS deploys a commit on main only after all of these checks pass (deploy/auto-deploy.sh).
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: API tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    services:
+      mariadb:
+        image: mariadb:10.11
+        env:
+          MARIADB_ROOT_PASSWORD: ci-root-password
+          MARIADB_DATABASE: diagon_store
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=30
+    defaults:
+      run:
+        working-directory: backend
+    env:
+      NODE_ENV: test
+      # throwaway values for the CI database only
+      DATABASE_URL: mysql://root:ci-root-password@127.0.0.1:3306/diagon_store
+      JWT_SECRET: ci-only-6f0d3b2a9e8c7d1f4a5b6c7d8e9f0a1b2c3d4e5f
+      CLIENT_URL: http://localhost:5173
+      SITE_URL: http://localhost:5173
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - run: npm ci --no-audit --no-fund
+      - name: Prisma client
+        run: npx prisma generate
+      - name: Database migrations
+        run: npx prisma migrate deploy
+      - name: Demo data
+        run: node prisma/seed.js
+      - name: Upload folders
+        run: mkdir -p uploads/banners uploads/products uploads/categories uploads/content
+      - name: Tests
+        run: npm test
+      - name: Security audit (production packages)
+        run: npm audit --omit=dev --audit-level=high
+
+  frontend:
+    name: Shop lint and build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci --no-audit --no-fund
+      - run: npm run lint
+      - name: Build
+        run: npm run build
+        env:
+          VITE_API_URL: /api
+      - name: Security audit
+        run: npm audit --audit-level=high
+
+  deploy-scripts:
+    name: Deploy scripts check
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Shell syntax and shellcheck
+        run: |
+          for f in deploy/*.sh; do bash -n "$f"; done
+          shellcheck --severity=warning deploy/*.sh

@@ -1,0 +1,4 @@
+# Server files must keep Linux line endings (bash and nginx break on CRLF)
+*.sh text eol=lf
+deploy/** text eol=lf
+.github/** text eol=lf

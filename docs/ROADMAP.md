@@ -14,7 +14,7 @@ Phase 3  Shop, categories, product page, search, filters, cart   ✅ done
 Phase 4  Order / inquiry flow: WhatsApp, email, tracking          ✅ done
 Phase 5  Admin panel UI                                           ✅ done
 Phase 6  Content pages, contact, SEO & performance               ✅ done
-Phase 7  QA, security review & launch                             ◐ security + link previews done
+Phase 7  QA, security review & launch                             ◐ security, link previews, VPS deploy kit done
 Future   Proposal §30 upgrades (payments, accounts, reviews, ...)
 ```
 
