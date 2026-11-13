@@ -41,6 +41,8 @@ as_app() { sudo -u "$APP_USER" -H bash -c "cd '$APP_DIR' && $1"; }
 trap 'die "Setup stopped at line $LINENO. Fix the problem above and run the script again (it is safe to re-run)."' ERR
 
 [[ $EUID -eq 0 ]] || die "Run with sudo: sudo bash $0"
+# commands run as the app user can't use root's current folder (e.g. /root)
+cd /
 # shellcheck disable=SC1091
 . /etc/os-release
 [[ "${ID:-}" == "ubuntu" ]] || die "This script is for Ubuntu (found ${PRETTY_NAME:-unknown})."

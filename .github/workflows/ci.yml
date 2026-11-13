@@ -51,6 +51,8 @@ jobs:
           cache: npm
           cache-dependency-path: backend/package-lock.json
       - run: npm ci --no-audit --no-fund
+      - name: Prisma client
+        run: npx prisma generate
       - name: Database migrations
         run: npx prisma migrate deploy
       - name: Demo data
