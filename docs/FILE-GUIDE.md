@@ -15,7 +15,7 @@ When you add a file, add a line here in the same commit.
 | `docs/` | Project documentation |
 | `deploy/` | VPS deployment kit (see below) |
 | `.github/workflows/ci.yml` | CI on every PR and push to `main`: API tests (MariaDB), shop lint + build, `npm audit`, deploy-script checks |
-| `.github/workflows/vps-setup-test.yml` | PRs that change `deploy/`: runs the full VPS setup on a fresh Ubuntu 24.04 runner and checks the result |
+| `.github/workflows/vps-setup-test.yml` | PRs that change `deploy/`: runs the full VPS setup on fresh Ubuntu 24.04 and 26.04 runners and checks the result |
 
 ## docs/
 
@@ -36,7 +36,7 @@ When you add a file, add a line here in the same commit.
 
 | File | Purpose |
 |---|---|
-| `setup-vps.sh` | One-time setup of a fresh Ubuntu 24.04 VPS: packages, Node.js 24, firewall, fail2ban, app user, database + secrets, secret admin address, first deploy, nginx, timers, first admin. Safe to re-run. |
+| `setup-vps.sh` | One-time setup of a fresh Ubuntu 24.04 / 26.04 VPS: packages, Node.js 24, firewall, fail2ban, app user, database + secrets, secret admin address, first deploy, nginx, timers, first admin. Safe to re-run. |
 | `deploy.sh` | Deploys one commit: install (only when lock files change), migrate, build the shop into `dist-next`, restart, health check, switch builds; rolls back on failure |
 | `auto-deploy.sh` | Run every minute by the deploy timer: newest commit on `main` → wait for its GitHub Actions checks → `deploy.sh` |
 | `enable-https.sh` | Domain + Let's Encrypt certificate + https settings in `backend/.env` |

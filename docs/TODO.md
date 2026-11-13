@@ -154,7 +154,7 @@ Task checklist grouped by the phases in [ROADMAP.md](ROADMAP.md). Tick `[x]` ite
 - [x] Auto-deploy: VPS checks `main` every minute and deploys after GitHub Actions passes; install only when lock files change; health check + rollback
 - [x] HTTPS with `deploy/enable-https.sh` (Let's Encrypt, auto-renew)
 - [x] Nightly backups (database + photos, 14 days)
-- [x] CI: API tests on MariaDB, shop lint + build, npm audit, deploy-script checks; VPS setup tested on a fresh Ubuntu 24.04 runner
+- [x] CI: API tests on MariaDB, shop lint + build, npm audit, deploy-script checks; VPS setup tested on fresh Ubuntu 24.04 and 26.04 runners
 - [x] `docs/DEPLOYMENT.md`
 - [ ] Run the setup on the Hostinger VPS, point the domain, enable HTTPS
 - [ ] Off-server backup copies (download or cloud sync); uptime monitoring (e.g. UptimeRobot on /api/health)

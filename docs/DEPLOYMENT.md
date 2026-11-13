@@ -1,4 +1,4 @@
-# Diagon Store — Deployment (Ubuntu 24.04 VPS)
+# Diagon Store — Deployment (Ubuntu 24.04 / 26.04 VPS)
 
 How the shop runs on a VPS, how to set up a new server, and how updates reach it automatically.
 
@@ -7,7 +7,7 @@ How the shop runs on a VPS, how to set up a new server, and how updates reach it
 ## How it works
 
 ```
- GitHub (Nodemor/diagon-store)                          VPS (Ubuntu 24.04)
+ GitHub (Nodemor/diagon-store)                          VPS (Ubuntu 24.04 / 26.04)
  ─────────────────────────────                          ──────────────────────────────────────────────
  pull request → CI (tests, lint, build)                 nginx :80/:443
  merge to main → CI runs again on main  ──────┐           ├─ /            → frontend/dist (the shop)
@@ -115,7 +115,7 @@ Nightly at 02:30 (Sri Lanka time): a database dump and the photos are written to
 
 ```bash
 # restore the database
-gunzip -c /var/backups/diagon-store/db-<date>.sql.gz | sudo mysql diagon_store
+gunzip -c /var/backups/diagon-store/db-<date>.sql.gz | sudo mariadb diagon_store
 # restore photos
 sudo tar -xzf /var/backups/diagon-store/uploads-<date>.tar.gz -C /var/lib/diagon-store
 sudo systemctl restart diagon-store
@@ -136,6 +136,6 @@ sudo systemctl restart diagon-store
 | Workflow | Runs on | Checks |
 |---|---|---|
 | `.github/workflows/ci.yml` | every PR and push to `main` | API tests against MariaDB, shop lint + build, `npm audit`, deploy-script syntax + shellcheck |
-| `.github/workflows/vps-setup-test.yml` | PRs that change `deploy/` | Runs `setup-vps.sh` on a fresh Ubuntu 24.04 machine and checks the shop, link previews, headers, admin sign-in, auto-deploy and backups |
+| `.github/workflows/vps-setup-test.yml` | PRs that change `deploy/` | Runs `setup-vps.sh` on fresh Ubuntu 24.04 and 26.04 machines and checks the shop, link previews, headers, admin sign-in, auto-deploy and backups |
 
 To require CI before merging, an organisation admin can add a branch rule: GitHub → repo **Settings → Branches → Add rule** for `main` → "Require status checks to pass".

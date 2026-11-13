@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# One-time setup of a fresh Ubuntu 24.04 VPS for the Diagon Store.
+# One-time setup of a fresh Ubuntu 24.04 or 26.04 VPS for the Diagon Store.
 #
 #   curl -fsSL https://raw.githubusercontent.com/Nodemor/diagon-store/main/deploy/setup-vps.sh -o setup-vps.sh
 #   sudo bash setup-vps.sh                         # shop on http://<server IP>
@@ -46,7 +46,7 @@ cd /
 # shellcheck disable=SC1091
 . /etc/os-release
 [[ "${ID:-}" == "ubuntu" ]] || die "This script is for Ubuntu (found ${PRETTY_NAME:-unknown})."
-[[ "${VERSION_ID:-}" == "24.04" ]] || echo "Note: made for Ubuntu 24.04, this is ${VERSION_ID:-?}. Continuing."
+[[ "${VERSION_ID:-}" == "24.04" || "${VERSION_ID:-}" == "26.04" ]] || echo "Note: made for Ubuntu 24.04 / 26.04, this is ${VERSION_ID:-?}. Continuing."
 
 # ---------------------------------------------------------------------------------------------
 say "System packages (this takes a few minutes)"
@@ -65,10 +65,16 @@ fi
 
 if ! node -v 2>/dev/null | grep -q "^v${NODE_MAJOR}\."; then
   say "Node.js ${NODE_MAJOR}"
-  curl -fsSL "https://deb.nodesource.com/setup_${NODE_MAJOR}.x" -o /tmp/nodesource_setup.sh
-  bash /tmp/nodesource_setup.sh >/dev/null
-  apt-get -y -q install nodejs
+  if curl -fsSL "https://deb.nodesource.com/setup_${NODE_MAJOR}.x" -o /tmp/nodesource_setup.sh &&
+    bash /tmp/nodesource_setup.sh >/dev/null && apt-get -y -q install nodejs; then
+    :
+  else
+    echo "NodeSource didn't work on this Ubuntu version; using Ubuntu's own Node.js"
+    apt-get -y -q install nodejs npm
+  fi
 fi
+node_major=$(node -p 'process.versions.node.split(".")[0]')
+((node_major >= 22)) || die "Node.js 22 or newer is needed (found $(node -v))."
 echo "node $(node -v), npm $(npm -v)"
 
 # ---------------------------------------------------------------------------------------------
@@ -99,14 +105,14 @@ fi
 # ---------------------------------------------------------------------------------------------
 say "Database"
 systemctl enable --now mariadb >/dev/null
-mysql -e "DROP USER IF EXISTS ''@'localhost'; DROP DATABASE IF EXISTS test;" 2>/dev/null || true
+mariadb -e "DROP USER IF EXISTS ''@'localhost'; DROP DATABASE IF EXISTS test;" 2>/dev/null || true
 
 PUBLIC_IP=$(hostname -I | awk '{print $1}')
 SITE="http://$PUBLIC_IP"
 BACKEND_ENV="$APP_DIR/backend/.env"
 if [[ ! -f "$BACKEND_ENV" ]]; then
   DB_PASS=$(openssl rand -hex 24)
-  mysql <<SQL
+  mariadb <<SQL
 CREATE DATABASE IF NOT EXISTS \`$DB_NAME\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 CREATE USER IF NOT EXISTS '$DB_USER'@'localhost' IDENTIFIED BY '$DB_PASS';
 CREATE USER IF NOT EXISTS '$DB_USER'@'127.0.0.1' IDENTIFIED BY '$DB_PASS';
@@ -173,7 +179,8 @@ cat >/etc/sudoers.d/diagon-store <<'SUDO'
 diagon ALL=(root) NOPASSWD: /usr/bin/systemctl restart diagon-store
 SUDO
 chmod 440 /etc/sudoers.d/diagon-store
-visudo -cf /etc/sudoers.d/diagon-store >/dev/null
+# (Ubuntu 26.04 uses sudo-rs; its visudo may not support -c, so a failed check only warns)
+visudo -c -f /etc/sudoers.d/diagon-store >/dev/null 2>&1 || echo "note: couldn't verify /etc/sudoers.d/diagon-store with visudo"
 systemctl daemon-reload
 systemctl enable diagon-store >/dev/null
 
@@ -206,7 +213,7 @@ if [[ -n "$DOMAIN" ]]; then
 fi
 
 # ---------------------------------------------------------------------------------------------
-admins=$(mysql -N -e "SELECT COUNT(*) FROM \`$DB_NAME\`.\`Admin\`" 2>/dev/null || echo 0)
+admins=$(mariadb -N -e "SELECT COUNT(*) FROM \`$DB_NAME\`.\`Admin\`" 2>/dev/null || echo 0)
 if [[ "$admins" == "0" ]]; then
   if [[ -t 0 ]]; then
     say "First back-office admin"
@@ -218,7 +225,7 @@ fi
 
 trap - ERR
 SITE_NOW=$(grep -E '^SITE_URL=' "$BACKEND_ENV" | cut -d= -f2)
-ADMIN_SEGMENT=$(grep -oE 'door-[a-z0-9]+' /root/diagon-store-admin-address.txt 2>/dev/null | head -1 || true)
+ADMIN_SEGMENT=$(grep -oE 'door-[a-z0-9]+' /root/diagon-store-admin-address.txt 2>/dev/null | head -n 1 || true)
 cat <<DONE
 
 $(printf '\033[1;32m✔ Diagon Store is running\033[0m')
