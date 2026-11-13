@@ -3,7 +3,8 @@ import { Link, NavLink, Navigate, Outlet, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "motion/react";
 import { useAdminAuth } from "./context";
 import { adminApi } from "./api";
-import { LampMark, MenuIcon, CloseIcon } from "../components/ui/icons";
+import { MenuIcon, CloseIcon } from "../components/ui/icons";
+import { LogoMark } from "../components/ui/Logo";
 import {
   BoxIcon,
   DashboardIcon,
@@ -55,7 +56,7 @@ function SideNav({ counts, onNavigate }) {
   return (
     <div className="flex h-full flex-col bg-night-deep text-moon">
       <Link to={adminPath("")} onClick={onNavigate} className="flex items-center gap-2 px-6 pb-6 pt-7">
-        <LampMark />
+        <LogoMark height={42} />
         <span>
           <span className="block font-sign text-2xl leading-none">Diagon Store</span>
           <span className="text-xs text-moon-soft">Back office</span>
@@ -156,7 +157,7 @@ export function AdminLayout() {
       {/* mobile top bar */}
       <div className="sticky top-0 z-40 flex h-14 items-center justify-between bg-night-deep px-4 text-moon lg:hidden">
         <Link to={adminPath("")} className="flex items-center gap-2">
-          <LampMark width={24} height={24} />
+          <LogoMark height={30} />
           <span className="font-sign text-xl">Back office</span>
         </Link>
         <button type="button" onClick={() => setOpen(true)} className="grid h-10 w-10 place-items-center" aria-label="Open menu" aria-expanded={open}>

@@ -5,7 +5,6 @@ import {
   ClockIcon,
   FacebookIcon,
   InstagramIcon,
-  LampMark,
   MailIcon,
   PhoneIcon,
   PinIcon,
@@ -13,6 +12,7 @@ import {
   WhatsAppIcon,
   YouTubeIcon,
 } from "../ui/icons";
+import { LogoFull } from "../ui/Logo";
 
 const SHOP_LINKS = [
   { to: "/shop", label: "All products" },
@@ -73,9 +73,8 @@ export function Footer() {
       <div className="mx-auto max-w-7xl px-4 pb-10 pt-16 sm:px-6 md:pt-20 lg:px-8">
         <div className="grid gap-12 md:grid-cols-[1.4fr_1fr_1fr_1.3fr]">
           <div>
-            <Link to="/" className="flex items-center gap-2">
-              <LampMark />
-              <span className="font-sign text-3xl">{s.storeName}</span>
+            <Link to="/" className="inline-block" aria-label={`${s.storeName} home`}>
+              <LogoFull width={190} alt={s.storeName} className="-ml-2 h-auto w-[190px]" />
             </Link>
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-moon-soft">{s.footerText || s.tagline}</p>
             {socials.length > 0 && (
@@ -125,7 +124,7 @@ export function Footer() {
 
         <div className="mt-14 flex flex-col gap-3 border-t border-cobble-line/60 pt-6 text-xs text-moon-soft sm:flex-row sm:items-center sm:justify-between">
           <p>
-            © {YEAR} {s.storeName}. Prices in {s.currency || "LKR"}.
+            © {YEAR} {s.storeName}, Powered by Nodemor PVT LTD. All rights reserved.
           </p>
           <p>Cash on delivery, island-wide.</p>
         </div>

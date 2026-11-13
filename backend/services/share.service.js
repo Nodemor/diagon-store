@@ -17,6 +17,9 @@ const { VISIBLE } = require("./product.service");
 const CARD = { width: 1200, height: 630 };
 const PHOTO = 600; // left part of the card
 const CACHE_DIR = path.join(env.upload.dir, ".cache", "og");
+// bump when the card design changes: new file names, and chat apps fetch the new picture
+const CARD_VERSION = "v2";
+const LOGO_FILE = path.join(__dirname, "..", "assets", "logo-mark.png");
 const TOKEN_PATTERN = /^[A-Za-z0-9_-]{22}$/;
 
 const COLORS = { night: "#1c2230", deep: "#141924", cobble: "#2b3345", lamp: "#f2b544", moon: "#e9edf3", moonSoft: "#a9b3c4", verdigris: "#4fa39a", oxblood: "#d9737f" };
@@ -116,7 +119,7 @@ function productPreview(product, settings) {
   const price = formatMoney(product.finalPrice, settings.currency);
   const was = product.onSale ? `, was ${formatMoney(product.price, settings.currency)}` : "";
   const blurb = product.shortDescription ? ` ${product.shortDescription}` : "";
-  const version = `${product.updatedAt.getTime().toString(36)}${product.images[0]?.id ?? ""}`;
+  const version = `${CARD_VERSION}${product.updatedAt.getTime().toString(36)}${product.images[0]?.id ?? ""}`;
   return {
     siteName: settings.storeName,
     title: product.name,
@@ -155,7 +158,14 @@ function wrap(text, maxChars, maxLines) {
 const text = (x, y, size, color, content, { font = SANS, weight = 400, extra = "" } = {}) =>
   `<text x="${x}" y="${y}" font-family="${font}" font-size="${size}" font-weight="${weight}" fill="${color}" ${extra}>${escapeHtml(content)}</text>`;
 
-/** The product photo for the left side, or a lamp-lit placeholder. Only files in uploads/ are read. */
+/** The shop logo (cart + wizard hat), resized once. Null if the file is missing. */
+const logoCache = new Map();
+function logo(height) {
+  if (!logoCache.has(height)) logoCache.set(height, sharp(LOGO_FILE).resize({ height }).png().toBuffer().catch(() => null));
+  return logoCache.get(height);
+}
+
+/** The product photo for the left side, or the lamp-lit logo. Only files in uploads/ are read. */
 async function photo(url) {
   if (typeof url === "string" && url.startsWith("/uploads/")) {
     const file = path.resolve(env.upload.dir, decodeURIComponent(url.slice("/uploads/".length)));
@@ -170,9 +180,12 @@ async function photo(url) {
   const placeholder = `<svg xmlns="http://www.w3.org/2000/svg" width="${PHOTO}" height="${CARD.height}">
     <defs><radialGradient id="g" cx="50%" cy="42%" r="60%"><stop offset="0" stop-color="${COLORS.lamp}" stop-opacity=".55"/><stop offset=".45" stop-color="${COLORS.lamp}" stop-opacity=".08"/><stop offset="1" stop-color="${COLORS.deep}" stop-opacity="0"/></radialGradient></defs>
     <rect width="100%" height="100%" fill="${COLORS.deep}"/><rect width="100%" height="100%" fill="url(#g)"/>
-    <circle cx="${PHOTO / 2}" cy="265" r="34" fill="${COLORS.lamp}"/>
   </svg>`;
-  return sharp(Buffer.from(placeholder)).png().toBuffer();
+  const mark = await logo(230);
+  const base = sharp(Buffer.from(placeholder));
+  if (!mark) return base.png().toBuffer();
+  const { width } = await sharp(mark).metadata();
+  return base.composite([{ input: mark, left: Math.round((PHOTO - width) / 2), top: 190 }]).png().toBuffer();
 }
 
 function orderPanel(order, settings) {
@@ -185,7 +198,7 @@ function orderPanel(order, settings) {
   y += name.length * 42 + 2;
   const moreSvg = more > 0 ? text(x, y, 28, COLORS.moonSoft, `and ${more} more item${more === 1 ? "" : "s"}`) : text(x, y, 28, COLORS.moonSoft, `Quantity ${first?.quantity ?? order.itemCount}`);
   return [
-    text(x, 112, 40, COLORS.lamp, settings.storeName, { font: SERIF }),
+    text(x + 104, 98, 38, COLORS.lamp, settings.storeName, { font: SERIF }),
     text(x, 186, 26, COLORS.moonSoft, "Order"),
     text(x, 238, 50, COLORS.moon, order.inquiryNumber, { weight: 700, extra: 'letter-spacing="1"' }),
     nameSvg,
@@ -204,7 +217,7 @@ function productPanel(product, settings) {
     ? text(x, priceY + 46, 28, COLORS.moonSoft, `was ${formatMoney(product.price, settings.currency)}`, { extra: 'text-decoration="line-through"' })
     : "";
   return [
-    text(x, 112, 40, COLORS.lamp, settings.storeName, { font: SERIF }),
+    text(x + 104, 98, 38, COLORS.lamp, settings.storeName, { font: SERIF }),
     nameSvg,
     text(x, priceY, 54, COLORS.lamp, formatMoney(product.finalPrice, settings.currency), { weight: 700 }),
     was,
@@ -230,6 +243,7 @@ async function renderCard(file, photoUrl, panelSvg) {
     .composite([
       { input: await photo(photoUrl), left: 0, top: 0 },
       { input: Buffer.from(panel), left: 0, top: 0 },
+      ...((await logo(72)) ? [{ input: await logo(72), left: PHOTO + 56, top: 44 }] : []),
     ])
     .jpeg({ quality: 82, mozjpeg: true })
     .toFile(temp);
@@ -241,11 +255,11 @@ async function renderCard(file, photoUrl, panelSvg) {
 }
 
 const orderCard = (order, token, settings) =>
-  renderCard(path.join(CACHE_DIR, `o-${token}.jpg`), order.items.find((i) => i.product?.images[0])?.product.images[0].url, orderPanel(order, settings));
+  renderCard(path.join(CACHE_DIR, `o-${CARD_VERSION}-${token}.jpg`), order.items.find((i) => i.product?.images[0])?.product.images[0].url, orderPanel(order, settings));
 
 const productCard = (product, settings) =>
   renderCard(
-    path.join(CACHE_DIR, `p-${product.id}-${product.updatedAt.getTime()}-${product.images[0]?.id ?? 0}.jpg`),
+    path.join(CACHE_DIR, `p-${CARD_VERSION}-${product.id}-${product.updatedAt.getTime()}-${product.images[0]?.id ?? 0}.jpg`),
     product.images[0]?.url,
     productPanel(product, settings),
   );

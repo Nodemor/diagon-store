@@ -2,7 +2,10 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#1c2230" />
     <meta
@@ -15,7 +18,14 @@
     <meta property="og:type" content="website" />
     <meta property="og:title" content="Diagon Store — Every shop in one alley" />
     <meta property="og:description" content="Electronics, fashion, beauty, home and more. Order on WhatsApp or email and pay on delivery." />
-    <meta name="twitter:card" content="summary" />
+    <!-- __SITE_URL__ is the shop's address (SITE_URL), filled in at build time: chat apps need full image URLs -->
+    <meta property="og:image" content="__SITE_URL__/og-image.jpg" />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Diagon Store logo: a smiling shopping cart in a wizard hat" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="__SITE_URL__/og-image.jpg" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

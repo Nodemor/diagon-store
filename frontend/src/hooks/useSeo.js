@@ -57,7 +57,8 @@ export function useSeo({ title, description, image, type = "website", jsonLd, no
     const fullTitle = title ? `${title} — ${storeName}` : metaTitle || storeName;
     const desc = clip(description || metaDescription);
     const url = window.location.origin + window.location.pathname + (window.location.pathname === "/shop" ? window.location.search : "");
-    const img = image ? new URL(image, window.location.origin).toString() : null;
+    // pages without their own picture share the logo card (public/og-image.jpg)
+    const img = new URL(image || "/og-image.jpg", window.location.origin).toString();
 
     document.title = fullTitle;
     setMeta("name", "description", desc);
@@ -70,7 +71,7 @@ export function useSeo({ title, description, image, type = "website", jsonLd, no
     setMeta("property", "og:type", type);
     setMeta("property", "og:url", url);
     setMeta("property", "og:image", img);
-    setMeta("name", "twitter:card", img ? "summary_large_image" : "summary");
+    setMeta("name", "twitter:card", "summary_large_image");
     setJsonLd(jsonKey ? JSON.parse(jsonKey) : null);
   }, [title, description, image, type, jsonKey, noindex, storeName, metaTitle, metaDescription]);
 }

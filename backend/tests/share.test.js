@@ -55,7 +55,7 @@ after(async () => {
   if (state.draftId) await prisma.product.delete({ where: { id: state.draftId } }).catch(() => {});
   if (state.oldWhatsapp) await prisma.setting.update({ where: { key: "whatsappNumber" }, data: { value: state.oldWhatsapp.value } });
   else await prisma.setting.deleteMany({ where: { key: "whatsappNumber" } });
-  for (const token of state.tokens) fs.rmSync(path.join(env.upload.dir, ".cache", "og", `o-${token}.jpg`), { force: true });
+  for (const token of state.tokens) fs.rmSync(path.join(env.upload.dir, ".cache", "og", `o-v2-${token}.jpg`), { force: true });
   await prisma.$disconnect();
 });
 
