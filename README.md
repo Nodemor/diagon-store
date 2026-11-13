@@ -126,7 +126,16 @@ npm run dev             # http://localhost:5173
 
 The shop and the API share **one address**. The web server serves the built shop and forwards `/api`, `/uploads`, `/s/` (share links), `/sitemap.xml` and `/robots.txt` to the API, which only listens on `127.0.0.1`. That's required for the secure admin session cookie.
 
-Before launch, work through the checklist and the full nginx example (HTTPS, security headers) in **[docs/SECURITY.md](docs/SECURITY.md)**. In short:
+**On a VPS (Ubuntu 24.04), one command sets everything up**: nginx, MariaDB, Node.js, firewall, HTTPS, auto-deploy after CI passes, and nightly backups. See **[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)**:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Nodemor/diagon-store/main/deploy/setup-vps.sh -o setup-vps.sh
+sudo bash setup-vps.sh
+```
+
+After that, every merge to `main` goes live automatically once GitHub Actions passes.
+
+The setup script takes care of the go-live checklist in **[docs/SECURITY.md](docs/SECURITY.md)**. On other hosting, do these by hand:
 
 - `NODE_ENV=production`, a new `JWT_SECRET`, and a dedicated database user (not root)
 - `CLIENT_URL` and `SITE_URL` set to the `https://` shop address (`SITE_URL` is used in the order links inside WhatsApp messages)
@@ -189,12 +198,13 @@ The full reference is in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md#api). In su
 | [docs/FILE-GUIDE.md](docs/FILE-GUIDE.md) | What every file does |
 | [docs/THEME-GUIDE.md](docs/THEME-GUIDE.md) | Wizarding theme, colours, fonts, motion |
 | [docs/SECURITY.md](docs/SECURITY.md) | Protections, secret admin address, admin accounts, go-live checklist, nginx example |
+| [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | VPS setup, domain + HTTPS, auto-deploy, backups, CI |
 
 ---
 
 ## Contributing
 
-1. Branch from `main` (`feature/<phase>-<name>`), then open a pull request into `main`.
+1. Branch from `main` (`feature/<phase>-<name>`), then open a pull request into `main`. CI (tests, lint, build) runs on every pull request; merging to `main` deploys to the VPS once CI passes.
 2. Only `.env.example` files are tracked. Never commit secrets or `backend/uploads/`.
 3. After changing `schema.prisma`, run `npm run db:migrate` and commit the new migration folder.
 4. Update [docs/TODO.md](docs/TODO.md) and [docs/FILE-GUIDE.md](docs/FILE-GUIDE.md) in the same PR.

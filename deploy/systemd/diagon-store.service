@@ -1,0 +1,38 @@
+# Diagon Store API (Express) — installed by deploy/setup-vps.sh
+[Unit]
+Description=Diagon Store API
+After=network-online.target mariadb.service
+Wants=network-online.target mariadb.service
+
+[Service]
+Type=simple
+User=diagon
+Group=diagon
+WorkingDirectory=/var/www/diagon-store/backend
+Environment=NODE_ENV=production
+ExecStart=/usr/bin/node server.js
+Restart=always
+RestartSec=3
+# give requests a moment to finish on restart
+TimeoutStopSec=15
+
+# hardening: the app can only write to its data folder (uploads)
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/diagon-store
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+RestrictRealtime=true
+RestrictNamespaces=true
+SystemCallArchitectures=native
+CapabilityBoundingSet=
+AmbientCapabilities=
+
+[Install]
+WantedBy=multi-user.target

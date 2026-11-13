@@ -1,0 +1,96 @@
+# Runs deploy/setup-vps.sh on a fresh Ubuntu 24.04 machine (a GitHub runner) and checks the result:
+# the same steps as on the real VPS, so a broken setup or deploy script is caught before it reaches the server.
+name: VPS setup test
+
+on:
+  pull_request:
+    paths:
+      - "deploy/**"
+      - ".github/workflows/vps-setup-test.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  setup:
+    name: Setup on Ubuntu 24.04
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Make the runner look like a fresh VPS
+        run: |
+          # the runner image ships MySQL and its own Node.js; a fresh VPS has neither
+          sudo systemctl stop mysql || true
+          sudo DEBIAN_FRONTEND=noninteractive apt-get -y -q purge 'mysql-*' >/dev/null || true
+          sudo rm -rf /var/lib/mysql /etc/mysql
+          sudo rm -f /usr/local/bin/node /usr/local/bin/npm /usr/local/bin/npx /usr/local/bin/corepack
+
+      - name: Run setup-vps.sh (with demo products)
+        run: |
+          branch="${{ github.head_ref || github.ref_name }}"
+          sudo SKIP_UPGRADE=1 bash deploy/setup-vps.sh --demo \
+            --repo "https://github.com/${{ github.repository }}.git" --branch "$branch" </dev/null
+
+      - name: Check the shop
+        run: |
+          set -x
+          fail() { echo "::error::$*"; exit 1; }
+          curl -fsS http://127.0.0.1/ | grep -q '<div id="root">' || fail "home page"
+          curl -fsS http://127.0.0.1/api/health | grep -q '"ok"' || fail "API health"
+          n=$(curl -fsS 'http://127.0.0.1/api/products?limit=1' | jq .total); [ "$n" -gt 0 ] || fail "products"
+          slug=$(curl -fsS 'http://127.0.0.1/api/products?limit=1' | jq -r '.items[0].slug')
+          img=$(curl -fsS 'http://127.0.0.1/api/products?limit=1' | jq -r '.items[0].images[0].url')
+          [[ "$img" == /uploads/* ]] || fail "demo photos stored locally ($img)"
+          curl -fsS -o /dev/null "http://127.0.0.1$img" || fail "photo served"
+          curl -fsS -o /dev/null "http://127.0.0.1$img?w=400" || fail "resized photo"
+          # single-page app routes and security headers
+          curl -fsS -o /dev/null "http://127.0.0.1/product/$slug" || fail "product page"
+          curl -fsSI http://127.0.0.1/ | grep -qi '^content-security-policy:' || fail "CSP header"
+          curl -fsSI http://127.0.0.1/ | grep -qi '^x-frame-options: DENY' || fail "X-Frame-Options"
+          # link previews: share link and the nginx rule for chat apps on /product/
+          curl -fsS -A 'WhatsApp/2.24' "http://127.0.0.1/s/p/$slug" | grep -q 'og:image' || fail "share link preview"
+          curl -fsS -A 'WhatsApp/2.24' "http://127.0.0.1/product/$slug" | grep -q 'og:image' || fail "product preview for chat apps"
+          curl -fsS -A 'Mozilla/5.0' "http://127.0.0.1/product/$slug" | grep -q '<div id="root">' || fail "product page for people"
+          # nothing private is reachable
+          [ "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1/.env)" = 404 ] || fail ".env reachable"
+          [ "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1/.git/config)" = 404 ] || fail ".git reachable"
+          sudo stat -c '%a %U' /var/www/diagon-store/backend/.env | grep -q '^600 diagon$' || fail ".env permissions"
+          sudo ss -ltnp | grep ':5000 ' | grep -q '127.0.0.1:5000' || fail "API must listen on 127.0.0.1 only"
+
+      - name: Check admin sign-in, services, auto-deploy and backup
+        run: |
+          set -x
+          fail() { echo "::error::$*"; exit 1; }
+          sudo -u diagon -H env ADMIN_EMAIL=ci@diagonstore.test ADMIN_PASSWORD='Brass-Lantern-4096' ADMIN_NAME=CI \
+            bash -c 'cd /var/www/diagon-store/backend && node create-admin.js'
+          code=$(curl -s -o /dev/null -w '%{http_code}' -H 'Content-Type: application/json' -H 'X-Requested-With: DiagonStore' \
+            -d '{"email":"ci@diagonstore.test","password":"Brass-Lantern-4096"}' http://127.0.0.1/api/admin/login)
+          [ "$code" = 200 ] || fail "admin sign-in ($code)"
+          systemctl is-active --quiet diagon-store || fail "API service"
+          systemctl is-enabled --quiet diagon-store-deploy.timer || fail "auto-deploy timer"
+          systemctl is-enabled --quiet diagon-store-backup.timer || fail "backup timer"
+          # auto-deploy: the live commit is already the newest, so it does nothing
+          sudo -u diagon -H bash /var/www/diagon-store/deploy/auto-deploy.sh
+          sudo -u diagon -H bash /var/www/diagon-store/deploy/deploy.sh | grep -q 'already live' || fail "deploy.sh re-run"
+          # the API runs with the systemd hardening and can't write to its code folder
+          sudo systemctl show diagon-store -p ProtectSystem | grep -q strict || fail "hardening"
+          # backup
+          sudo systemctl start diagon-store-backup
+          sudo ls /var/backups/diagon-store | grep -q '^db-.*\.sql\.gz$' || fail "database backup"
+          sudo ls /var/backups/diagon-store | grep -q '^uploads-.*\.tar\.gz$' || fail "photo backup"
+          # re-running the setup keeps everything (and the database password)
+          before=$(sudo grep '^DATABASE_URL=' /var/www/diagon-store/backend/.env)
+          sudo SKIP_UPGRADE=1 bash /var/www/diagon-store/deploy/setup-vps.sh \
+            --repo "https://github.com/${{ github.repository }}.git" --branch "${{ github.head_ref || github.ref_name }}" </dev/null
+          [ "$before" = "$(sudo grep '^DATABASE_URL=' /var/www/diagon-store/backend/.env)" ] || fail "setup re-run changed .env"
+          curl -fsS http://127.0.0.1/api/health | grep -q '"ok"' || fail "API after re-run"
+
+      - name: Logs
+        if: always()
+        run: |
+          sudo journalctl -u diagon-store --no-pager -n 80 || true
+          sudo cat /var/lib/diagon-store/deploy/deploy.log || true
+          sudo nginx -T 2>/dev/null | head -120 || true

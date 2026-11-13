@@ -1,0 +1,16 @@
+# Auto-deploy check — started every minute by diagon-store-deploy.timer.
+# Deploys the newest commit on main once its GitHub Actions checks have passed.
+[Unit]
+Description=Diagon Store auto-deploy check
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=diagon
+Group=diagon
+WorkingDirectory=/var/www/diagon-store
+ExecStart=/bin/bash /var/www/diagon-store/deploy/auto-deploy.sh
+# a full deploy (install + build) can take a few minutes on a small server
+TimeoutStartSec=20min
+Nice=10

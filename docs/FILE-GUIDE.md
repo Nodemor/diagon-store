@@ -13,6 +13,9 @@ When you add a file, add a line here in the same commit.
 | `README.md` | Overview, setup (XAMPP), scripts, API summary |
 | `.gitignore` | Ignores `.env`, `node_modules`, build output, uploads, editor and AI-assistant folders (`.env.example` is still committed) |
 | `docs/` | Project documentation |
+| `deploy/` | VPS deployment kit (see below) |
+| `.github/workflows/ci.yml` | CI on every PR and push to `main`: API tests (MariaDB), shop lint + build, `npm audit`, deploy-script checks |
+| `.github/workflows/vps-setup-test.yml` | PRs that change `deploy/`: runs the full VPS setup on a fresh Ubuntu 24.04 runner and checks the result |
 
 ## docs/
 
@@ -25,8 +28,22 @@ When you add a file, add a line here in the same commit.
 | `FILE-GUIDE.md` | This file |
 | `THEME-GUIDE.md` | Wizarding visual style, wording and motion rules |
 | `SECURITY.md` | Protections, secret admin address, admin accounts, go-live checklist, nginx example |
+| `DEPLOYMENT.md` | VPS setup, domain + HTTPS, auto-deploy, backups, restore, CI |
 
 ---
+
+## deploy/
+
+| File | Purpose |
+|---|---|
+| `setup-vps.sh` | One-time setup of a fresh Ubuntu 24.04 VPS: packages, Node.js 24, firewall, fail2ban, app user, database + secrets, secret admin address, first deploy, nginx, timers, first admin. Safe to re-run. |
+| `deploy.sh` | Deploys one commit: install (only when lock files change), migrate, build the shop into `dist-next`, restart, health check, switch builds; rolls back on failure |
+| `auto-deploy.sh` | Run every minute by the deploy timer: newest commit on `main` → wait for its GitHub Actions checks → `deploy.sh` |
+| `enable-https.sh` | Domain + Let's Encrypt certificate + https settings in `backend/.env` |
+| `backup.sh` | Nightly database dump + photos archive, kept 14 days |
+| `nginx/diagon-store.conf` | nginx site: the built shop, API proxy, share links, chat-app preview rule, caching, hidden files blocked |
+| `nginx/diagon-security-headers.conf` | Security headers for shop pages (CSP, HSTS, frame, referrer, permissions) |
+| `systemd/*.service`, `*.timer` | API service (with sandboxing), auto-deploy timer (every minute), backup timer (02:30) |
 
 ## backend/
 
