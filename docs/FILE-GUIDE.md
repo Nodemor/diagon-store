@@ -39,6 +39,7 @@ When you add a file, add a line here in the same commit.
 | `setup-vps.sh` | One-time setup of a fresh Ubuntu 24.04 / 26.04 VPS: packages, Node.js 24, firewall, fail2ban, app user, database + secrets, secret admin address, first deploy, nginx, timers, first admin. Safe to re-run. |
 | `deploy.sh` | Deploys one commit: install (only when lock files change), migrate, build the shop into `dist-next`, restart, health check, switch builds; rolls back on failure |
 | `auto-deploy.sh` | Run every minute by the deploy timer: newest commit on `main` → wait for its GitHub Actions checks → `deploy.sh` |
+| `update-web-server.sh` | Brings an existing server's nginx up to date: HTTP/2 on the HTTPS site, latest security headers (run once on servers set up before it existed; enable-https.sh runs it) |
 | `enable-https.sh` | Domain + Let's Encrypt certificate + https settings in `backend/.env` |
 | `backup.sh` | Nightly database dump + photos archive, kept 14 days |
 | `nginx/diagon-store.conf` | nginx site: the built shop, API proxy, share links, chat-app preview rule, caching, hidden files blocked |
@@ -191,6 +192,7 @@ React 19 + Vite 8 + Tailwind CSS 4. Motion: GSAP + ScrollTrigger, Lenis, Motion 
 
 | File | Purpose |
 |---|---|
+| `lib/lazyPage.js` | Page code loaded on demand; if a page's file is gone because the site was updated meanwhile, reloads once (no blank page) |
 | `lib/adminPath.js` | Secret back-office address: hashes the first part of the address and compares it with `VITE_ADMIN_PATH_HASH`; `adminPath()` builds admin links |
 | `lib/api.js` | `request()` fetch wrapper, `ApiError`, `API_BASE_URL`, `API_ORIGIN` |
 | `lib/format.js` | `formatPrice` (Rs), `assetUrl` (adds the API origin to `/uploads` paths), `imageAt` (resized Unsplash URLs), `whatsappDigits` (0771234567 → 94771234567), `whatsappLink`, `productShareUrl` (/s/p/ link with preview), `productWhatsAppMessage` (single-product order message with product link) |
@@ -234,6 +236,7 @@ React 19 + Vite 8 + Tailwind CSS 4. Motion: GSAP + ScrollTrigger, Lenis, Motion 
 | `ui/PriceTag.jsx` | Sale and regular price |
 | `ui/Skeleton.jsx` | Product card loading placeholder |
 | `ui/icons.jsx` | Inline SVG icons (+ the old lamp mark, still used as a small decoration) |
+| `ErrorBoundary.jsx` | If a page crashes, shows "Reload the page" instead of a blank screen; resets when the address changes |
 | `ui/Logo.jsx` | `LogoMark` (navbar, back office) and `LogoFull` (footer, sign-in page) |
 | `reactbits/PillNav.jsx` | React Bits Pill Nav (desktop navigation) |
 | `reactbits/PixelSnow.jsx` | React Bits Pixel Snow (WebGL2 hero snow; lazy-loaded) |

@@ -1,11 +1,27 @@
-import { lazy, Suspense, useRef } from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { gsap, useGSAP, REDUCED_MOTION } from "../../lib/motion";
 import { ButtonLink } from "../ui/Button";
 import { AlleyScene } from "./AlleyScene";
 import { HeroWindow } from "./HeroWindow";
 
 // WebGL snow (React Bits "Pixel Snow") is loaded separately so it never delays the first paint.
-const PixelSnow = lazy(() => import("../reactbits/PixelSnow"));
+// decoration only: if its file can't load, the hero simply has no snow
+const PixelSnow = lazy(() => import("../reactbits/PixelSnow").catch(() => ({ default: () => null })));
+
+/** Starts the snow once the browser is idle, so it never competes with the first paint on phones. */
+function useWhenIdle() {
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    const start = () => setReady(true);
+    if ("requestIdleCallback" in window) {
+      const id = window.requestIdleCallback(start, { timeout: 2500 });
+      return () => window.cancelIdleCallback(id);
+    }
+    const id = setTimeout(start, 1200);
+    return () => clearTimeout(id);
+  }, []);
+  return ready;
+}
 
 /**
  * Landing hero: the street at night. On load the windows light up, then the lamps
@@ -14,6 +30,9 @@ const PixelSnow = lazy(() => import("../reactbits/PixelSnow"));
  */
 export function Hero({ banners, fallbackImage }) {
   const root = useRef(null);
+  const snowReady = useWhenIdle();
+  // phones: fewer flakes at normal resolution (saves battery and keeps scrolling smooth)
+  const [smallScreen] = useState(() => typeof window !== "undefined" && window.matchMedia("(max-width: 767px)").matches);
 
   useGSAP(
     () => {
@@ -71,20 +90,23 @@ export function Hero({ banners, fallbackImage }) {
       {/* falling snow over the empty sky; flakes drift aside from the cursor */}
       <div className="pointer-events-none absolute inset-0 -z-10">
         <Suspense fallback={null}>
-          <PixelSnow
-            color="#e9edf3"
-            variant="round"
-            density={0.32}
-            speed={0.55}
-            wind={0.18}
-            sway={0.6}
-            flakeSize={0.85}
-            pixelSize={2}
-            depth={0.75}
-            glow={0.7}
-            twinkle={0.3}
-            opacity={0.8}
-          />
+          {snowReady && (
+            <PixelSnow
+              dpr={smallScreen ? 1 : undefined}
+              color="#e9edf3"
+              variant="round"
+              density={smallScreen ? 0.22 : 0.32}
+              speed={0.55}
+              wind={0.18}
+              sway={0.6}
+              flakeSize={0.85}
+              pixelSize={2}
+              depth={0.75}
+              glow={0.7}
+              twinkle={0.3}
+              opacity={0.8}
+            />
+          )}
         </Suspense>
       </div>
 

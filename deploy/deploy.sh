@@ -76,6 +76,13 @@ main() {
     exit 1
   fi
 
+  # keep earlier builds' page files for 14 days: a tab opened before this update still asks for the
+  # old file names, and gets them instead of a blank page (names contain a hash, so nothing clashes)
+  if [[ -d frontend/dist/assets ]]; then
+    cp -p -n frontend/dist/assets/* frontend/dist-next/assets/ 2>/dev/null || true
+    find frontend/dist-next/assets -type f -mtime +14 -delete
+  fi
+
   # the API is up: switch the shop to the new build in one step
   rm -rf frontend/dist-previous
   [[ -d frontend/dist ]] && mv frontend/dist frontend/dist-previous

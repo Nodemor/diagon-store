@@ -102,8 +102,11 @@ journalctl -u diagon-store-deploy -f                 # what auto-deploy is doing
 | Change settings | edit `backend/.env`, then `sudo systemctl restart diagon-store` |
 | New back-office admin password | `sudo -u diagon -H bash -c 'cd /var/www/diagon-store/backend && node create-admin.js --reset'` |
 | Backup now | `sudo systemctl start diagon-store-backup` |
+| Update nginx settings (HTTP/2, security headers) | `sudo bash /var/www/diagon-store/deploy/update-web-server.sh` |
 
 **Database changes** run automatically on deploy (`prisma migrate deploy`). They can't be rolled back by the deploy script, so keep them additive: add columns and tables, and remove old ones in a later release.
+
+Page files from earlier builds are kept for 14 days, so visitors who opened the site before an update don't get a blank page when they click on. If a file is still missing, the shop reloads itself once.
 
 If a deploy fails (build error, or the new API doesn't start), `deploy.sh` puts the previous version back. It records the commit in `deploy/failed` so it isn't retried, and logs the reason.
 

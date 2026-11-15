@@ -33,7 +33,7 @@ export function ProductCard({ product, priority = false }) {
           {main && (
             <Img
               src={imageAt(main.url, 600)}
-              srcSet={`${imageAt(main.url, 400)} 400w, ${imageAt(main.url, 800)} 800w`}
+              srcSet={`${imageAt(main.url, 240)} 240w, ${imageAt(main.url, 400)} 400w, ${imageAt(main.url, 600)} 600w, ${imageAt(main.url, 800)} 800w`}
               sizes="(min-width: 1024px) 22vw, (min-width: 640px) 33vw, 50vw"
               alt=""
               loading={priority ? "eager" : "lazy"}
@@ -45,7 +45,8 @@ export function ProductCard({ product, priority = false }) {
               src={imageAt(hover.url, 600)}
               alt=""
               loading="lazy"
-              className="absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+              // display:none on touch screens, so the lazy second photo is never downloaded there
+              className="absolute inset-0 hidden h-full w-full object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100 [@media(hover:hover)]:block"
             />
           )}
         </Link>
