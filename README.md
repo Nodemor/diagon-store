@@ -199,6 +199,7 @@ The full reference is in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md#api). In su
 | [docs/THEME-GUIDE.md](docs/THEME-GUIDE.md) | Wizarding theme, colours, fonts, motion |
 | [docs/SECURITY.md](docs/SECURITY.md) | Protections, secret admin address, admin accounts, go-live checklist, nginx example |
 | [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | VPS setup, domain + HTTPS, auto-deploy, backups, CI |
+| [docs/SEO.md](docs/SEO.md) | Getting found on Google: Search Console, Bing, IndexNow, Google Business Profile |
 
 ---
 

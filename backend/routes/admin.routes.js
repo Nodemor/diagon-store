@@ -8,6 +8,7 @@ const content = require("../controllers/admin/content.controller");
 const contact = require("../controllers/contact.controller");
 const contactV = require("../validators/contact");
 const { requireAuth, requireRole, requireCsrfHeader } = require("../middleware/auth");
+const { notifySearchEngines } = require("../services/indexnow.service");
 const { verifyImages } = require("../middleware/verifyImages");
 const { validate } = require("../middleware/validate");
 const { loginLimiter } = require("../middleware/rateLimiters");
@@ -36,6 +37,8 @@ router.use(requireCsrfHeader);
 router.post("/login", loginLimiter, validate({ body: adminV.login }), auth.login);
 
 router.use(requireAuth);
+// new or changed products, categories and pages are announced to search engines (IndexNow)
+router.use(notifySearchEngines);
 
 router.post("/logout", auth.logout);
 

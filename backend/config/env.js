@@ -45,6 +45,8 @@ const env = {
   apiPublicUrl: process.env.API_PUBLIC_URL || `http://127.0.0.1:${toInt(process.env.PORT, 5000)}`,
   // Public address of the storefront (sitemap.xml, robots.txt, links in emails)
   siteUrl: (process.env.SITE_URL || (process.env.CLIENT_URL || "http://localhost:5173").split(",")[0]).trim().replace(/\/$/, ""),
+  // IndexNow key (8–128 letters, digits or dashes); deploy.sh creates it and publishes /<key>.txt
+  indexNowKey: /^[A-Za-z0-9-]{8,128}$/.test(process.env.INDEXNOW_KEY || "") ? process.env.INDEXNOW_KEY : "",
 
   jwtSecret,
   // admin sessions: short-lived, stored in an httpOnly cookie
