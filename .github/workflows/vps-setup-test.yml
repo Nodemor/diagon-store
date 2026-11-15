@@ -79,6 +79,22 @@ jobs:
           # auto-deploy: the live commit is already the newest, so it does nothing
           sudo -u diagon -H bash /var/www/diagon-store/deploy/auto-deploy.sh
           sudo -u diagon -H bash /var/www/diagon-store/deploy/deploy.sh | grep -q 'already live' || fail "deploy.sh re-run"
+          # an update that changes deploy.sh itself: the deploy continues with the new script
+          sudo -u diagon -H bash -c '
+            set -e
+            cd /var/www/diagon-store
+            prev=$(git rev-parse HEAD)
+            echo "# test change" >> deploy/deploy.sh
+            git -c user.name=ci -c user.email=ci@diagonstore.test commit -qam "test: change deploy script"
+            next=$(git rev-parse HEAD)
+            git reset -q --hard "$prev"
+            bash deploy/deploy.sh "$next" | tee /tmp/redeploy.log
+            grep -q "continuing with the new version" /tmp/redeploy.log
+            [ "$(cat /var/lib/diagon-store/deploy/deployed)" = "$next" ]
+          ' || fail "deploy with a changed deploy script"
+          curl -fsS http://127.0.0.1/api/health | grep -q '"ok"' || fail "API after self-updating deploy"
+          # the page files of the earlier build are still there
+          ls /var/www/diagon-store/frontend/dist/assets | grep -c '\.js$'
           # the API runs with the systemd hardening and can't write to its code folder
           sudo systemctl show diagon-store -p ProtectSystem | grep -q strict || fail "hardening"
           # backup
