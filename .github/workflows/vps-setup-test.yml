@@ -78,7 +78,8 @@ jobs:
           systemctl is-enabled --quiet diagon-store-backup.timer || fail "backup timer"
           # auto-deploy: the live commit is already the newest, so it does nothing
           sudo -u diagon -H bash /var/www/diagon-store/deploy/auto-deploy.sh
-          sudo -u diagon -H bash /var/www/diagon-store/deploy/deploy.sh | grep -q 'already live' || fail "deploy.sh re-run"
+          live=$(sudo cat /var/lib/diagon-store/deploy/deployed)
+          sudo -u diagon -H bash /var/www/diagon-store/deploy/deploy.sh "$live" | grep -q 'already live' || fail "deploy.sh re-run"
           # an update that changes deploy.sh itself: the deploy continues with the new script
           sudo -u diagon -H bash -c '
             set -e
