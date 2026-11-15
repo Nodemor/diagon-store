@@ -42,7 +42,8 @@ main() {
     exit 1
   fi
   local previous
-  previous=$(git rev-parse HEAD)
+  # PREVIOUS_COMMIT is set when an older copy of this script handed the deploy over (see below)
+  previous="${PREVIOUS_COMMIT:-$(git rev-parse HEAD)}"
   local first_deploy=false
   [[ -f "$STATE_DIR/deployed" ]] || first_deploy=true
 
@@ -52,8 +53,21 @@ main() {
     exit 0
   fi
 
+  # this script as it was when the deploy started; the new commit may bring a newer version
+  local started_with
+  started_with=$(mktemp)
+  cp "${BASH_SOURCE[0]}" "$started_with"
   log "deploying ${target:0:7} ($(git log -1 --format=%s "$target" | cut -c1-70)) — live was ${previous:0:7}"
   git reset --quiet --hard "$target"
+
+  # the new commit changed this script: finish the deploy with the new version, so improvements to
+  # the deploy itself apply to this update already (not only to the next one)
+  if [[ -z "${PREVIOUS_COMMIT:-}" ]] && ! cmp -s "$started_with" "$APP_DIR/deploy/deploy.sh"; then
+    rm -f "$started_with"
+    log "deploy script updated — continuing with the new version"
+    exec env PREVIOUS_COMMIT="$previous" bash "$APP_DIR/deploy/deploy.sh" "$target"
+  fi
+  rm -f "$started_with"
 
   if ! build "$previous" "$target" "$first_deploy"; then
     log "✖ build failed — keeping ${previous:0:7}"
@@ -74,6 +88,13 @@ main() {
     echo "$target" >"$STATE_DIR/failed"
     healthy && log "previous version is running again" || log "✖ previous version is not healthy either — check: journalctl -u $SERVICE"
     exit 1
+  fi
+
+  # keep earlier builds' page files for 14 days: a tab opened before this update still asks for the
+  # old file names, and gets them instead of a blank page (names contain a hash, so nothing clashes)
+  if [[ -d frontend/dist/assets ]]; then
+    cp -p -n frontend/dist/assets/* frontend/dist-next/assets/ 2>/dev/null || true
+    find frontend/dist-next/assets -type f -mtime +14 -delete
   fi
 
   # the API is up: switch the shop to the new build in one step

@@ -31,7 +31,7 @@
   --color-moon-soft: #a9b3c4;
 
   --font-sign: "IM Fell English", "Iowan Old Style", Georgia, serif;
-  --font-sans: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-sans: "Figtree Variable", "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
 
   --ease-alley: cubic-bezier(0.22, 1, 0.36, 1);
 }

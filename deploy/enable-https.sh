@@ -41,6 +41,7 @@ cert_args=(--nginx --non-interactive --agree-tos --redirect)
 if [[ -n "$EMAIL" ]]; then cert_args+=(-m "$EMAIL"); else cert_args+=(--register-unsafely-without-email); fi
 for n in "${names[@]}"; do cert_args+=(-d "$n"); done
 certbot "${cert_args[@]}"
+bash "$APP_DIR/deploy/update-web-server.sh" || echo "note: HTTP/2 not turned on; run deploy/update-web-server.sh later"
 
 echo "▸ shop settings"
 env_file="$APP_DIR/backend/.env"

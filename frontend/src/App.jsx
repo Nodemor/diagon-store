@@ -1,21 +1,24 @@
-import { lazy, Suspense, useEffect, useState } from "react";
-import { BrowserRouter, Route, Routes, useParams } from "react-router-dom";
+import { Suspense, useEffect, useState } from "react";
+import { BrowserRouter, Route, Routes, useLocation, useParams } from "react-router-dom";
 import { StoreLayout } from "./components/layout/StoreLayout";
 import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
 import { recogniseAdminSegment } from "./lib/adminPath";
+import { lazyPage } from "./lib/lazyPage";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 
 // The home page loads with the app; every other page is downloaded when it's first visited.
-const Shop = lazy(() => import("./pages/Shop"));
-const Product = lazy(() => import("./pages/Product"));
-const Cart = lazy(() => import("./pages/Cart"));
-const Checkout = lazy(() => import("./pages/Checkout"));
-const OrderSuccess = lazy(() => import("./pages/OrderSuccess"));
-const Track = lazy(() => import("./pages/Track"));
-const Contact = lazy(() => import("./pages/Contact"));
-const ContentPage = lazy(() => import("./pages/ContentPage"));
+// lazyPage: if a page's file disappeared because the site was updated meanwhile, reload once.
+const Shop = lazyPage(() => import("./pages/Shop"));
+const Product = lazyPage(() => import("./pages/Product"));
+const Cart = lazyPage(() => import("./pages/Cart"));
+const Checkout = lazyPage(() => import("./pages/Checkout"));
+const OrderSuccess = lazyPage(() => import("./pages/OrderSuccess"));
+const Track = lazyPage(() => import("./pages/Track"));
+const Contact = lazyPage(() => import("./pages/Contact"));
+const ContentPage = lazyPage(() => import("./pages/ContentPage"));
 // the whole back office is loaded on demand, so shoppers never download it
-const AdminApp = lazy(() => import("./admin/AdminApp"));
+const AdminApp = lazyPage(() => import("./admin/AdminApp"));
 
 /** Quiet placeholder while a page's code downloads (usually a few milliseconds). */
 const PageLoading = () => (
@@ -64,27 +67,35 @@ function AddressGate() {
   );
 }
 
+/** A crashed page never leaves a blank screen; moving to another address clears the error. */
+function SafeRoutes({ children }) {
+  const { pathname } = useLocation();
+  return <ErrorBoundary resetKey={pathname}>{children}</ErrorBoundary>;
+}
+
 function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        {/* Storefront */}
-        <Route element={<StoreLayout />}>
-          <Route path="/" element={<Home />} />
-          <Route path="/shop" element={page(<Shop />)} />
-          <Route path="/category/:slug" element={page(<Shop />)} />
-          <Route path="/product/:slug" element={page(<Product />)} />
-          <Route path="/cart" element={page(<Cart />)} />
-          <Route path="/checkout" element={page(<Checkout />)} />
-          <Route path="/order/success/:number" element={page(<OrderSuccess />)} />
-          <Route path="/track" element={page(<Track />)} />
-          <Route path="/contact" element={page(<Contact />)} />
-          <Route path="/pages/:slug" element={page(<ContentPage />)} />
-        </Route>
+      <SafeRoutes>
+        <Routes>
+          {/* Storefront */}
+          <Route element={<StoreLayout />}>
+            <Route path="/" element={<Home />} />
+            <Route path="/shop" element={page(<Shop />)} />
+            <Route path="/category/:slug" element={page(<Shop />)} />
+            <Route path="/product/:slug" element={page(<Product />)} />
+            <Route path="/cart" element={page(<Cart />)} />
+            <Route path="/checkout" element={page(<Checkout />)} />
+            <Route path="/order/success/:number" element={page(<OrderSuccess />)} />
+            <Route path="/track" element={page(<Track />)} />
+            <Route path="/contact" element={page(<Contact />)} />
+            <Route path="/pages/:slug" element={page(<ContentPage />)} />
+          </Route>
 
-        {/* Unknown addresses: "page not found", or the back office at its secret address */}
-        <Route path="/:segment/*" element={<AddressGate />} />
-      </Routes>
+          {/* Unknown addresses: "page not found", or the back office at its secret address */}
+          <Route path="/:segment/*" element={<AddressGate />} />
+        </Routes>
+      </SafeRoutes>
     </BrowserRouter>
   );
 }
