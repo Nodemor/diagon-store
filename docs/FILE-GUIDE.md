@@ -28,6 +28,7 @@ When you add a file, add a line here in the same commit.
 | `FILE-GUIDE.md` | This file |
 | `THEME-GUIDE.md` | Wizarding visual style, wording and motion rules |
 | `SECURITY.md` | Protections, secret admin address, admin accounts, go-live checklist, nginx example |
+| `SEO.md` | Search engines: what's built in, Google Search Console / Bing / IndexNow / Business Profile setup, do's and don'ts |
 | `DEPLOYMENT.md` | VPS setup, domain + HTTPS, auto-deploy, backups, restore, CI |
 
 ---
@@ -56,10 +57,12 @@ When you add a file, add a line here in the same commit.
 | `app.js` | Builds the Express app: helmet, CORS, JSON limit, request logging, `/uploads` static files, `/api/health`, routes, 404 and error handlers |
 | `prisma.js` | Shared Prisma client using the MariaDB adapter. Connection details come from `DATABASE_URL`. |
 | `prisma.config.ts` | Prisma CLI config: schema, migrations folder, seed command, `DATABASE_URL` |
+| `tests/seo.test.js` | `npm test`: sitemap with product photos, robots.txt, IndexNow off outside production |
 | `tests/share.test.js` | `npm test`: share links, link previews and the WhatsApp number setting (9 tests) |
 | `tests/security.test.js` | `npm test`: 16 security tests (sessions, CSRF, lockout, passwords, uploads, HTML cleaning, public surface) |
 | `create-admin.js` | `npm run create-admin`: creates a SUPER_ADMIN, asking for the details at the terminal (password typing hidden). `-- --reset` sets a new password, unlocks the account and ends its sessions |
 | `test-db.js` | `npm run db:test`: runs a real query to check the database connection |
+| `scripts/indexnow-submit.js` | `npm run seo:indexnow`: announces every public page once (after going live) |
 | `scripts/whatsapp-test.js` | `npm run whatsapp:test -- --number <phone>`: WhatsApp test environment. Serves the built shop + API on one port, opens a temporary public https address (Cloudflare quick tunnel), places a sample order, prints QR codes, and cleans up on Ctrl+C |
 | `scripts/localize-images.js` | `npm run images:localize` (`-- --dry` to preview): copies external product, category and banner images into `uploads/` and points the database at the local copies |
 
@@ -87,7 +90,7 @@ When you add a file, add a line here in the same commit.
 | `admin/catalog.controller.js` | Products CRUD, stock, product images (upload / URL / reorder / alt text / delete), categories, subcategories |
 | `admin/sales.controller.js` | Dashboard, orders (list / detail / status / notes / delete), customers |
 | `contact.controller.js` | Contact form: save + email (public), list / mark read / delete (admin) |
-| `seo.controller.js` | `/sitemap.xml` and `/robots.txt` |
+| `seo.controller.js` | `/sitemap.xml` (with product photos) and `/robots.txt`; `siteUrls()` lists every public address |
 | `share.controller.js` | Share-link pages (preview tags + redirect), preview images, friendly 404 |
 | `admin/content.controller.js` | Generic image upload, banners, settings, content pages, admin users |
 
@@ -99,6 +102,7 @@ When you add a file, add a line here in the same commit.
 | `category.service.js` | Category and subcategory queries with product counts; CRUD with unique slugs; deletes old images |
 | `inquiry.service.js` | Order placement (phone normalisation, stock check, server pricing, transaction, order number, share code, WhatsApp message with order link, emails), tracking, admin list/detail (customer WhatsApp message with status + order link)/status/notes/delete |
 | `dashboard.service.js` | Dashboard numbers: product counts, orders by status, recent orders, stock alerts |
+| `indexnow.service.js` | IndexNow: announces changed products, categories and pages to Bing & co. a minute after admin edits (production only) |
 | `settings.service.js` | Allowed setting keys + defaults, cached read, save; checks and normalises the WhatsApp number |
 | `share.service.js` | Share links: random order codes, preview data (no customer details), preview page HTML, 1200×630 preview cards with sharp (cached) |
 | `email.service.js` | nodemailer SMTP sender (logs to the console when disabled); new-order emails to the business and the customer |

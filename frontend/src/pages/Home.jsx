@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useAsync } from "../hooks/useAsync";
 import { getHome } from "../services/store";
 import { ScrollTrigger } from "../lib/motion";
-import { imageAt, mainImage } from "../lib/format";
+import { mainImage } from "../lib/format";
 import { useSeo } from "../hooks/useSeo";
 import { Hero } from "../components/home/Hero";
 import { CategoryAlley } from "../components/home/CategoryAlley";
@@ -14,10 +14,8 @@ import { Button } from "../components/ui/Button";
 /** Landing page — all content comes from GET /api/home (managed in the admin panel). */
 export default function Home() {
   const { data, error, loading } = useAsync((signal) => getHome({ signal }), []);
-  useSeo({
-    title: null,
-    image: imageAt(data?.heroBanners?.[0]?.imageUrl || mainImage(data?.featured?.[0]), 1200),
-  });
+  // no page picture: link previews of the home page show the logo card (public/og-image.jpg)
+  useSeo({ title: null });
 
   // pinned sections change height once real content arrives
   useEffect(() => {

@@ -143,6 +143,13 @@ Task checklist grouped by the phases in [ROADMAP.md](ROADMAP.md). Tick `[x]` ite
 - [x] nginx: `/s/` proxied; chat-app crawlers on `/product/…` get the preview page
 - [x] `backend/tests/share.test.js`: 9 tests
 
+### SEO ✅
+- [x] Structured data for the shop (OnlineStore, logo, Sri Lanka) and site search (WebSite + SearchAction) in index.html
+- [x] Sitemap with product photos (Google Images); Sri Lanka keywords in the default title / description; noscript summary
+- [x] IndexNow: automatic announcements to Bing & co. after admin changes; `npm run seo:indexnow`; key created by deploy.sh
+- [x] `docs/SEO.md`: Google Search Console, Bing Webmaster Tools, Google Business Profile
+- [ ] Verify the domain in Google Search Console and submit the sitemap (owner, see docs/SEO.md)
+
 ### Still to do
 - [x] WhatsApp test environment: `npm run whatsapp:test -- --number <phone>` (public test address, sample order, QR codes, clean-up)
 - [ ] Test a real WhatsApp preview on a phone (run the test environment, or after going live)

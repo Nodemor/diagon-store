@@ -143,6 +143,17 @@ build() {
   site_url=$(grep -E '^SITE_URL=' backend/.env 2>/dev/null | tail -n 1 | cut -d= -f2- | tr -d '"[:space:]')
   (cd frontend && VITE_SITE_URL="$site_url" npx --no-install vite build --outDir dist-next --emptyOutDir --logLevel warn) || return 1
   [[ -f frontend/dist-next/index.html ]] || return 1
+
+  # IndexNow key (search engines check https://<shop>/<key>.txt before accepting new-page notices):
+  # created once and kept in backend/.env, published with every build
+  local key
+  key=$(grep -E '^INDEXNOW_KEY=' backend/.env 2>/dev/null | tail -n 1 | cut -d= -f2- | tr -d '"[:space:]')
+  if [[ ! "$key" =~ ^[A-Za-z0-9-]{8,128}$ ]]; then
+    key=$(openssl rand -hex 16)
+    printf '\n# IndexNow: announces new and changed pages to Bing and others (created by deploy.sh)\nINDEXNOW_KEY=%s\n' "$key" >>backend/.env
+    log "IndexNow key created"
+  fi
+  printf '%s' "$key" >"frontend/dist-next/$key.txt"
 }
 
 healthy() {

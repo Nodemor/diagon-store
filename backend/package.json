@@ -15,7 +15,8 @@
     "create-admin": "node create-admin.js",
     "test": "node --test --test-concurrency=1 \"tests/**/*.test.js\"",
     "images:localize": "node scripts/localize-images.js",
-    "whatsapp:test": "node scripts/whatsapp-test.js"
+    "whatsapp:test": "node scripts/whatsapp-test.js",
+    "seo:indexnow": "node scripts/indexnow-submit.js"
   },
   "keywords": [],
   "author": "",

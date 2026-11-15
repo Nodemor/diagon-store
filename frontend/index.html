@@ -8,16 +8,47 @@
     <link rel="manifest" href="/site.webmanifest" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#1c2230" />
+    <!-- who we are, for Google: shop name, logo, site search (__SITE_URL__ is filled in at build time) -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "OnlineStore",
+            "@id": "__SITE_URL__/#store",
+            "name": "Diagon Store",
+            "url": "__SITE_URL__/",
+            "logo": "__SITE_URL__/brand/logo-light-background.png",
+            "image": "__SITE_URL__/og-image.jpg",
+            "description": "Shop electronics, mobile accessories, fashion, beauty and home goods online at Diagon Store. Island-wide delivery in Sri Lanka: order on WhatsApp and pay cash on delivery.",
+            "areaServed": { "@type": "Country", "name": "Sri Lanka" }
+          },
+          {
+            "@type": "WebSite",
+            "@id": "__SITE_URL__/#website",
+            "name": "Diagon Store",
+            "url": "__SITE_URL__/",
+            "inLanguage": "en",
+            "publisher": { "@id": "__SITE_URL__/#store" },
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": { "@type": "EntryPoint", "urlTemplate": "__SITE_URL__/shop?search={search_term_string}" },
+              "query-input": "required name=search_term_string"
+            }
+          }
+        ]
+      }
+    </script>
     <meta
       name="description"
-      content="Shop electronics, fashion, home & living, beauty and accessories at Diagon Store. Order on WhatsApp or email and pay on delivery."
+      content="Shop electronics, mobile accessories, fashion, beauty and home goods online at Diagon Store. Island-wide delivery in Sri Lanka: order on WhatsApp and pay cash on delivery."
     />
-    <title>Diagon Store — Every shop in one alley</title>
+    <title>Diagon Store — Online Shopping in Sri Lanka, Cash on Delivery</title>
     <!-- defaults for link previews (WhatsApp, Facebook); pages update these as you browse -->
     <meta property="og:site_name" content="Diagon Store" />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Diagon Store — Every shop in one alley" />
-    <meta property="og:description" content="Electronics, fashion, beauty, home and more. Order on WhatsApp or email and pay on delivery." />
+    <meta property="og:title" content="Diagon Store — Online Shopping in Sri Lanka, Cash on Delivery" />
+    <meta property="og:description" content="Shop electronics, mobile accessories, fashion, beauty and home goods online at Diagon Store. Island-wide delivery in Sri Lanka: order on WhatsApp and pay cash on delivery." />
     <!-- __SITE_URL__ is the shop's address (SITE_URL), filled in at build time: chat apps need full image URLs -->
     <meta property="og:image" content="__SITE_URL__/og-image.jpg" />
     <meta property="og:image:type" content="image/jpeg" />
@@ -29,6 +60,13 @@
   </head>
   <body>
     <div id="root"></div>
+    <noscript>
+      <h1>Diagon Store — online shopping in Sri Lanka</h1>
+      <p>Shop electronics, mobile accessories, fashion, beauty and home goods online at Diagon Store. Island-wide delivery in Sri Lanka: order on WhatsApp and pay cash on delivery.</p>
+      <p><a href="/shop">Browse all products</a></p>
+      <p><a href="/contact">Contact us</a></p>
+      <p>Please turn on JavaScript to shop.</p>
+    </noscript>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

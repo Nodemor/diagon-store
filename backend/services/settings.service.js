@@ -21,9 +21,9 @@ const DEFAULTS = {
   tiktokUrl: "",
   youtubeUrl: "",
   footerText: "A curious little alley of everyday magic — electronics, fashion, home and more.",
-  metaTitle: "Diagon Store — Every curious find, in one enchanted alley",
+  metaTitle: "Diagon Store — Online Shopping in Sri Lanka, Cash on Delivery",
   metaDescription:
-    "Shop electronics, fashion, home & living, beauty and accessories at Diagon Store. Order on WhatsApp or email, pay on delivery.",
+    "Shop electronics, mobile accessories, fashion, beauty and home goods online at Diagon Store. Island-wide delivery in Sri Lanka: order on WhatsApp and pay cash on delivery.",
 };
 
 let cache = null;
